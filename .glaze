@@ -1,0 +1,61 @@
+session "Session One" {
+  window "Window One" {
+    layout = "even-horizontal"
+
+    options = {
+      "main-pain-width" = 50
+    }
+
+    pane "Terminal" {
+      focus = true
+    }
+
+    pane "Logs" {
+      commands = [
+        "tail -f /var/log/syslog"
+      ]
+    }
+
+    pane "Editor" {
+      commands = [
+        "vim"
+      ]
+    }
+  }
+
+  window "Window Two" {
+    layout = "tiled"
+    focus  = true
+
+    options = {
+      "main-pain-width" = 50
+    }
+
+    pane "One" {
+      focus = true
+
+      commands = [
+        "echo 'One'",
+        "echo 'Another One'"
+      ]
+    }
+
+    pane "Two" {
+      commands = [
+        "echo 'Two'"
+      ]
+    }
+
+    pane "Three" {
+      commands = [
+        "echo 'Two'"
+      ]
+    }
+
+    pane "Four" {
+      commands = [
+        "echo 'Four'"
+      ]
+    }
+  }
+}
