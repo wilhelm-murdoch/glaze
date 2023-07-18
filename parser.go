@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hcldec"
 	"github.com/hashicorp/hcl/v2/hclparse"
-	"github.com/zclconf/go-cty/cty"
+	"github.com/wilhelm-murdoch/glaze/models"
 )
 
 type Parser struct {
@@ -34,14 +34,31 @@ func (p *Parser) Open(path string) {
 	}
 }
 
-func (p *Parser) Decode(s hcldec.Spec) cty.Value {
+func (p *Parser) Decode(s hcldec.Spec) []*models.Session {
 	decoded, diags := hcldec.Decode(p.File.Body, s, nil)
 	if diags.HasErrors() {
 		p.diags = p.diags.Extend(diags)
-		return cty.NilVal
+		return nil
 	}
 
-	return decoded
+	var sessions []*models.Session
+
+	it := decoded.ElementIterator()
+	for it.Next() {
+		_, value := it.Element()
+
+		session := new(models.Session)
+		diags := session.Decode(value)
+
+		if diags.HasErrors() {
+			p.diags = diags.Extend(diags)
+			continue
+		}
+
+		sessions = append(sessions, session)
+	}
+
+	return sessions
 }
 
 func (p *Parser) AppendDiag(diag *hcl.Diagnostic) {

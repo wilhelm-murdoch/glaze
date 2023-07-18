@@ -35,9 +35,9 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           goos: ${{ matrix.goos }}
           goarch: ${{ matrix.goarch }}
-          project_path: "./cmd/otto"
-          binary_name: "otto"
+          project_path: "./cmd/glaze"
+          binary_name: "glaze"
           ldflags: "-s -w -X main.Version=${{ github.ref_name }} -X main.Stage=production -X main.Commit=${{ github.sha	}} -X main.Date=${{ steps.date.outputs.date }}"
           build_flags: "-a -installsuffix cgo"
           extra_files: LICENSE.md README.md
-          asset_name: "otto-${{ matrix.goos }}-${{ matrix.goarch }}"
+          asset_name: "glaze-${{ matrix.goos }}-${{ matrix.goarch }}"
