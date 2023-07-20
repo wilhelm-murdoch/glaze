@@ -9,26 +9,25 @@ import (
 )
 
 func ActionFmt(profilePath string) error {
-	p := glaze.NewParser()
-	p.Open(profilePath)
+	parser := glaze.NewParser(profilePath)
 
-	if p.HasErrors() {
-		p.WriteDiags()
+	if parser.HasErrors() {
+		parser.WriteDiags()
 		return nil
 	}
 
-	formatted := string(hclwrite.Format(p.File.Bytes))
+	formatted := string(hclwrite.Format(parser.File.Bytes))
 
 	if err := os.WriteFile(profilePath, []byte(formatted), 0644); err != nil {
-		p.AppendDiag(&hcl.Diagnostic{
+		parser.AppendDiag(&hcl.Diagnostic{
 			Severity: hcl.DiagError,
 			Summary:  "Failed to write file",
 			Detail:   err.Error(),
 		})
 	}
 
-	if p.HasErrors() {
-		p.WriteDiags()
+	if parser.HasErrors() {
+		parser.WriteDiags()
 		return nil
 	}
 

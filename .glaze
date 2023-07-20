@@ -1,4 +1,6 @@
 session "Session One" {
+  reattach_on_start = false
+
   window "Window One" {
     layout = "even-horizontal"
 

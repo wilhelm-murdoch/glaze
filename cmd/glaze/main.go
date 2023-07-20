@@ -4,10 +4,15 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"time"
 
 	"github.com/urfave/cli/v2"
 	"github.com/wilhelm-murdoch/glaze/cmd/glaze/actions"
+)
+
+const (
+	TmuxBinaryName = "tmux"
 )
 
 var (
@@ -53,23 +58,40 @@ func main() {
 			Email: "wilhelm@devilmayco.de",
 		}},
 		Copyright: fmt.Sprintf(`(c) %d Wilhelm Codes ( https://wilhelm.codes )`, currentYear),
+		Before: func(ctx *cli.Context) error {
+			_, err := exec.LookPath(TmuxBinaryName)
+			if err != nil {
+				return err
+			}
+			return nil
+		},
 		Commands: []*cli.Command{{
-			Name:  "apply",
+			Name:  "up",
 			Usage: "apply the specified glaze profile",
-			Action: func(c *cli.Context) error {
-				return actions.ActionApply(c.Args().First())
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:  "socket-path",
+					Value: "",
+					Usage: "optional path to the tmux socket",
+				},
+				&cli.StringFlag{
+					Name:  "socket-name",
+					Value: "",
+					Usage: "optional name for the tmux socket",
+				},
 			},
+			Action: actions.ActionUp,
 		}, {
 			Name:  "fmt",
 			Usage: "rewrites the target glaze profile file to a canonical format",
-			Action: func(c *cli.Context) error {
-				return actions.ActionFmt(c.Args().First())
+			Action: func(ctx *cli.Context) error {
+				return actions.ActionFmt(ctx.Args().First())
 			},
 		}, {
 			Name:  "save",
 			Usage: "running this within a tmux session will save its current state to the specified glaze profile",
-			Action: func(c *cli.Context) error {
-				return actions.ActionSave(c.Args().First())
+			Action: func(ctx *cli.Context) error {
+				return actions.ActionSave(ctx.Args().First())
 			},
 		}},
 	}

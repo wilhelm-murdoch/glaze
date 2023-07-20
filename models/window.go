@@ -2,6 +2,7 @@ package models
 
 import (
 	"github.com/hashicorp/hcl/v2"
+	"github.com/wilhelm-murdoch/go-collection"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
 )
@@ -10,8 +11,8 @@ type Window struct {
 	Name    string
 	Layout  string
 	Focus   bool
-	Options []Option
-	Panes   []Pane
+	Options collection.Collection[*Option]
+	Panes   collection.Collection[*Pane]
 }
 
 func (w *Window) Decode(value cty.Value) hcl.Diagnostics {
@@ -43,7 +44,7 @@ func (w *Window) Decode(value cty.Value) hcl.Diagnostics {
 					continue
 				}
 
-				w.Panes = append(w.Panes, *pane)
+				w.Panes.Push(pane)
 			}
 		}
 	}

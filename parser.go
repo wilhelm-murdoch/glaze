@@ -16,49 +16,41 @@ type Parser struct {
 	diagsWriter hcl.DiagnosticWriter
 }
 
-func NewParser() *Parser {
+func NewParser(path string) *Parser {
+	parser := hclparse.NewParser()
+	file, diags := parser.ParseHCLFile(path)
+
 	return &Parser{
-		parser: hclparse.NewParser(),
+		parser:      parser,
+		File:        file,
+		diags:       diags,
+		diagsWriter: hcl.NewDiagnosticTextWriter(os.Stdout, map[string]*hcl.File{path: file}, 78, true),
 	}
 }
 
-func (p *Parser) Open(path string) {
-	file, diags := p.parser.ParseHCLFile(path)
+func (p *Parser) Decode(s hcldec.Spec) *models.Session {
+	var session *models.Session
 
-	p.File = file
-	p.diagsWriter = hcl.NewDiagnosticTextWriter(os.Stdout, map[string]*hcl.File{path: p.File}, 78, true)
-
-	if diags.HasErrors() {
-		p.diags = p.diags.Extend(diags)
-		return
-	}
-}
-
-func (p *Parser) Decode(s hcldec.Spec) []*models.Session {
 	decoded, diags := hcldec.Decode(p.File.Body, s, nil)
 	if diags.HasErrors() {
 		p.diags = p.diags.Extend(diags)
-		return nil
+		return session
 	}
-
-	var sessions []*models.Session
 
 	it := decoded.ElementIterator()
 	for it.Next() {
 		_, value := it.Element()
 
-		session := new(models.Session)
+		session = new(models.Session)
 		diags := session.Decode(value)
 
 		if diags.HasErrors() {
 			p.diags = diags.Extend(diags)
 			continue
 		}
-
-		sessions = append(sessions, session)
 	}
 
-	return sessions
+	return session
 }
 
 func (p *Parser) AppendDiag(diag *hcl.Diagnostic) {

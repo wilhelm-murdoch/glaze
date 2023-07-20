@@ -5,13 +5,16 @@ go 1.20
 require (
 	github.com/hashicorp/hcl/v2 v2.17.0
 	github.com/urfave/cli/v2 v2.25.7
+	github.com/wilhelm-murdoch/go-collection v1.0.10
 	github.com/zclconf/go-cty v1.13.2
 )
 
 require (
 	github.com/google/go-cmp v0.3.1 // indirect
+	github.com/k0kubun/colorstring v0.0.0-20150214042306-9440f1994b88 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.16 // indirect
+	github.com/stretchr/testify v1.8.4 // indirect
 	golang.org/x/sys v0.0.0-20220811171246-fbc7d0a398ab // indirect
 )
 
