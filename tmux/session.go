@@ -41,11 +41,12 @@ func (s Session) NewWindow(windowName string) (Window, error) {
 	}
 
 	return Window{
-		Id:       id,
-		Index:    index,
-		Name:     parts[2],
-		Layout:   parts[3],
-		IsActive: parts[4] == "1",
+		Id:        id,
+		Index:     index,
+		Name:      parts[2],
+		Layout:    parts[3],
+		IsActive:  parts[4] == "1",
+		SessionId: s.Id,
 	}, nil
 }
 

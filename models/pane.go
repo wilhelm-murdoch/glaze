@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/hashicorp/hcl/v2"
+	"github.com/wilhelm-murdoch/glaze/tmux"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
 )
@@ -13,7 +14,7 @@ type Pane struct {
 	Split             string
 	StartingDirectory string
 	Commands          []string
-	Focus             bool
+	IsActive          bool
 }
 
 func (p *Pane) Decode(value cty.Value) hcl.Diagnostics {
@@ -24,13 +25,13 @@ func (p *Pane) Decode(value cty.Value) hcl.Diagnostics {
 	}
 
 	if !value.GetAttr("focus").IsNull() {
-		gocty.FromCtyValue(value.GetAttr("focus"), &p.Focus)
+		gocty.FromCtyValue(value.GetAttr("focus"), &p.IsActive)
 	}
 
 	if !value.GetAttr("split").IsNull() {
 		p.Split = value.GetAttr("split").AsString()
 	} else {
-		p.Split = "horizontal"
+		p.Split = tmux.SplitVertical
 	}
 
 	if !value.GetAttr("starting_directory").IsNull() {

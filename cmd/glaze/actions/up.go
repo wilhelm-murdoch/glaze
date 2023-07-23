@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
-	"github.com/k0kubun/pp"
 	"github.com/urfave/cli/v2"
 	"github.com/wilhelm-murdoch/glaze"
 	"github.com/wilhelm-murdoch/glaze/models"
@@ -74,11 +74,20 @@ func ActionUp(ctx *cli.Context) error {
 
 		w.Panes.Each(func(i int, p *models.Pane) bool {
 			pane, err := window.Split(p.Name, p.Split, p.StartingDirectory)
-			pp.Print(pane, err)
+			if err != nil {
+				outerErr = err
+				return true
+			}
+
+			for _, cmd := range p.Commands {
+				time.Sleep(time.Millisecond * time.Duration(100))
+				pane.SendKeys(cmd)
+			}
+
 			return false
 		})
 
-		return false
+		return outerErr != nil
 	})
 
 	if outerErr != nil {
@@ -103,53 +112,6 @@ func ActionUp(ctx *cli.Context) error {
 	if err := client.Attach(session); err != nil {
 		return err
 	}
-
-	// if t.SessionExists(profile.Name) && !profile.ReattachOnStart {
-	// 	if _, err := t.KillSession(profile.Name); err != nil {
-	// 		return err
-	// 	}
-
-	// 	if _, err := t.NewSession(profile.Name, profile.StartingDirectory); err != nil {
-	// 		return err
-	// 	}
-	// } else if !t.SessionExists(profile.Name) {
-	// 	if _, err := t.NewSession(profile.Name, profile.StartingDirectory); err != nil {
-	// 		return err
-	// 	}
-	// }
-
-	// every new window starts with a single pane
-	//  - find new pane index
-	//  - rename pane
-	//
-	// create new panes by splitting the target window
-	// var err error
-	// profile.Windows.Each(func(i int, w *models.Window) bool {
-	// 	o, _ := t.NewWindow(w.Name)
-	// 	fmt.Println(o)
-	// 	return false
-	// })
-
-	// if err != nil {
-	// 	return err
-	// }
-
-	// if _, err := t.AttachToSession(profile.Name); err != nil {
-	// 	return err
-	// }
-	// sessions, _ := t.Sessions()
-
-	// for _, session := range sessions {
-	// 	fmt.Println("Session Name:", session.Name)
-	// 	windows, _ := t.Windows(session)
-	// 	for _, window := range windows {
-	// 		fmt.Println("... Window Name:", window.Name)
-	// 		panes, _ := t.Panes(window)
-	// 		for _, pane := range panes {
-	// 			fmt.Println("... ... Pane Name:", pane.Id, pane.Name)
-	// 		}
-	// 	}
-	// }
 
 	return nil
 }

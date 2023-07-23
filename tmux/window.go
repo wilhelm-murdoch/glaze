@@ -6,11 +6,12 @@ import (
 )
 
 type Window struct {
-	Id       int
-	Index    int
-	Name     string
-	Layout   string
-	IsActive bool
+	Id        int
+	Index     int
+	Name      string
+	Layout    string
+	IsActive  bool
+	SessionId int
 }
 
 func (w Window) Split(name, splitType, StartingDirectory string) (Pane, error) {
@@ -55,7 +56,13 @@ func (w Window) Split(name, splitType, StartingDirectory string) (Pane, error) {
 		Name:              name,
 		StartingDirectory: StartingDirectory,
 		IsActive:          parts[3] == "1",
+		WindowId:          w.Id,
+		SessionId:         w.SessionId,
 	}, nil
+}
+
+func (w Window) Reindex() error {
+	return nil
 }
 
 func (w Window) Kill() error {
