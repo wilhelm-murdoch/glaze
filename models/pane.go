@@ -1,15 +1,19 @@
 package models
 
 import (
+	"os"
+
 	"github.com/hashicorp/hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
 )
 
 type Pane struct {
-	Name     string
-	Commands []string
-	Focus    bool
+	Name              string
+	Split             string
+	StartingDirectory string
+	Commands          []string
+	Focus             bool
 }
 
 func (p *Pane) Decode(value cty.Value) hcl.Diagnostics {
@@ -21,6 +25,20 @@ func (p *Pane) Decode(value cty.Value) hcl.Diagnostics {
 
 	if !value.GetAttr("focus").IsNull() {
 		gocty.FromCtyValue(value.GetAttr("focus"), &p.Focus)
+	}
+
+	if !value.GetAttr("split").IsNull() {
+		p.Split = value.GetAttr("split").AsString()
+	} else {
+		p.Split = "horizontal"
+	}
+
+	if !value.GetAttr("starting_directory").IsNull() {
+		p.StartingDirectory = value.GetAttr("starting_directory").AsString()
+	} else {
+		if pwd, err := os.Getwd(); err == nil {
+			p.StartingDirectory = pwd
+		}
 	}
 
 	if !value.GetAttr("commands").IsNull() {

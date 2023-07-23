@@ -1,62 +1,28 @@
-session "Session One" {
+session "Glaze" {
   reattach_on_start = false
 
-  window "Window One" {
-    layout = "even-horizontal"
-
-    options = {
-      "main-pain-width" = 50
-    }
+  window "Workspace" {
+    layout = "tiled"
+    starting_directory = "~/Development/github/wilhelm-murdoch/glaze"
 
     pane "Terminal" {
+      split = "vertical"
       focus = true
     }
 
-    pane "Logs" {
+    pane "Watcher" {
+      split = "vertical"
+      starting_directory = "~/Development/github/wilhelm-murdoch/glaze/cmd/glaze/"
       commands = [
-        "tail -f /var/log/syslog"
+        "fswatch -or ../../ | xargs -n1 -I{} go run main.go up ../../.glaze"
       ]
     }
 
-    pane "Editor" {
+    pane "Tester" {
+      split = "vertical"
+      starting_directory = "~/Development/github/wilhelm-murdoch/glaze/"
       commands = [
-        "vim"
-      ]
-    }
-  }
-
-  window "Window Two" {
-    layout = "tiled"
-    focus  = true
-
-    options = {
-      "main-pain-width" = 50
-    }
-
-    pane "One" {
-      focus = true
-
-      commands = [
-        "echo 'One'",
-        "echo 'Another One'"
-      ]
-    }
-
-    pane "Two" {
-      commands = [
-        "echo 'Two'"
-      ]
-    }
-
-    pane "Three" {
-      commands = [
-        "echo 'Two'"
-      ]
-    }
-
-    pane "Four" {
-      commands = [
-        "echo 'Four'"
+        "fswatch -or . | xargs -n1 -I{} go test"
       ]
     }
   }

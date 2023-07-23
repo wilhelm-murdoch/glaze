@@ -34,7 +34,7 @@ var (
 				},
 				Func: func(value cty.Value) hcl.Diagnostics {
 					if !value.IsNull() {
-						fileInfo, err := os.Stat(value.AsString())
+						fileInfo, err := os.Stat(tmux.ExpandPath(value.AsString()))
 						if err != nil || errors.Is(err, fs.ErrNotExist) || !fileInfo.IsDir() {
 							return hcl.Diagnostics{{
 								Severity: hcl.DiagError,
@@ -60,9 +60,28 @@ var (
 						Type: cty.Bool,
 					},
 					"options": &hcldec.AttrSpec{
-						Name:     "options",
-						Type:     cty.Map(cty.String),
-						Required: true,
+						Name: "options",
+						Type: cty.Map(cty.String),
+					},
+					"starting_directory": &hcldec.ValidateSpec{
+						Wrapped: &hcldec.AttrSpec{
+							Name: "starting_directory",
+							Type: cty.String,
+						},
+						Func: func(value cty.Value) hcl.Diagnostics {
+							if !value.IsNull() {
+								fileInfo, err := os.Stat(tmux.ExpandPath(value.AsString()))
+								if err != nil || errors.Is(err, fs.ErrNotExist) || !fileInfo.IsDir() {
+									return hcl.Diagnostics{{
+										Severity: hcl.DiagError,
+										Summary:  `Invalid starting directory specified`,
+										Detail:   fmt.Sprintf(`The starting directory "%s" does not exist or is not a directory`, value.AsString()),
+									}}
+								}
+							}
+
+							return nil
+						},
 					},
 					"layout": &hcldec.ValidateSpec{
 						Wrapped: &hcldec.AttrSpec{
@@ -70,7 +89,7 @@ var (
 							Type: cty.String,
 						},
 						Func: func(value cty.Value) hcl.Diagnostics {
-							if !tmux.LayoutExists(value.AsString()) {
+							if !tmux.Contains(tmux.LayoutList, value.AsString()) {
 								return hcl.Diagnostics{{
 									Severity: hcl.DiagError,
 									Summary:  `Invalid layout specified`,
@@ -92,6 +111,43 @@ var (
 							"focus": &hcldec.AttrSpec{
 								Name: "focus",
 								Type: cty.Bool,
+							},
+							"split": &hcldec.ValidateSpec{
+								Wrapped: &hcldec.AttrSpec{
+									Name: "split",
+									Type: cty.String,
+								},
+								Func: func(value cty.Value) hcl.Diagnostics {
+									if !tmux.Contains(tmux.SplitList, value.AsString()) {
+										return hcl.Diagnostics{{
+											Severity: hcl.DiagError,
+											Summary:  `Invalid split specified`,
+											Detail:   fmt.Sprintf(`The split of "%s" is not supported among: %s`, value.AsString(), strings.Join(tmux.SplitList, ", ")),
+										}}
+									}
+
+									return nil
+								},
+							},
+							"starting_directory": &hcldec.ValidateSpec{
+								Wrapped: &hcldec.AttrSpec{
+									Name: "starting_directory",
+									Type: cty.String,
+								},
+								Func: func(value cty.Value) hcl.Diagnostics {
+									if !value.IsNull() {
+										fileInfo, err := os.Stat(tmux.ExpandPath(value.AsString()))
+										if err != nil || errors.Is(err, fs.ErrNotExist) || !fileInfo.IsDir() {
+											return hcl.Diagnostics{{
+												Severity: hcl.DiagError,
+												Summary:  `Invalid starting directory specified`,
+												Detail:   fmt.Sprintf(`The starting directory "%s" does not exist or is not a directory`, value.AsString()),
+											}}
+										}
+									}
+
+									return nil
+								},
 							},
 							"commands": &hcldec.AttrSpec{
 								Name: "commands",
