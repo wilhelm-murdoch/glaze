@@ -8,13 +8,16 @@ session "Glaze" {
     pane "Terminal" {
       split = "vertical"
       focus = true
+      commands = [
+        "echo \"Starting...\"",
+      ]
     }
 
     pane "Watcher" {
-      split = "vertical"
+      split = "horizontal"
       starting_directory = "~/Development/github/wilhelm-murdoch/glaze/cmd/glaze/"
       commands = [
-        "fswatch -or ../../ | xargs -n1 -I{} go run main.go up ../../.glaze"
+        "echo \"Watching...\"",
       ]
     }
 
@@ -22,7 +25,7 @@ session "Glaze" {
       split = "vertical"
       starting_directory = "~/Development/github/wilhelm-murdoch/glaze/"
       commands = [
-        "fswatch -or . | xargs -n1 -I{} go test"
+        "echo \"Testing...\"",
       ]
     }
   }

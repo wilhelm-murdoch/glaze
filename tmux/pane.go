@@ -12,10 +12,33 @@ type Pane struct {
 	SessionId         int
 }
 
+func (p Pane) Target() string {
+	return fmt.Sprintf(`$%d:@%d.%%%d`, p.SessionId, p.WindowId, p.Id)
+}
+
 func (p Pane) SendKeys(keys string) error {
-	return Exec("send", "-t", fmt.Sprintf(`%d:%d.%d`, p.SessionId, p.WindowId, p.Index), keys, "Enter")
+	cmd, err := NewCommand("send", "-t", p.Target(), keys, "Enter")
+	if err != nil {
+		return err
+	}
+
+	return cmd.Exec()
 }
 
 func (p Pane) SetEnv(key string, value string) error {
-	return Exec("setenv", "-t", p.Name, key, value)
+	cmd, err := NewCommand("setenv", "-t", p.Name, key, value)
+	if err != nil {
+		return err
+	}
+
+	return cmd.Exec()
+}
+
+func (p Pane) Kill() error {
+	cmd, err := NewCommand("kill-pane", "-t", p.Target())
+	if err != nil {
+		return err
+	}
+
+	return cmd.Exec()
 }

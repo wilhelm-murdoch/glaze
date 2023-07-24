@@ -67,11 +67,6 @@ func ActionUp(ctx *cli.Context) error {
 			return true
 		}
 
-		if err := window.SelectLayout(w.Layout); err != nil {
-			outerErr = err
-			return true
-		}
-
 		w.Panes.Each(func(i int, p *models.Pane) bool {
 			pane, err := window.Split(p.Name, p.Split, p.StartingDirectory)
 			if err != nil {
@@ -86,6 +81,11 @@ func ActionUp(ctx *cli.Context) error {
 
 			return false
 		})
+
+		if err := window.SelectLayout(w.Layout); err != nil {
+			outerErr = err
+			return true
+		}
 
 		return outerErr != nil
 	})
@@ -103,11 +103,32 @@ func ActionUp(ctx *cli.Context) error {
 	windows.Each(func(i int, w tmux.Window) bool {
 		if w.Index == 0 {
 			w.Kill()
-			return true
+		} else {
+
+			panes, err := client.Panes(w)
+
+			if err != nil {
+				outerErr = err
+				return true
+			}
+
+			panes.Each(func(i int, p tmux.Pane) bool {
+				if p.Index == 0 {
+					fmt.Println("sups")
+					p.Kill()
+					return true
+				}
+
+				return false
+			})
 		}
 
 		return false
 	})
+
+	if outerErr != nil {
+		return outerErr
+	}
 
 	if err := client.Attach(session); err != nil {
 		return err

@@ -29,12 +29,17 @@ func (c *Client) Attach(session Session) error {
 	var args []string
 
 	if !IsInsideTmux() {
-		args = append(args, "attach-session", "-t", session.Name)
+		args = append(args, "attach-session", "-t", session.Target())
 	} else {
-		args = append(args, "switch-client", "-t", session.Name)
+		args = append(args, "switch-client", "-t", session.Target())
 	}
 
-	if err := Exec(args...); err != nil {
+	cmd, err := NewCommand(args...)
+	if err != nil {
+		return err
+	}
+
+	if err := cmd.Exec(); err != nil {
 		if strings.Contains(err.Error(), "can't find session") {
 			return fmt.Errorf(`session "%s" not found`, session.Name)
 		}
@@ -50,8 +55,18 @@ func (c *Client) Attach(session Session) error {
 func (c Client) Sessions() (collection.Collection[Session], error) {
 	var sessions collection.Collection[Session]
 
-	output, err := ExecWithOutput("ls", "-F", "#{session_id};#{session_name};#{session_path}")
+	format := []string{
+		"#{session_id}",
+		"#{session_name}",
+		"#{session_path}",
+	}
 
+	cmd, err := NewCommand("ls", "-F", strings.Join(format, ";"))
+	if err != nil {
+		return sessions, err
+	}
+
+	output, err := cmd.ExecWithOutput()
 	if err != nil {
 		return sessions, err
 	}
@@ -85,7 +100,12 @@ func (c Client) Windows(session Session) (collection.Collection[Window], error) 
 		"#{window_active}",
 	}
 
-	output, err := ExecWithOutput("list-windows", "-F", strings.Join(format, ";"), "-t", session.Name)
+	cmd, err := NewCommand("list-windows", "-F", strings.Join(format, ";"), "-t", session.Target())
+	if err != nil {
+		return windows, err
+	}
+
+	output, err := cmd.ExecWithOutput()
 	if err != nil {
 		return windows, err
 	}
@@ -126,7 +146,12 @@ func (c Client) Panes(window Window) (collection.Collection[Pane], error) {
 		"#{pane_current_path}",
 	}
 
-	output, err := ExecWithOutput("list-panes", "-F", strings.Join(format, ";"), "-t", window.Name)
+	cmd, err := NewCommand("list-panes", "-F", strings.Join(format, ";"), "-t", window.Target())
+	if err != nil {
+		return panes, err
+	}
+
+	output, err := cmd.ExecWithOutput()
 	if err != nil {
 		return panes, err
 	}
@@ -159,7 +184,12 @@ func (c Client) Panes(window Window) (collection.Collection[Pane], error) {
 func (c Client) NewSession(sessionName, startingDirectory string) (Session, error) {
 	var session Session
 
-	if err := Exec("new", "-d", "-s", sessionName, "-c", startingDirectory); err != nil {
+	cmd, err := NewCommand("new", "-d", "-s", sessionName, "-c", startingDirectory)
+	if err != nil {
+		return session, err
+	}
+
+	if err := cmd.Exec(); err != nil {
 		return session, err
 	}
 
@@ -187,10 +217,17 @@ func (c Client) KillSessionByName(sessionName string) error {
 		return fmt.Errorf(`session "%s" not found`, sessionName)
 	}
 
-	return Exec("kill-session", "-t", found.Name)
+	cmd, err := NewCommand("kill-session", "-t", found.Target())
+	if err != nil {
+		return err
+	}
+
+	return cmd.Exec()
 }
 
 func (c Client) SessionExists(name string) bool {
-	output, err := ExecWithOutput("has-session", "-t", name)
-	return output == "" && err == nil
+	sessions, _ := c.Sessions()
+	return sessions.Find(func(i int, s Session) bool {
+		return s.Name == name
+	}) != (Session{})
 }

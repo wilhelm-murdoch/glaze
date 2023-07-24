@@ -1,6 +1,7 @@
 package tmux
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 )
@@ -12,6 +13,10 @@ type Window struct {
 	Layout    string
 	IsActive  bool
 	SessionId int
+}
+
+func (w Window) Target() string {
+	return fmt.Sprintf(`$%d:@%d`, w.SessionId, w.Id)
 }
 
 func (w Window) Split(name, splitType, StartingDirectory string) (Pane, error) {
@@ -29,7 +34,12 @@ func (w Window) Split(name, splitType, StartingDirectory string) (Pane, error) {
 		splitTypeFlag = "-v"
 	}
 
-	output, err := ExecWithOutput("splitw", splitTypeFlag, "-Pd", "-t", w.Name, "-c", StartingDirectory, "-F", strings.Join(format, ";"))
+	cmd, err := NewCommand("splitw", splitTypeFlag, "-Pd", "-t", w.Name, "-c", StartingDirectory, "-F", strings.Join(format, ";"))
+	if err != nil {
+		return pane, err
+	}
+
+	output, err := cmd.ExecWithOutput()
 	if err != nil {
 		return pane, err
 	}
@@ -46,7 +56,12 @@ func (w Window) Split(name, splitType, StartingDirectory string) (Pane, error) {
 		return pane, err
 	}
 
-	if err = Exec("selectp", "-T", name, "-t", parts[0]); err != nil {
+	cmd, err = NewCommand("selectp", "-T", name, "-t", parts[0])
+	if err != nil {
+		return pane, err
+	}
+
+	if err = cmd.Exec(); err != nil {
 		return pane, err
 	}
 
@@ -66,9 +81,19 @@ func (w Window) Reindex() error {
 }
 
 func (w Window) Kill() error {
-	return Exec("kill-window", "-t", w.Name)
+	cmd, err := NewCommand("kill-window", "-t", w.Target())
+	if err != nil {
+		return err
+	}
+
+	return cmd.Exec()
 }
 
 func (w Window) SelectLayout(layout string) error {
-	return Exec("selectl", "-t", w.Name, layout)
+	cmd, err := NewCommand("selectl", "-t", w.Target(), layout)
+	if err != nil {
+		return err
+	}
+
+	return cmd.Exec()
 }

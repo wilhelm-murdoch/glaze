@@ -12,6 +12,10 @@ type Session struct {
 	StartingDirectory string
 }
 
+func (s Session) Target() string {
+	return fmt.Sprintf(`$%d`, s.Id)
+}
+
 func (s Session) NewWindow(windowName string) (Window, error) {
 	var window Window
 
@@ -23,7 +27,12 @@ func (s Session) NewWindow(windowName string) (Window, error) {
 		"#{window_active}",
 	}
 
-	output, err := ExecWithOutput("neww", "-d", "-t", fmt.Sprintf("%s:", s.Name), "-n", windowName, "-F", strings.Join(format, ";"), "-P")
+	cmd, err := NewCommand("neww", "-d", "-t", fmt.Sprintf("%s:", s.Name), "-n", windowName, "-F", strings.Join(format, ";"), "-P")
+	if err != nil {
+		return window, err
+	}
+
+	output, err := cmd.ExecWithOutput()
 	if err != nil {
 		return window, err
 	}
@@ -51,5 +60,10 @@ func (s Session) NewWindow(windowName string) (Window, error) {
 }
 
 func (s Session) Kill() error {
-	return Exec("kill-session", "-t", s.Name)
+	cmd, err := NewCommand("kill-session", "-t", s.Target())
+	if err != nil {
+		return err
+	}
+
+	return cmd.Exec()
 }
