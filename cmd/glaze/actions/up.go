@@ -90,44 +90,33 @@ func ActionUp(ctx *cli.Context) error {
 		return outerErr != nil
 	})
 
-	if outerErr != nil {
-		return outerErr
-	}
-
 	windows, err := client.Windows(session)
 	if err != nil {
 		return err
 	}
 
-	// Kill the first window and associated pane.
-	windows.Each(func(i int, w tmux.Window) bool {
-		if w.Index == 0 {
-			w.Kill()
-		} else {
+	if window, found := windows.At(0); found {
+		if err := window.Kill(); err != nil {
+			return err
+		}
 
+		windows.Shift()
+
+		windows.Each(func(i int, w *tmux.Window) bool {
 			panes, err := client.Panes(w)
-
 			if err != nil {
-				outerErr = err
 				return true
 			}
 
-			panes.Each(func(i int, p tmux.Pane) bool {
-				if p.Index == 0 {
-					fmt.Println("sups")
-					p.Kill()
+			if pane, found := panes.At(0); found {
+				if err := pane.Kill(); err != nil {
 					return true
 				}
 
-				return false
-			})
-		}
-
-		return false
-	})
-
-	if outerErr != nil {
-		return outerErr
+				panes.Shift()
+			}
+			return false
+		})
 	}
 
 	if err := client.Attach(session); err != nil {

@@ -11,7 +11,7 @@ import (
 type Client struct {
 	socketPath     string
 	socketName     string
-	CurrentSession Session
+	CurrentSession *Session
 }
 
 func NewClient() Client {
@@ -25,7 +25,7 @@ func NewClientWithSocket(socketPath string, socketName string) Client {
 	}
 }
 
-func (c *Client) Attach(session Session) error {
+func (c *Client) Attach(session *Session) error {
 	var args []string
 
 	if !IsInsideTmux() {
@@ -52,8 +52,8 @@ func (c *Client) Attach(session Session) error {
 	return nil
 }
 
-func (c Client) Sessions() (collection.Collection[Session], error) {
-	var sessions collection.Collection[Session]
+func (c Client) Sessions() (collection.Collection[*Session], error) {
+	var sessions collection.Collection[*Session]
 
 	format := []string{
 		"#{session_id}",
@@ -79,7 +79,7 @@ func (c Client) Sessions() (collection.Collection[Session], error) {
 			return sessions, err
 		}
 
-		sessions.Push(Session{
+		sessions.Push(&Session{
 			Id:                id,
 			Name:              strings.TrimSpace(parts[1]),
 			StartingDirectory: strings.TrimSpace(parts[2]),
@@ -89,8 +89,8 @@ func (c Client) Sessions() (collection.Collection[Session], error) {
 	return sessions, err
 }
 
-func (c Client) Windows(session Session) (collection.Collection[Window], error) {
-	var windows collection.Collection[Window]
+func (c Client) Windows(session *Session) (collection.Collection[*Window], error) {
+	var windows collection.Collection[*Window]
 
 	format := []string{
 		"#{window_id}",
@@ -123,20 +123,21 @@ func (c Client) Windows(session Session) (collection.Collection[Window], error) 
 			return windows, err
 		}
 
-		windows.Push(Window{
+		windows.Push(&Window{
 			Id:       id,
 			Index:    index,
 			Name:     parts[2],
 			Layout:   parts[3],
 			IsActive: parts[4] == "1",
+			Session:  session,
 		})
 	}
 
 	return windows, nil
 }
 
-func (c Client) Panes(window Window) (collection.Collection[Pane], error) {
-	var panes collection.Collection[Pane]
+func (c Client) Panes(window *Window) (collection.Collection[*Pane], error) {
+	var panes collection.Collection[*Pane]
 
 	format := []string{
 		"#{pane_id}",
@@ -169,20 +170,22 @@ func (c Client) Panes(window Window) (collection.Collection[Pane], error) {
 			return panes, err
 		}
 
-		panes.Push(Pane{
+		panes.Push(&Pane{
 			Id:                id,
 			Index:             index,
 			Name:              parts[2],
 			StartingDirectory: parts[4],
 			IsActive:          parts[3] == "1",
+			Window:            window,
+			Session:           window.Session,
 		})
 	}
 
 	return panes, nil
 }
 
-func (c Client) NewSession(sessionName, startingDirectory string) (Session, error) {
-	var session Session
+func (c Client) NewSession(sessionName, startingDirectory string) (*Session, error) {
+	var session *Session
 
 	cmd, err := NewCommand("new", "-d", "-s", sessionName, "-c", startingDirectory)
 	if err != nil {
@@ -198,7 +201,7 @@ func (c Client) NewSession(sessionName, startingDirectory string) (Session, erro
 		return session, err
 	}
 
-	return sessions.Find(func(i int, s Session) bool {
+	return sessions.Find(func(i int, s *Session) bool {
 		return s.Name == sessionName
 	}), nil
 }
@@ -209,11 +212,11 @@ func (c Client) KillSessionByName(sessionName string) error {
 		return err
 	}
 
-	found := sessions.Find(func(i int, s Session) bool {
+	found := sessions.Find(func(i int, s *Session) bool {
 		return s.Name == sessionName
 	})
 
-	if found == (Session{}) {
+	if found == nil {
 		return fmt.Errorf(`session "%s" not found`, sessionName)
 	}
 
@@ -227,7 +230,7 @@ func (c Client) KillSessionByName(sessionName string) error {
 
 func (c Client) SessionExists(name string) bool {
 	sessions, _ := c.Sessions()
-	return sessions.Find(func(i int, s Session) bool {
+	return sessions.Find(func(i int, s *Session) bool {
 		return s.Name == name
-	}) != (Session{})
+	}) != nil
 }

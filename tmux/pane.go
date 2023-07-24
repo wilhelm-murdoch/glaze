@@ -8,12 +8,12 @@ type Pane struct {
 	Name              string
 	StartingDirectory string
 	IsActive          bool
-	WindowId          int
-	SessionId         int
+	Window            *Window
+	Session           *Session
 }
 
 func (p Pane) Target() string {
-	return fmt.Sprintf(`$%d:@%d.%%%d`, p.SessionId, p.WindowId, p.Id)
+	return fmt.Sprintf(`%s:@%d.%%%d`, p.Session.Name, p.Window.Id, p.Id)
 }
 
 func (p Pane) SendKeys(keys string) error {

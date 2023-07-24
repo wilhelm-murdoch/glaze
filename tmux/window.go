@@ -7,19 +7,19 @@ import (
 )
 
 type Window struct {
-	Id        int
-	Index     int
-	Name      string
-	Layout    string
-	IsActive  bool
-	SessionId int
+	Id       int
+	Index    int
+	Name     string
+	Layout   string
+	IsActive bool
+	Session  *Session
 }
 
 func (w Window) Target() string {
-	return fmt.Sprintf(`$%d:@%d`, w.SessionId, w.Id)
+	return fmt.Sprintf(`%s:@%d`, w.Session.Name, w.Id)
 }
 
-func (w Window) Split(name, splitType, StartingDirectory string) (Pane, error) {
+func (w *Window) Split(name, splitType, StartingDirectory string) (Pane, error) {
 	var pane Pane
 
 	format := []string{
@@ -71,8 +71,8 @@ func (w Window) Split(name, splitType, StartingDirectory string) (Pane, error) {
 		Name:              name,
 		StartingDirectory: StartingDirectory,
 		IsActive:          parts[3] == "1",
-		WindowId:          w.Id,
-		SessionId:         w.SessionId,
+		Window:            w,
+		Session:           w.Session,
 	}, nil
 }
 

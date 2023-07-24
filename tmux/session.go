@@ -12,12 +12,12 @@ type Session struct {
 	StartingDirectory string
 }
 
-func (s Session) Target() string {
-	return fmt.Sprintf(`$%d`, s.Id)
+func (s *Session) Target() string {
+	return s.Name
 }
 
-func (s Session) NewWindow(windowName string) (Window, error) {
-	var window Window
+func (s *Session) NewWindow(windowName string) (*Window, error) {
+	var window *Window
 
 	format := []string{
 		"#{window_id}",
@@ -49,17 +49,17 @@ func (s Session) NewWindow(windowName string) (Window, error) {
 		return window, err
 	}
 
-	return Window{
-		Id:        id,
-		Index:     index,
-		Name:      parts[2],
-		Layout:    parts[3],
-		IsActive:  parts[4] == "1",
-		SessionId: s.Id,
+	return &Window{
+		Id:       id,
+		Index:    index,
+		Name:     parts[2],
+		Layout:   parts[3],
+		IsActive: parts[4] == "1",
+		Session:  s,
 	}, nil
 }
 
-func (s Session) Kill() error {
+func (s *Session) Kill() error {
 	cmd, err := NewCommand("kill-session", "-t", s.Target())
 	if err != nil {
 		return err
