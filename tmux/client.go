@@ -177,7 +177,6 @@ func (c Client) Panes(window *Window) (collection.Collection[*Pane], error) {
 			StartingDirectory: parts[4],
 			IsActive:          parts[3] == "1",
 			Window:            window,
-			Session:           window.Session,
 		})
 	}
 

@@ -7,6 +7,10 @@
 - fix send keys to send to the appropriate `session:window.pane` target
 - set active window / pane
 - pass `Environment` or `EnvironmentFile` for session > window > pane cascading
+- `--debug` flag or `glaze debug ...` which spits out the list of tmux commands used to spin up a profile
+- use charm for menu-based selection of glaze profiles
+- `client.GetOption` & `client.SetOption` global, session, window + pane?
+- add support for `err` in `collection.Each`
 
 
 ```hcl

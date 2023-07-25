@@ -72,7 +72,6 @@ func (w *Window) Split(name, splitType, StartingDirectory string) (Pane, error) 
 		StartingDirectory: StartingDirectory,
 		IsActive:          parts[3] == "1",
 		Window:            w,
-		Session:           w.Session,
 	}, nil
 }
 

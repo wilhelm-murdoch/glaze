@@ -9,11 +9,10 @@ type Pane struct {
 	StartingDirectory string
 	IsActive          bool
 	Window            *Window
-	Session           *Session
 }
 
 func (p Pane) Target() string {
-	return fmt.Sprintf(`%s:@%d.%%%d`, p.Session.Name, p.Window.Id, p.Id)
+	return fmt.Sprintf(`%s:@%d.%%%d`, p.Window.Session.Name, p.Window.Id, p.Id)
 }
 
 func (p Pane) SendKeys(keys string) error {
