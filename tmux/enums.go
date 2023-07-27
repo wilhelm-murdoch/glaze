@@ -6,6 +6,12 @@ import (
 )
 
 const (
+	PlacementAbove = "above"
+	PlacementLeft  = "left"
+
+	FullHeight = "height"
+	FullWidth  = "width"
+
 	SplitHorizontal = "horizontal"
 	SplitVertical   = "vertical"
 
@@ -18,6 +24,16 @@ const (
 )
 
 var (
+	PlacementList = []string{
+		PlacementAbove,
+		PlacementLeft,
+	}
+
+	FullList = []string{
+		FullHeight,
+		FullWidth,
+	}
+
 	SplitList = []string{
 		SplitHorizontal,
 		SplitVertical,

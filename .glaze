@@ -6,26 +6,15 @@ session "Glaze" {
     starting_directory = "~/Development/github/wilhelm-murdoch/glaze"
 
     pane "Terminal" {
-      split = "vertical"
-      focus = true
       commands = [
-        "echo \"Starting...\"",
+        "echo \"Top\"",
       ]
     }
 
     pane "Watcher" {
-      split = "horizontal"
       starting_directory = "~/Development/github/wilhelm-murdoch/glaze/cmd/glaze/"
       commands = [
         "echo \"Watching...\"",
-      ]
-    }
-
-    pane "Tester" {
-      split = "vertical"
-      starting_directory = "~/Development/github/wilhelm-murdoch/glaze/"
-      commands = [
-        "echo \"Testing...\"",
       ]
     }
   }

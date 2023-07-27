@@ -205,6 +205,19 @@ func (c Client) NewSession(sessionName, startingDirectory string) (*Session, err
 	}), nil
 }
 
+func (c Client) NewSessionIfNotExists(sessionName, startingDirectory string) (*Session, error) {
+	sessions, _ := c.Sessions()
+	exists := sessions.Find(func(i int, s *Session) bool {
+		return s.Name == sessionName
+	})
+
+	if exists == nil {
+		return c.NewSession(sessionName, startingDirectory)
+	}
+
+	return exists, nil
+}
+
 func (c Client) KillSessionByName(sessionName string) error {
 	sessions, err := c.Sessions()
 	if err != nil {

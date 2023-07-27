@@ -52,8 +52,7 @@ func (w *Window) Decode(value cty.Value) hcl.Diagnostics {
 				_, value := it.Element()
 
 				pane := new(Pane)
-				diags = pane.Decode(value)
-				if diags.HasErrors() {
+				if diags = pane.Decode(value); diags.HasErrors() {
 					diags = diags.Extend(diags)
 					continue
 				}

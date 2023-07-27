@@ -8,7 +8,6 @@ import (
 
 	"github.com/urfave/cli/v2"
 	"github.com/wilhelm-murdoch/glaze"
-	"github.com/wilhelm-murdoch/glaze/models"
 	"github.com/wilhelm-murdoch/glaze/tmux"
 )
 
@@ -59,37 +58,37 @@ func ActionUp(ctx *cli.Context) error {
 		return err
 	}
 
-	var outerErr error
-	profile.Windows.Each(func(i int, w *models.Window) bool {
-		window, err := session.NewWindow(w.Name)
+	// Iterate through the windows and panes defined within the specified
+	// profile and create them within the tmux session.
+	for _, wm := range profile.Windows.Items() {
+		wc, err := session.NewWindow(wm.Name)
 		if err != nil {
-			outerErr = err
-			return true
+			return err
 		}
 
-		w.Panes.Each(func(i int, p *models.Pane) bool {
-			pane, err := window.Split(p.Name, p.Split, p.StartingDirectory)
+		for _, pm := range wm.Panes.Items() {
+			pc, err := wc.Split(pm.Name, pm.Split, pm.StartingDirectory)
 			if err != nil {
-				outerErr = err
-				return true
+				return err
 			}
 
-			for _, cmd := range p.Commands {
+			// Run any defined commands in order as defined within the
+			// current the profile. Add a small delay between each command
+			// to ensure they are executed in order.
+			for _, cmd := range pm.Commands {
 				time.Sleep(time.Millisecond * time.Duration(100))
-				pane.SendKeys(cmd)
+				pc.SendKeys(cmd)
 			}
-
-			return false
-		})
-
-		if err := window.SelectLayout(w.Layout); err != nil {
-			outerErr = err
-			return true
 		}
 
-		return outerErr != nil
-	})
+		if err := wc.SelectLayout(wm.Layout); err != nil {
+			return err
+		}
+	}
 
+	// Tmux creates a default window with a default pane for every
+	// session. Remove the defaults so only windows and panes defined
+	// within the profile are left.
 	windows, err := client.Windows(session)
 	if err != nil {
 		return err
@@ -102,26 +101,25 @@ func ActionUp(ctx *cli.Context) error {
 
 		windows.Shift()
 
-		windows.Each(func(i int, w *tmux.Window) bool {
-			panes, err := client.Panes(w)
+		for _, wc := range windows.Items() {
+			pc, err := client.Panes(wc)
 			if err != nil {
-				return true
+				return err
 			}
 
-			if pane, found := panes.At(0); found {
+			if pane, found := pc.At(0); found {
 				if err := pane.Kill(); err != nil {
-					return true
+					return err
 				}
 
-				panes.Shift()
+				pc.Shift()
 			}
-			return false
-		})
+		}
 	}
 
-	if err := client.Attach(session); err != nil {
-		return err
-	}
+	// if err := client.Attach(session); err != nil {
+	// 	return err
+	// }
 
 	return nil
 }

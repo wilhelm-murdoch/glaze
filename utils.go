@@ -2,8 +2,10 @@ package glaze
 
 import (
 	"errors"
+	"fmt"
 	"io/fs"
 	"os"
+	"strings"
 )
 
 func FileExists(path string) bool {
@@ -13,4 +15,25 @@ func FileExists(path string) bool {
 	}
 
 	return true
+}
+
+func JoinWithOr(choices []string) string {
+	return joinWith(choices, "or")
+}
+
+func JoinWithAnd(choices []string) string {
+	return joinWith(choices, "and")
+}
+
+func joinWith(choices []string, conjunction string) string {
+	length := len(choices)
+	if length == 0 {
+		return ""
+	} else if length == 1 {
+		return choices[0]
+	} else if length == 2 {
+		return fmt.Sprintf(`%s %s %s`, choices[0], conjunction, choices[1])
+	}
+
+	return fmt.Sprintf(`%s %s %s`, strings.Join(choices[:length-1], ", "), conjunction, choices[length-1])
 }

@@ -1,11 +1,8 @@
 package glaze
 
 import (
-	"errors"
-	"fmt"
-	"io/fs"
-	"os"
-	"strings"
+	"regexp"
+	"strconv"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hcldec"
@@ -33,18 +30,7 @@ var (
 					Type: cty.String,
 				},
 				Func: func(value cty.Value) hcl.Diagnostics {
-					if !value.IsNull() {
-						fileInfo, err := os.Stat(tmux.ExpandPath(value.AsString()))
-						if err != nil || errors.Is(err, fs.ErrNotExist) || !fileInfo.IsDir() {
-							return hcl.Diagnostics{{
-								Severity: hcl.DiagError,
-								Summary:  `Invalid starting directory specified`,
-								Detail:   fmt.Sprintf(`The starting directory "%s" does not exist or is not a directory`, value.AsString()),
-							}}
-						}
-					}
-
-					return nil
+					return DirectoryDiagnostic("starting directory", value)
 				},
 			},
 			"windows": &hcldec.BlockListSpec{
@@ -59,28 +45,13 @@ var (
 						Name: "focus",
 						Type: cty.Bool,
 					},
-					"options": &hcldec.AttrSpec{
-						Name: "options",
-						Type: cty.Map(cty.String),
-					},
 					"starting_directory": &hcldec.ValidateSpec{
 						Wrapped: &hcldec.AttrSpec{
 							Name: "starting_directory",
 							Type: cty.String,
 						},
 						Func: func(value cty.Value) hcl.Diagnostics {
-							if !value.IsNull() {
-								fileInfo, err := os.Stat(tmux.ExpandPath(value.AsString()))
-								if err != nil || errors.Is(err, fs.ErrNotExist) || !fileInfo.IsDir() {
-									return hcl.Diagnostics{{
-										Severity: hcl.DiagError,
-										Summary:  `Invalid starting directory specified`,
-										Detail:   fmt.Sprintf(`The starting directory "%s" does not exist or is not a directory`, value.AsString()),
-									}}
-								}
-							}
-
-							return nil
+							return DirectoryDiagnostic("starting directory", value)
 						},
 					},
 					"layout": &hcldec.ValidateSpec{
@@ -89,69 +60,126 @@ var (
 							Type: cty.String,
 						},
 						Func: func(value cty.Value) hcl.Diagnostics {
-							if !tmux.Contains(tmux.LayoutList, value.AsString()) {
-								return hcl.Diagnostics{{
-									Severity: hcl.DiagError,
-									Summary:  `Invalid layout specified`,
-									Detail:   fmt.Sprintf(`The layout of "%s" is not supported among: %s`, value.AsString(), strings.Join(tmux.LayoutList, ", ")),
-								}}
-							}
-
-							return nil
+							return ContainsDiagnostic("layout", value, tmux.LayoutList)
 						},
 					},
 					"panes": &hcldec.BlockListSpec{
 						TypeName: "pane",
 						MinItems: 1,
-						Nested: &hcldec.ObjectSpec{
-							"name": &hcldec.BlockLabelSpec{
-								Index: 0,
-								Name:  "name",
-							},
-							"focus": &hcldec.AttrSpec{
-								Name: "focus",
-								Type: cty.Bool,
-							},
-							"split": &hcldec.ValidateSpec{
-								Wrapped: &hcldec.AttrSpec{
-									Name: "split",
-									Type: cty.String,
+						Nested: &hcldec.ValidateSpec{
+							Wrapped: &hcldec.ObjectSpec{
+								"name": &hcldec.BlockLabelSpec{
+									Index: 0,
+									Name:  "name",
 								},
-								Func: func(value cty.Value) hcl.Diagnostics {
-									if !tmux.Contains(tmux.SplitList, value.AsString()) {
-										return hcl.Diagnostics{{
-											Severity: hcl.DiagError,
-											Summary:  `Invalid split specified`,
-											Detail:   fmt.Sprintf(`The split of "%s" is not supported among: %s`, value.AsString(), strings.Join(tmux.SplitList, ", ")),
-										}}
-									}
+								"focus": &hcldec.AttrSpec{
+									Name: "focus",
+									Type: cty.Bool,
+								},
+								"size": &hcldec.ValidateSpec{
+									Wrapped: &hcldec.AttrSpec{
+										Name: "size",
+										Type: cty.String,
+									},
+									Func: func(value cty.Value) hcl.Diagnostics {
+										var diags hcl.Diagnostics
 
-									return nil
-								},
-							},
-							"starting_directory": &hcldec.ValidateSpec{
-								Wrapped: &hcldec.AttrSpec{
-									Name: "starting_directory",
-									Type: cty.String,
-								},
-								Func: func(value cty.Value) hcl.Diagnostics {
-									if !value.IsNull() {
-										fileInfo, err := os.Stat(tmux.ExpandPath(value.AsString()))
-										if err != nil || errors.Is(err, fs.ErrNotExist) || !fileInfo.IsDir() {
-											return hcl.Diagnostics{{
-												Severity: hcl.DiagError,
-												Summary:  `Invalid starting directory specified`,
-												Detail:   fmt.Sprintf(`The starting directory "%s" does not exist or is not a directory`, value.AsString()),
-											}}
+										if !value.IsNull() {
+											input := value.AsString()
+
+											matched := regexp.MustCompile(`^(\\d+|\\d+%)$`).MatchString(input)
+
+											if input[len(input)-1] == '%' {
+												input = input[:len(input)-1]
+											}
+
+											_, err := strconv.Atoi(input)
+
+											if err != nil || !matched {
+												diags = diags.Append(&hcl.Diagnostic{
+													Severity: hcl.DiagError,
+													Summary:  `Invalid size specified`,
+													Detail:   `The size value must be either an integer or a percentage.`,
+												})
+											}
 										}
-									}
 
-									return nil
+										return diags
+									},
+								},
+								"placement": &hcldec.ValidateSpec{
+									Wrapped: &hcldec.AttrSpec{
+										Name: "placement",
+										Type: cty.String,
+									},
+									Func: func(value cty.Value) hcl.Diagnostics {
+										return ContainsDiagnostic("placement", value, tmux.PlacementList)
+									},
+								},
+								"full": &hcldec.ValidateSpec{
+									Wrapped: &hcldec.AttrSpec{
+										Name: "full",
+										Type: cty.String,
+									},
+									Func: func(value cty.Value) hcl.Diagnostics {
+										return ContainsDiagnostic("full", value, tmux.FullList)
+									},
+								},
+								"split": &hcldec.ValidateSpec{
+									Wrapped: &hcldec.AttrSpec{
+										Name: "split",
+										Type: cty.String,
+									},
+									Func: func(value cty.Value) hcl.Diagnostics {
+										return ContainsDiagnostic("split", value, tmux.SplitList)
+									},
+								},
+								"starting_directory": &hcldec.ValidateSpec{
+									Wrapped: &hcldec.AttrSpec{
+										Name: "starting_directory",
+										Type: cty.String,
+									},
+									Func: func(value cty.Value) hcl.Diagnostics {
+										return DirectoryDiagnostic("starting directory", value)
+									},
+								},
+								"commands": &hcldec.AttrSpec{
+									Name: "commands",
+									Type: cty.List(cty.String),
 								},
 							},
-							"commands": &hcldec.AttrSpec{
-								Name: "commands",
-								Type: cty.List(cty.String),
+							Func: func(value cty.Value) hcl.Diagnostics {
+								var diags hcl.Diagnostics
+
+								split := value.GetAttr("split")
+								full := value.GetAttr("full")
+								placement := value.GetAttr("placement")
+								if split.IsNull() || split.AsString() == tmux.SplitVertical {
+									if !placement.IsNull() && placement.AsString() == tmux.PlacementAbove {
+										diags = diags.Append(WrongAttributeDiagnostic("placement", placement.AsString(), tmux.PlacementLeft))
+									}
+
+									if !full.IsNull() && full.AsString() == tmux.FullHeight {
+										diags = diags.Append(WrongAttributeDiagnostic("full", full.AsString(), tmux.FullWidth))
+									}
+
+									return diags
+								}
+
+								if !split.IsNull() && split.AsString() == tmux.SplitHorizontal {
+									if !placement.IsNull() && placement.AsString() == tmux.PlacementLeft {
+										diags = diags.Append(WrongAttributeDiagnostic("placement", placement.AsString(), tmux.PlacementAbove))
+
+									}
+
+									if !full.IsNull() && full.AsString() == tmux.FullWidth {
+										diags = diags.Append(WrongAttributeDiagnostic("full", full.AsString(), tmux.FullHeight))
+									}
+
+									return diags
+								}
+
+								return nil
 							},
 						},
 					},
