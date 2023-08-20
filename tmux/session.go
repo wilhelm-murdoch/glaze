@@ -27,7 +27,16 @@ func (s *Session) NewWindow(windowName string) (*Window, error) {
 		"#{window_active}",
 	}
 
-	cmd, err := NewCommand("neww", "-d", "-t", fmt.Sprintf("%s:", s.Name), "-n", windowName, "-F", strings.Join(format, ";"), "-P")
+	args := []string{
+		"neww",
+		"-d",
+		"-t", fmt.Sprintf("%s:", s.Name),
+		"-n", windowName,
+		"-F", strings.Join(format, ";"),
+		"-P",
+	}
+
+	cmd, err := NewCommand(args...)
 	if err != nil {
 		return window, err
 	}

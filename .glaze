@@ -2,20 +2,29 @@ session "Glaze" {
   reattach_on_start = false
 
   window "Workspace" {
-    layout = "tiled"
     starting_directory = "~/Development/github/wilhelm-murdoch/glaze"
-
-    pane "Terminal" {
-      commands = [
-        "echo \"Top\"",
-      ]
-    }
 
     pane "Watcher" {
       starting_directory = "~/Development/github/wilhelm-murdoch/glaze/cmd/glaze/"
       commands = [
         "echo \"Watching...\"",
       ]
+    }
+
+    pane "Left" {
+      commands = [
+        "echo \"Left\"",
+      ]
+
+      split = "horizontal"
+    }
+
+    pane "Terminal" {
+      commands = [
+        "echo \"Top\"",
+      ]
+
+      // size = 10
     }
   }
 }

@@ -19,7 +19,7 @@ func (w Window) Target() string {
 	return fmt.Sprintf(`%s:@%d`, w.Session.Name, w.Id)
 }
 
-func (w *Window) Split(name, splitType, StartingDirectory string) (Pane, error) {
+func (w *Window) Split(name, splitType, startingDirectory, size, placement, full string) (Pane, error) {
 	var pane Pane
 
 	format := []string{
@@ -29,12 +29,36 @@ func (w *Window) Split(name, splitType, StartingDirectory string) (Pane, error) 
 		"#{pane_active}",
 	}
 
+	args := []string{
+		"splitw",
+		"-Pd",
+		"-t", w.Name,
+		"-c", startingDirectory,
+		"-F", strings.Join(format, ";"),
+	}
+
 	splitTypeFlag := "-h"
 	if splitType == SplitVertical {
 		splitTypeFlag = "-v"
 	}
 
-	cmd, err := NewCommand("splitw", splitTypeFlag, "-Pd", "-t", w.Name, "-c", StartingDirectory, "-F", strings.Join(format, ";"))
+	args = append(args, splitTypeFlag)
+
+	if size != "" {
+		args = append(args, "-l", size)
+	}
+
+	if placement != "" {
+		args = append(args, "-b", placement)
+	}
+
+	if full != "" {
+		args = append(args, "-f")
+	}
+
+	fmt.Println("size:", size, "placement:", placement, "full:", full)
+
+	cmd, err := NewCommand(args...)
 	if err != nil {
 		return pane, err
 	}
@@ -69,7 +93,7 @@ func (w *Window) Split(name, splitType, StartingDirectory string) (Pane, error) 
 		Id:                id,
 		Index:             index,
 		Name:              name,
-		StartingDirectory: StartingDirectory,
+		StartingDirectory: startingDirectory,
 		IsActive:          parts[3] == "1",
 		Window:            w,
 	}, nil
@@ -80,7 +104,7 @@ func (w Window) Reindex() error {
 }
 
 func (w Window) Kill() error {
-	cmd, err := NewCommand("kill-window", "-t", w.Target())
+	cmd, err := NewCommand("killw", "-t", w.Target())
 	if err != nil {
 		return err
 	}

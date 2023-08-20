@@ -34,7 +34,7 @@ func (p Pane) SetEnv(key string, value string) error {
 }
 
 func (p Pane) Kill() error {
-	cmd, err := NewCommand("kill-pane", "-t", p.Target())
+	cmd, err := NewCommand("killp", "-t", p.Target())
 	if err != nil {
 		return err
 	}

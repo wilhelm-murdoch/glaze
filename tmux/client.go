@@ -29,9 +29,9 @@ func (c *Client) Attach(session *Session) error {
 	var args []string
 
 	if !IsInsideTmux() {
-		args = append(args, "attach-session", "-t", session.Target())
+		args = append(args, "attach", "-t", session.Target())
 	} else {
-		args = append(args, "switch-client", "-t", session.Target())
+		args = append(args, "switchc", "-t", session.Target())
 	}
 
 	cmd, err := NewCommand(args...)
@@ -61,7 +61,12 @@ func (c Client) Sessions() (collection.Collection[*Session], error) {
 		"#{session_path}",
 	}
 
-	cmd, err := NewCommand("ls", "-F", strings.Join(format, ";"))
+	args := []string{
+		"ls",
+		"-F", strings.Join(format, ";"),
+	}
+
+	cmd, err := NewCommand(args...)
 	if err != nil {
 		return sessions, err
 	}
@@ -100,7 +105,13 @@ func (c Client) Windows(session *Session) (collection.Collection[*Window], error
 		"#{window_active}",
 	}
 
-	cmd, err := NewCommand("list-windows", "-F", strings.Join(format, ";"), "-t", session.Target())
+	args := []string{
+		"lsw",
+		"-F", strings.Join(format, ";"),
+		"-t", session.Target(),
+	}
+
+	cmd, err := NewCommand(args...)
 	if err != nil {
 		return windows, err
 	}
@@ -147,7 +158,13 @@ func (c Client) Panes(window *Window) (collection.Collection[*Pane], error) {
 		"#{pane_current_path}",
 	}
 
-	cmd, err := NewCommand("list-panes", "-F", strings.Join(format, ";"), "-t", window.Target())
+	args := []string{
+		"lsp",
+		"-F", strings.Join(format, ";"),
+		"-t", window.Target(),
+	}
+
+	cmd, err := NewCommand(args...)
 	if err != nil {
 		return panes, err
 	}

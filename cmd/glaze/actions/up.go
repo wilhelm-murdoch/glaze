@@ -67,7 +67,7 @@ func ActionUp(ctx *cli.Context) error {
 		}
 
 		for _, pm := range wm.Panes.Items() {
-			pc, err := wc.Split(pm.Name, pm.Split, pm.StartingDirectory)
+			pc, err := wc.Split(pm.Name, pm.Split, pm.StartingDirectory, pm.Size, pm.Placement, pm.Full)
 			if err != nil {
 				return err
 			}
