@@ -11,9 +11,5 @@ func IsInstalled() (string, bool) {
 }
 
 func IsInsideTmux() bool {
-	if os.Getenv("TMUX") != "" {
-		return true
-	} else {
-		return false
-	}
+	return os.Getenv("TMUX") != ""
 }
