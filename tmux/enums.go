@@ -1,10 +1,5 @@
 package tmux
 
-import (
-	"os"
-	"strings"
-)
-
 const (
 	PlacementAbove = "above"
 	PlacementLeft  = "left"
@@ -56,17 +51,4 @@ func Contains(list []string, value string) bool {
 	}
 
 	return false
-}
-
-func ExpandPath(path string) string {
-	if strings.HasPrefix(path, "~/") {
-		userHome, err := os.UserHomeDir()
-		if err != nil {
-			return path
-		}
-
-		return strings.Replace(path, "~", userHome, 1)
-	}
-
-	return path
 }
