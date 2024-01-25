@@ -4,22 +4,28 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+
+	"github.com/wilhelm-murdoch/glaze/tmux/enums"
 )
 
+// Window represents a tmux window.
 type Window struct {
 	Id       int
 	Index    int
 	Name     string
-	Layout   string
+	Layout   enums.Layout
 	IsActive bool
 	Session  *Session
 }
 
+// Target returns the target window by its composite id of session name
+// and window id.
 func (w Window) Target() string {
 	return fmt.Sprintf(`%s:@%d`, w.Session.Name, w.Id)
 }
 
-func (w *Window) Split(name, splitType, startingDirectory, size, placement, full string) (Pane, error) {
+// Split splits the current window into two panes.
+func (w *Window) Split(splitType enums.Split, placement enums.Placement, full enums.Full, name, startingDirectory, size string) (Pane, error) {
 	var pane Pane
 
 	format := []string{
@@ -38,7 +44,7 @@ func (w *Window) Split(name, splitType, startingDirectory, size, placement, full
 	}
 
 	splitTypeFlag := "-h"
-	if splitType == SplitVertical {
+	if splitType == enums.SplitVertical {
 		splitTypeFlag = "-v"
 	}
 
@@ -48,15 +54,13 @@ func (w *Window) Split(name, splitType, startingDirectory, size, placement, full
 		args = append(args, "-l", size)
 	}
 
-	if placement != "" {
-		args = append(args, "-b", placement)
+	if placement != enums.PlacementUnknown {
+		args = append(args, "-b", fmt.Sprint(placement))
 	}
 
-	if full != "" {
+	if full != enums.FullUnknown {
 		args = append(args, "-f")
 	}
-
-	fmt.Println("size:", size, "placement:", placement, "full:", full)
 
 	cmd, err := NewCommand(args...)
 	if err != nil {
@@ -112,8 +116,8 @@ func (w Window) Kill() error {
 	return cmd.Exec()
 }
 
-func (w Window) SelectLayout(layout string) error {
-	cmd, err := NewCommand("selectl", "-t", w.Target(), layout)
+func (w Window) SelectLayout(layout enums.Layout) error {
+	cmd, err := NewCommand("selectl", "-t", w.Target(), fmt.Sprint(layout))
 	if err != nil {
 		return err
 	}

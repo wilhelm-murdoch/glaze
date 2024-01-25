@@ -6,7 +6,7 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hcldec"
-	"github.com/wilhelm-murdoch/glaze/tmux"
+	"github.com/wilhelm-murdoch/glaze/tmux/enums"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -60,7 +60,7 @@ var (
 							Type: cty.String,
 						},
 						Func: func(value cty.Value) hcl.Diagnostics {
-							return ContainsDiagnostic("layout", value, tmux.LayoutList)
+							return ContainsDiagnostic("layout", value, enums.LayoutList)
 						},
 					},
 					"panes": &hcldec.BlockListSpec{
@@ -113,7 +113,7 @@ var (
 										Type: cty.String,
 									},
 									Func: func(value cty.Value) hcl.Diagnostics {
-										return ContainsDiagnostic("placement", value, tmux.PlacementList)
+										return ContainsDiagnostic("placement", value, enums.PlacementList)
 									},
 								},
 								"full": &hcldec.ValidateSpec{
@@ -122,7 +122,7 @@ var (
 										Type: cty.String,
 									},
 									Func: func(value cty.Value) hcl.Diagnostics {
-										return ContainsDiagnostic("full", value, tmux.FullList)
+										return ContainsDiagnostic("full", value, enums.FullList)
 									},
 								},
 								"split": &hcldec.ValidateSpec{
@@ -131,7 +131,7 @@ var (
 										Type: cty.String,
 									},
 									Func: func(value cty.Value) hcl.Diagnostics {
-										return ContainsDiagnostic("split", value, tmux.SplitList)
+										return ContainsDiagnostic("split", value, enums.SplitList)
 									},
 								},
 								"starting_directory": &hcldec.ValidateSpec{
@@ -154,26 +154,26 @@ var (
 								split := value.GetAttr("split")
 								full := value.GetAttr("full")
 								placement := value.GetAttr("placement")
-								if split.IsNull() || split.AsString() == tmux.SplitVertical {
-									if !placement.IsNull() && placement.AsString() == tmux.PlacementAbove {
-										diags = diags.Append(WrongAttributeDiagnostic("placement", placement.AsString(), tmux.PlacementLeft))
+								if split.IsNull() || enums.SplitFromString(split.AsString()) == enums.SplitVertical {
+									if !placement.IsNull() && enums.PlacementFromString(placement.AsString()) == enums.PlacementAbove {
+										diags = diags.Append(WrongAttributeDiagnostic("placement", placement.AsString(), enums.PlacementLeftString))
 									}
 
-									if !full.IsNull() && full.AsString() == tmux.FullHeight {
-										diags = diags.Append(WrongAttributeDiagnostic("full", full.AsString(), tmux.FullWidth))
+									if !full.IsNull() && enums.FullFromString(full.AsString()) == enums.FullHeight {
+										diags = diags.Append(WrongAttributeDiagnostic("full", full.AsString(), enums.FullWidthString))
 									}
 
 									return diags
 								}
 
-								if !split.IsNull() && split.AsString() == tmux.SplitHorizontal {
-									if !placement.IsNull() && placement.AsString() == tmux.PlacementLeft {
-										diags = diags.Append(WrongAttributeDiagnostic("placement", placement.AsString(), tmux.PlacementAbove))
+								if !split.IsNull() && enums.SplitFromString(split.AsString()) == enums.SplitHorizontal {
+									if !placement.IsNull() && enums.PlacementFromString(placement.AsString()) == enums.PlacementLeft {
+										diags = diags.Append(WrongAttributeDiagnostic("placement", placement.AsString(), enums.PlacementAboveString))
 
 									}
 
-									if !full.IsNull() && full.AsString() == tmux.FullWidth {
-										diags = diags.Append(WrongAttributeDiagnostic("full", full.AsString(), tmux.FullHeight))
+									if !full.IsNull() && enums.FullFromString(full.AsString()) == enums.FullWidth {
+										diags = diags.Append(WrongAttributeDiagnostic("full", full.AsString(), enums.FullHeightString))
 									}
 
 									return diags

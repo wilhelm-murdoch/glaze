@@ -5,19 +5,23 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/wilhelm-murdoch/glaze/tmux/enums"
 	"github.com/wilhelm-murdoch/go-collection"
 )
 
+// Client represents a tmux client.
 type Client struct {
 	socketPath     string
 	socketName     string
 	CurrentSession *Session
 }
 
+// NewClient returns a new client.
 func NewClient() Client {
 	return Client{}
 }
 
+// NewClientWithSocket returns a new client with the given socket path and name.
 func NewClientWithSocket(socketPath string, socketName string) Client {
 	return Client{
 		socketPath: socketPath,
@@ -25,6 +29,8 @@ func NewClientWithSocket(socketPath string, socketName string) Client {
 	}
 }
 
+// Attach attaches to the given session. If we are inside a tmux session,
+// we switch to the given session.
 func (c *Client) Attach(session *Session) error {
 	var args []string
 
@@ -52,6 +58,7 @@ func (c *Client) Attach(session *Session) error {
 	return nil
 }
 
+// Sessions returns a collection of active sessions.
 func (c Client) Sessions() (collection.Collection[*Session], error) {
 	var sessions collection.Collection[*Session]
 
@@ -94,6 +101,7 @@ func (c Client) Sessions() (collection.Collection[*Session], error) {
 	return sessions, err
 }
 
+// Windows returns a collection of windows for the given session.
 func (c Client) Windows(session *Session) (collection.Collection[*Window], error) {
 	var windows collection.Collection[*Window]
 
@@ -138,7 +146,7 @@ func (c Client) Windows(session *Session) (collection.Collection[*Window], error
 			Id:       id,
 			Index:    index,
 			Name:     parts[2],
-			Layout:   parts[3],
+			Layout:   enums.LayoutFromString(parts[3]),
 			IsActive: parts[4] == "1",
 			Session:  session,
 		})
@@ -147,6 +155,7 @@ func (c Client) Windows(session *Session) (collection.Collection[*Window], error
 	return windows, nil
 }
 
+// Panes returns a collection of panes for the given window.
 func (c Client) Panes(window *Window) (collection.Collection[*Pane], error) {
 	var panes collection.Collection[*Pane]
 
@@ -200,6 +209,7 @@ func (c Client) Panes(window *Window) (collection.Collection[*Pane], error) {
 	return panes, nil
 }
 
+// NewSession creates a new session with the given name and starting directory.
 func (c Client) NewSession(sessionName, startingDirectory string) (*Session, error) {
 	var session *Session
 
@@ -222,6 +232,8 @@ func (c Client) NewSession(sessionName, startingDirectory string) (*Session, err
 	}), nil
 }
 
+// NewSessionIfNotExists creates a new session with the given name and starting
+// directory if it does not already exist.
 func (c Client) NewSessionIfNotExists(sessionName, startingDirectory string) (*Session, error) {
 	sessions, _ := c.Sessions()
 	exists := sessions.Find(func(i int, s *Session) bool {
@@ -235,6 +247,7 @@ func (c Client) NewSessionIfNotExists(sessionName, startingDirectory string) (*S
 	return exists, nil
 }
 
+// KillSession kills the given session.
 func (c Client) KillSessionByName(sessionName string) error {
 	sessions, err := c.Sessions()
 	if err != nil {
@@ -257,6 +270,7 @@ func (c Client) KillSessionByName(sessionName string) error {
 	return cmd.Exec()
 }
 
+// SessionExists returns true if a session with the given name exists.
 func (c Client) SessionExists(name string) bool {
 	sessions, _ := c.Sessions()
 	return sessions.Find(func(i int, s *Session) bool {

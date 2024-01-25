@@ -23,8 +23,6 @@ session "Glaze" {
       commands = [
         "echo \"Top\"",
       ]
-
-      // size = 10
     }
   }
 }

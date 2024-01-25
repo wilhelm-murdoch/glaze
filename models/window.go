@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/hashicorp/hcl/v2"
-	"github.com/wilhelm-murdoch/glaze/tmux"
+	"github.com/wilhelm-murdoch/glaze/tmux/enums"
 	"github.com/wilhelm-murdoch/go-collection"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
@@ -12,7 +12,7 @@ import (
 
 type Window struct {
 	Name              string
-	Layout            string
+	Layout            enums.Layout
 	Focus             bool
 	StartingDirectory string
 	// Options collection.Collection[*Option]
@@ -27,9 +27,9 @@ func (w *Window) Decode(value cty.Value) hcl.Diagnostics {
 	}
 
 	if !value.GetAttr("layout").IsNull() {
-		w.Layout = value.GetAttr("layout").AsString()
+		w.Layout = enums.LayoutFromString(value.GetAttr("layout").AsString())
 	} else {
-		w.Layout = tmux.LayoutTiled
+		w.Layout = enums.LayoutTiled
 	}
 
 	if !value.GetAttr("focus").IsNull() {
