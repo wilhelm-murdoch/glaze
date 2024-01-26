@@ -34,7 +34,7 @@ func (ce CommandError) Error() string {
 
 // NewCommand returns a new command with the given arguments.
 func NewCommand(args ...string) (Command, error) {
-	tmux, ok := IsInstalled()
+	ok, tmux := IsInstalled()
 	if !ok {
 		return Command{}, fmt.Errorf("tmux is not installed")
 	}
