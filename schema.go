@@ -24,6 +24,10 @@ var (
 				Name: "reattach_on_start",
 				Type: cty.Bool,
 			},
+			"env": &hcldec.AttrSpec{
+				Name: "env",
+				Type: cty.Map(cty.String),
+			},
 			"starting_directory": &hcldec.ValidateSpec{
 				Wrapped: &hcldec.AttrSpec{
 					Name: "starting_directory",

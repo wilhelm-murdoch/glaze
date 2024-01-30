@@ -62,7 +62,7 @@ func (w *Window) Split(splitType enums.Split, placement enums.Placement, full en
 		args = append(args, "-f")
 	}
 
-	cmd, err := NewCommand(args...)
+	cmd, err := NewCommand(w.Session.Client, args...)
 	if err != nil {
 		return pane, err
 	}
@@ -84,7 +84,7 @@ func (w *Window) Split(splitType enums.Split, placement enums.Placement, full en
 		return pane, err
 	}
 
-	cmd, err = NewCommand("selectp", "-T", name, "-t", parts[0])
+	cmd, err = NewCommand(w.Session.Client, "selectp", "-T", name, "-t", parts[0])
 	if err != nil {
 		return pane, err
 	}
@@ -108,7 +108,7 @@ func (w Window) Reindex() error {
 }
 
 func (w Window) Kill() error {
-	cmd, err := NewCommand("killw", "-t", w.Target())
+	cmd, err := NewCommand(w.Session.Client, "killw", "-t", w.Target())
 	if err != nil {
 		return err
 	}
@@ -117,7 +117,7 @@ func (w Window) Kill() error {
 }
 
 func (w Window) SelectLayout(layout enums.Layout) error {
-	cmd, err := NewCommand("selectl", "-t", w.Target(), fmt.Sprint(layout))
+	cmd, err := NewCommand(w.Session.Client, "selectl", "-t", w.Target(), fmt.Sprint(layout))
 	if err != nil {
 		return err
 	}

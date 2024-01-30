@@ -17,12 +17,7 @@ type Client struct {
 }
 
 // NewClient returns a new client.
-func NewClient() Client {
-	return Client{}
-}
-
-// NewClientWithSocket returns a new client with the given socket path and name.
-func NewClientWithSocket(socketPath string, socketName string) Client {
+func NewClient(socketPath, socketName string) Client {
 	return Client{
 		socketPath: socketPath,
 		socketName: socketName,
@@ -40,7 +35,7 @@ func (c *Client) Attach(session *Session) error {
 		args = append(args, "switchc", "-t", session.Target())
 	}
 
-	cmd, err := NewCommand(args...)
+	cmd, err := NewCommand(*c, args...)
 	if err != nil {
 		return err
 	}
@@ -73,7 +68,7 @@ func (c Client) Sessions() (collection.Collection[*Session], error) {
 		"-F", strings.Join(format, ";"),
 	}
 
-	cmd, err := NewCommand(args...)
+	cmd, err := NewCommand(c, args...)
 	if err != nil {
 		return sessions, err
 	}
@@ -92,6 +87,7 @@ func (c Client) Sessions() (collection.Collection[*Session], error) {
 		}
 
 		sessions.Push(&Session{
+			Client:            c,
 			Id:                id,
 			Name:              strings.TrimSpace(parts[1]),
 			StartingDirectory: strings.TrimSpace(parts[2]),
@@ -119,7 +115,7 @@ func (c Client) Windows(session *Session) (collection.Collection[*Window], error
 		"-t", session.Target(),
 	}
 
-	cmd, err := NewCommand(args...)
+	cmd, err := NewCommand(c, args...)
 	if err != nil {
 		return windows, err
 	}
@@ -173,7 +169,7 @@ func (c Client) Panes(window *Window) (collection.Collection[*Pane], error) {
 		"-t", window.Target(),
 	}
 
-	cmd, err := NewCommand(args...)
+	cmd, err := NewCommand(c, args...)
 	if err != nil {
 		return panes, err
 	}
@@ -213,7 +209,7 @@ func (c Client) Panes(window *Window) (collection.Collection[*Pane], error) {
 func (c Client) NewSession(sessionName, startingDirectory string) (*Session, error) {
 	var session *Session
 
-	cmd, err := NewCommand("new", "-d", "-s", sessionName, "-c", startingDirectory)
+	cmd, err := NewCommand(c, "new", "-d", "-s", sessionName, "-c", startingDirectory)
 	if err != nil {
 		return session, err
 	}
@@ -262,7 +258,7 @@ func (c Client) KillSessionByName(sessionName string) error {
 		return fmt.Errorf(`session "%s" not found`, sessionName)
 	}
 
-	cmd, err := NewCommand("kill-session", "-t", found.Target())
+	cmd, err := NewCommand(c, "kill-session", "-t", found.Target())
 	if err != nil {
 		return err
 	}

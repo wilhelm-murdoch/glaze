@@ -19,7 +19,7 @@ func (p Pane) Target() string {
 
 // SendKeys sends the given keystrokes to the current pane.
 func (p Pane) SendKeys(keys string) error {
-	cmd, err := NewCommand("send", "-t", p.Target(), keys, "Enter")
+	cmd, err := NewCommand(p.Window.Session.Client, "send", "-t", p.Target(), keys, "Enter")
 	if err != nil {
 		return err
 	}
@@ -29,7 +29,7 @@ func (p Pane) SendKeys(keys string) error {
 
 // SetEnv sets the given environment variable to the given value in the current pane.
 func (p Pane) SetEnv(key string, value string) error {
-	cmd, err := NewCommand("setenv", "-t", p.Name, key, value)
+	cmd, err := NewCommand(p.Window.Session.Client, "setenv", "-t", p.Name, key, value)
 	if err != nil {
 		return err
 	}
@@ -39,7 +39,7 @@ func (p Pane) SetEnv(key string, value string) error {
 
 // Kill closes the current pane.
 func (p Pane) Kill() error {
-	cmd, err := NewCommand("killp", "-t", p.Target())
+	cmd, err := NewCommand(p.Window.Session.Client, "killp", "-t", p.Target())
 	if err != nil {
 		return err
 	}

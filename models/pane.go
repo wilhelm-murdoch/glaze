@@ -10,14 +10,15 @@ import (
 )
 
 type Pane struct {
-	Name              string
-	StartingDirectory string
-	Commands          []string
-	IsActive          bool
-	Split             enums.Split
-	Size              string
-	Placement         enums.Placement
-	Full              enums.Full
+	Name                   string
+	StartingDirectory      string
+	Commands               []string
+	IsActive               bool
+	Split                  enums.Split
+	Size                   string
+	Placement              enums.Placement
+	Full                   enums.Full
+	EnvironmentalVariables map[string]string
 }
 
 func (p *Pane) Decode(value cty.Value) hcl.Diagnostics {

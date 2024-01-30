@@ -10,6 +10,7 @@ import (
 
 // Session represents a tmux session.
 type Session struct {
+	Client            Client
 	Id                int
 	Name              string
 	StartingDirectory string
@@ -41,7 +42,7 @@ func (s *Session) NewWindow(windowName string) (*Window, error) {
 		"-P",
 	}
 
-	cmd, err := NewCommand(args...)
+	cmd, err := NewCommand(s.Client, args...)
 	if err != nil {
 		return window, err
 	}
@@ -75,7 +76,7 @@ func (s *Session) NewWindow(windowName string) (*Window, error) {
 
 // Kill closes the current session.
 func (s *Session) Kill() error {
-	cmd, err := NewCommand("kill-session", "-t", s.Target())
+	cmd, err := NewCommand(s.Client, "kill-session", "-t", s.Target())
 	if err != nil {
 		return err
 	}

@@ -1,6 +1,7 @@
 package actions
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -13,6 +14,16 @@ import (
 
 func ActionUp(ctx *cli.Context) error {
 	profilePath := ctx.Args().First()
+
+	if ctx.String("socket-name") != "" && ctx.String("socket-path") != "" {
+		return errors.New("cannot specify both --socket-name and --socket-path flags")
+	}
+
+	if ctx.String("socket-path") != "" {
+		if !glaze.FileExists(ctx.String("socket-path")) {
+			return fmt.Errorf("specified --socket-path of %s does not exist", ctx.String("socket-path"))
+		}
+	}
 
 	if profilePath == "" {
 		cwd, err := os.Getwd()
@@ -45,9 +56,9 @@ func ActionUp(ctx *cli.Context) error {
 		return nil
 	}
 
-	client := tmux.NewClient()
+	client := tmux.NewClient(ctx.String("socket-name"), ctx.String("socket-path"))
 
-	if client.SessionExists(profile.Name) {
+	if ctx.Bool("clear") {
 		if err := client.KillSessionByName(profile.Name); err != nil {
 			return err
 		}

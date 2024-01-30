@@ -10,10 +10,11 @@ import (
 )
 
 type Session struct {
-	Name              string
-	ReattachOnStart   bool
-	StartingDirectory string
-	Windows           collection.Collection[*Window]
+	Name                   string
+	ReattachOnStart        bool
+	StartingDirectory      string
+	EnvironmentalVariables map[string]string
+	Windows                collection.Collection[*Window]
 }
 
 func (s *Session) Decode(value cty.Value) hcl.Diagnostics {

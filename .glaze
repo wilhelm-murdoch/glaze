@@ -1,27 +1,19 @@
 session "Glaze" {
   reattach_on_start = false
 
+  env = {
+    FOO  = "bar"
+    MERP = "derp"
+  }
+
   window "Workspace" {
     starting_directory = "~/Development/github/wilhelm-murdoch/glaze"
 
-    pane "Watcher" {
+    pane "Primary" {
       starting_directory = "~/Development/github/wilhelm-murdoch/glaze/cmd/glaze/"
-      commands = [
-        "echo \"Watching...\"",
-      ]
-    }
 
-    pane "Left" {
       commands = [
-        "echo \"Left\"",
-      ]
-
-      split = "horizontal"
-    }
-
-    pane "Terminal" {
-      commands = [
-        "echo \"Top\"",
+        "env | grep FOO",
       ]
     }
   }

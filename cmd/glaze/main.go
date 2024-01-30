@@ -30,11 +30,11 @@ var (
 )
 
 func main() {
-	// defer func() {
-	// 	if r := recover(); r != nil {
-	// 		os.Exit(1)
-	// 	}
-	// }()
+	defer func() {
+		if r := recover(); r != nil {
+			os.Exit(1)
+		}
+	}()
 
 	cli.VersionPrinter = func(c *cli.Context) {
 		fmt.Printf("Version: %s, Stage: %s, Commit: %s, Date: %s\n", Version, Stage, Commit, Date)
@@ -69,6 +69,10 @@ func main() {
 			Name:  "up",
 			Usage: "apply the specified glaze profile",
 			Flags: []cli.Flag{
+				&cli.BoolFlag{
+					Name:  "clear",
+					Usage: "clear the current glaze session before starting",
+				},
 				&cli.StringFlag{
 					Name:  "socket-path",
 					Value: "",
