@@ -10,15 +10,15 @@ import (
 )
 
 type Pane struct {
-	Name                   string
-	StartingDirectory      string
-	Commands               []string
-	IsActive               bool
-	Split                  enums.Split
-	Size                   string
-	Placement              enums.Placement
-	Full                   enums.Full
-	EnvironmentalVariables map[string]string
+	Name              string
+	StartingDirectory string
+	Commands          []string
+	IsActive          bool
+	Split             enums.Split
+	Size              string
+	Placement         enums.Placement
+	Full              enums.Full
+	Envs              map[string]string
 }
 
 func (p *Pane) Decode(value cty.Value) hcl.Diagnostics {
@@ -56,6 +56,12 @@ func (p *Pane) Decode(value cty.Value) hcl.Diagnostics {
 
 	if !value.GetAttr("placement").IsNull() {
 		p.Placement = enums.PlacementFromString(value.GetAttr("placement").AsString())
+	}
+
+	if !value.GetAttr("envs").IsNull() {
+		for name, value := range value.GetAttr("envs").AsValueMap() {
+			p.Envs[name] = value.AsString()
+		}
 	}
 
 	if !value.GetAttr("commands").IsNull() {

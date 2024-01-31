@@ -70,6 +70,10 @@ func main() {
 			Usage: "apply the specified glaze profile",
 			Flags: []cli.Flag{
 				&cli.BoolFlag{
+					Name:  "detached",
+					Usage: "start a tmux session using glaze detached mode",
+				},
+				&cli.BoolFlag{
 					Name:  "clear",
 					Usage: "clear the current glaze session before starting",
 				},

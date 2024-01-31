@@ -1,20 +1,23 @@
 session "Glaze" {
-  reattach_on_start = false
-
   env = {
-    FOO  = "bar"
-    MERP = "derp"
+    SESSION = "session"
   }
 
-  window "Workspace" {
-    starting_directory = "~/Development/github/wilhelm-murdoch/glaze"
+  window "WorkspaceOne" {
+    env = {
+      WINDOW = "window"
+    }
 
     pane "Primary" {
-      starting_directory = "~/Development/github/wilhelm-murdoch/glaze/cmd/glaze/"
+      env = {
+        PANE = "pane"
+      }
+    }
 
-      commands = [
-        "env | grep FOO",
-      ]
+    pane "Secondary" {
+      env = {
+        PANE = "pane"
+      }
     }
   }
 }

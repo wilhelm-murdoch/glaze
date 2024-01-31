@@ -24,7 +24,7 @@ var (
 				Name: "reattach_on_start",
 				Type: cty.Bool,
 			},
-			"env": &hcldec.AttrSpec{
+			"envs": &hcldec.AttrSpec{
 				Name: "env",
 				Type: cty.Map(cty.String),
 			},
@@ -44,6 +44,10 @@ var (
 					"name": &hcldec.BlockLabelSpec{
 						Index: 0,
 						Name:  "name",
+					},
+					"envs": &hcldec.AttrSpec{
+						Name: "env",
+						Type: cty.Map(cty.String),
 					},
 					"focus": &hcldec.AttrSpec{
 						Name: "focus",
@@ -75,6 +79,10 @@ var (
 								"name": &hcldec.BlockLabelSpec{
 									Index: 0,
 									Name:  "name",
+								},
+								"envs": &hcldec.AttrSpec{
+									Name: "env",
+									Type: cty.Map(cty.String),
 								},
 								"focus": &hcldec.AttrSpec{
 									Name: "focus",

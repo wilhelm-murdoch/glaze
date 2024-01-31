@@ -10,11 +10,11 @@ import (
 )
 
 type Session struct {
-	Name                   string
-	ReattachOnStart        bool
-	StartingDirectory      string
-	EnvironmentalVariables map[string]string
-	Windows                collection.Collection[*Window]
+	Name              string
+	ReattachOnStart   bool
+	StartingDirectory string
+	Envs              map[string]string
+	Windows           collection.Collection[*Window]
 }
 
 func (s *Session) Decode(value cty.Value) hcl.Diagnostics {
@@ -38,6 +38,13 @@ func (s *Session) Decode(value cty.Value) hcl.Diagnostics {
 		}
 	}
 
+	if !value.GetAttr("envs").IsNull() {
+		s.Envs = make(map[string]string, 1)
+		for range value.GetAttr("envs").AsValueMap() {
+			s.Envs["wow"] = "hi"
+		}
+	}
+
 	if !value.GetAttr("windows").IsNull() {
 		if value.GetAttr("windows").CanIterateElements() {
 			it := value.GetAttr("windows").ElementIterator()
@@ -46,6 +53,9 @@ func (s *Session) Decode(value cty.Value) hcl.Diagnostics {
 				_, value := it.Element()
 
 				window := new(Window)
+
+				window.Envs = s.Envs
+
 				if diags = window.Decode(value); diags.HasErrors() {
 					diags = diags.Extend(diags)
 					continue

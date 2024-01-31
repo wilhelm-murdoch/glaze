@@ -1,42 +1,42 @@
 package enums
 
-type Full int
+type Split int
 
-func (f Full) String() string {
-	switch f {
-	case FullHeight:
-		return FullHeightString
-	case FullWidth:
-		return FullWidthString
-	}
-
-	return FullUnknownString
-}
-
-const (
-	FullHeight Full = iota
-	FullWidth
-	FullUnknown
-)
-
-const (
-	FullHeightString  = "height"
-	FullWidthString   = "width"
-	FullUnknownString = "unknown"
-)
-
-var FullList = []string{
-	FullHeightString,
-	FullWidthString,
-}
-
-func FullFromString(s string) Full {
+func (s Split) String() string {
 	switch s {
-	case FullHeightString:
-		return FullHeight
-	case FullWidthString:
-		return FullWidth
+	case SplitHorizontal:
+		return SplitHorizontalString
+	case SplitVertical:
+		return SplitVerticalString
 	}
 
-	return FullUnknown
+	return SplitUnknownString
+}
+
+const (
+	SplitHorizontal Split = iota
+	SplitVertical
+	SplitUnknown
+)
+
+const (
+	SplitHorizontalString = "horizontal"
+	SplitVerticalString   = "vertical"
+	SplitUnknownString    = "unknown"
+)
+
+var SplitList = []string{
+	SplitHorizontalString,
+	SplitVerticalString,
+}
+
+func SplitFromString(s string) Split {
+	switch s {
+	case SplitHorizontalString:
+		return SplitHorizontal
+	case SplitVerticalString:
+		return SplitVertical
+	}
+
+	return SplitUnknown
 }

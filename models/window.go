@@ -11,12 +11,12 @@ import (
 )
 
 type Window struct {
-	Name                   string
-	Layout                 enums.Layout
-	Focus                  bool
-	StartingDirectory      string
-	EnvironmentalVariables map[string]string
-	Panes                  collection.Collection[*Pane]
+	Name              string
+	Layout            enums.Layout
+	Focus             bool
+	StartingDirectory string
+	Envs              map[string]string
+	Panes             collection.Collection[*Pane]
 }
 
 func (w *Window) Decode(value cty.Value) hcl.Diagnostics {
@@ -44,6 +44,12 @@ func (w *Window) Decode(value cty.Value) hcl.Diagnostics {
 		}
 	}
 
+	if !value.GetAttr("envs").IsNull() {
+		for name, value := range value.GetAttr("envs").AsValueMap() {
+			w.Envs[name] = value.AsString()
+		}
+	}
+
 	if !value.GetAttr("panes").IsNull() {
 		if value.GetAttr("panes").CanIterateElements() {
 			it := value.GetAttr("panes").ElementIterator()
@@ -55,6 +61,10 @@ func (w *Window) Decode(value cty.Value) hcl.Diagnostics {
 				if diags = pane.Decode(value); diags.HasErrors() {
 					diags = diags.Extend(diags)
 					continue
+				}
+
+				for name, value := range w.Envs {
+					pane.Envs[name] = value
 				}
 
 				w.Panes.Push(pane)

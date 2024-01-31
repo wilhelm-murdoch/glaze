@@ -245,10 +245,7 @@ func (c Client) NewSessionIfNotExists(sessionName, startingDirectory string) (*S
 
 // KillSession kills the given session.
 func (c Client) KillSessionByName(sessionName string) error {
-	sessions, err := c.Sessions()
-	if err != nil {
-		return err
-	}
+	sessions, _ := c.Sessions()
 
 	found := sessions.Find(func(i int, s *Session) bool {
 		return s.Name == sessionName
