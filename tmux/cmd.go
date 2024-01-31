@@ -5,41 +5,12 @@ import (
 	"os"
 	"os/exec"
 	"strings"
-	"syscall"
 )
 
 // Command represents a command to run within a tmux session.
 type Command struct {
 	args []string
 	cmd  *exec.Cmd
-}
-
-// CommandError represents an error that occurred while running a command.
-type CommandError struct {
-	args       []string
-	err        error
-	ExitStatus int
-}
-
-// NewCommandError returns a new command error.
-func NewCommandError(args []string, err error) CommandError {
-	exitStatus := 0
-	if exiterr, ok := err.(*exec.ExitError); ok {
-		if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
-			exitStatus = status.ExitStatus()
-		}
-	}
-
-	return CommandError{
-		args:       args,
-		err:        err,
-		ExitStatus: exitStatus,
-	}
-}
-
-// Error returns the error message.
-func (ce CommandError) Error() string {
-	return fmt.Sprintf(`error: "%s" status: "%d" command: "%s"`, ce.err, ce.ExitStatus, strings.Join(ce.args, " "))
 }
 
 // NewCommand returns a new command with the given arguments.
@@ -85,7 +56,7 @@ func (c Command) Exec() error {
 func (c Command) ExecWithOutput() (string, error) {
 	output, err := c.cmd.CombinedOutput()
 	if err != nil {
-		return "", NewCommandError(c.args, err)
+		return "", NewCommandErrorWithOutput(c.args, err, string(output))
 	}
 
 	return strings.TrimSuffix(string(output), "\n"), nil

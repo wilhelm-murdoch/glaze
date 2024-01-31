@@ -266,10 +266,26 @@ func (c Client) KillSessionByName(sessionName string) error {
 	return cmd.Exec()
 }
 
-// SessionExists returns true if a session with the given name exists.
-func (c Client) SessionExists(name string) bool {
+// FindSessionByName returns the session with the given name if it exists.
+func (c Client) FindSessionByName(sessionName string) (*Session, error) {
 	sessions, _ := c.Sessions()
+
+	found := sessions.Find(func(i int, s *Session) bool {
+		return s.Name == sessionName
+	})
+
+	if found != nil {
+		return found, nil
+	}
+
+	return nil, fmt.Errorf(`session "%s" not found`, sessionName)
+}
+
+// SessionExists returns true if a session with the given name exists.
+func (c Client) SessionExists(sessionName string) bool {
+	sessions, _ := c.Sessions()
+
 	return sessions.Find(func(i int, s *Session) bool {
-		return s.Name == name
+		return s.Name == sessionName
 	}) != nil
 }

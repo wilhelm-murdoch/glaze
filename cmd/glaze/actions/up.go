@@ -64,9 +64,22 @@ func ActionUp(ctx *cli.Context) error {
 		}
 	}
 
-	session, err := client.NewSession(profile.Name, profile.StartingDirectory)
-	if err != nil {
-		return err
+	var session *tmux.Session
+	var err error
+	if client.SessionExists(profile.Name) {
+		session, err = client.FindSessionByName(profile.Name)
+		if err != nil {
+			return err
+		}
+
+		if err := client.Attach(session); err != nil {
+			return err
+		}
+	} else {
+		session, err = client.NewSession(profile.Name, profile.StartingDirectory)
+		if err != nil {
+			return err
+		}
 	}
 
 	// Iterate through the windows and panes defined within the specified
