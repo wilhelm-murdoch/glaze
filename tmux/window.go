@@ -38,7 +38,7 @@ func (w *Window) Split(splitType enums.Split, placement enums.Placement, full en
 	args := []string{
 		"splitw",
 		"-Pd",
-		"-t", w.Name,
+		"-t", w.Session.Name,
 		"-c", startingDirectory,
 		"-F", strings.Join(format, ";"),
 	}

@@ -39,9 +39,9 @@ func (s *Session) Decode(value cty.Value) hcl.Diagnostics {
 	}
 
 	if !value.GetAttr("envs").IsNull() {
-		s.Envs = make(map[string]string, 1)
-		for range value.GetAttr("envs").AsValueMap() {
-			s.Envs["wow"] = "hi"
+		s.Envs = make(map[string]string)
+		for name, value := range value.GetAttr("envs").AsValueMap() {
+			s.Envs[name] = value.AsString()
 		}
 	}
 
@@ -53,8 +53,6 @@ func (s *Session) Decode(value cty.Value) hcl.Diagnostics {
 				_, value := it.Element()
 
 				window := new(Window)
-
-				window.Envs = s.Envs
 
 				if diags = window.Decode(value); diags.HasErrors() {
 					diags = diags.Extend(diags)

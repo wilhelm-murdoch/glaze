@@ -59,6 +59,7 @@ func (p *Pane) Decode(value cty.Value) hcl.Diagnostics {
 	}
 
 	if !value.GetAttr("envs").IsNull() {
+		p.Envs = make(map[string]string)
 		for name, value := range value.GetAttr("envs").AsValueMap() {
 			p.Envs[name] = value.AsString()
 		}

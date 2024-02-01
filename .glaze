@@ -20,4 +20,22 @@ session "Glaze" {
       }
     }
   }
+
+  window "WorkspaceTwo" {
+    env = {
+      WINDOW = "window"
+    }
+
+    pane "Primary" {
+      env = {
+        PANE = "pane"
+      }
+    }
+
+    pane "Secondary" {
+      env = {
+        PANE = "pane"
+      }
+    }
+  }
 }

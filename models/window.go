@@ -45,6 +45,7 @@ func (w *Window) Decode(value cty.Value) hcl.Diagnostics {
 	}
 
 	if !value.GetAttr("envs").IsNull() {
+		w.Envs = make(map[string]string)
 		for name, value := range value.GetAttr("envs").AsValueMap() {
 			w.Envs[name] = value.AsString()
 		}
@@ -58,13 +59,10 @@ func (w *Window) Decode(value cty.Value) hcl.Diagnostics {
 				_, value := it.Element()
 
 				pane := new(Pane)
+
 				if diags = pane.Decode(value); diags.HasErrors() {
 					diags = diags.Extend(diags)
 					continue
-				}
-
-				for name, value := range w.Envs {
-					pane.Envs[name] = value
 				}
 
 				w.Panes.Push(pane)

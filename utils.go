@@ -6,6 +6,8 @@ import (
 	"io/fs"
 	"os"
 	"strings"
+
+	"github.com/kr/pretty"
 )
 
 func FileExists(path string) bool {
@@ -36,4 +38,10 @@ func joinWith(choices []string, conjunction string) string {
 	}
 
 	return fmt.Sprintf(`%s %s %s`, strings.Join(choices[:length-1], ", "), conjunction, choices[length-1])
+}
+
+func Prettier(values ...any) {
+	for _, value := range values {
+		fmt.Printf("%# v\n", pretty.Formatter(value))
+	}
 }

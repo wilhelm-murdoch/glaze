@@ -252,7 +252,7 @@ func (c Client) KillSessionByName(sessionName string) error {
 	})
 
 	if found == nil {
-		return fmt.Errorf(`session "%s" not found`, sessionName)
+		return nil
 	}
 
 	cmd, err := NewCommand(c, "kill-session", "-t", found.Target())
