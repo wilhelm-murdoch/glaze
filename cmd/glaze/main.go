@@ -30,16 +30,15 @@ var (
 )
 
 func main() {
-	defer func() {
-		// If the GLAZE_DEBUG environment variable is set, we don't want to recover from panics.
-		if os.Getenv("GLAZE_DEBUG") == "" {
-			if r := recover(); r != nil {
-				fmt.Println(r)
-				os.Exit(1)
-			}
-		}
-
-	}()
+	// defer func() {
+	// 	// If the GLAZE_DEBUG environment variable is set, we don't want to recover from panics.
+	// 	if os.Getenv("GLAZE_DEBUG") == "" {
+	// 		if r := recover(); r != nil {
+	// 			fmt.Println(r)
+	// 			os.Exit(1)
+	// 		}
+	// 	}
+	// }()
 
 	cli.VersionPrinter = func(c *cli.Context) {
 		fmt.Printf("Version: %s, Stage: %s, Commit: %s, Date: %s\n", Version, Stage, Commit, Date)

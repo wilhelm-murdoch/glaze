@@ -70,6 +70,7 @@ func (s *Session) NewWindow(windowName string) (*Window, error) {
 		Name:     parts[2],
 		Layout:   enums.LayoutFromString(parts[3]),
 		IsActive: parts[4] == "1",
+		IsFirst:  index == 0,
 		Session:  s,
 	}, nil
 }

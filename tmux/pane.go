@@ -9,6 +9,7 @@ type Pane struct {
 	Name              string
 	StartingDirectory string
 	IsActive          bool
+	IsFirst           bool
 	Window            *Window
 }
 

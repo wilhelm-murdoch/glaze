@@ -75,76 +75,77 @@ func ActionUp(ctx *cli.Context) error {
 		}
 	}
 
+	glaze.Prettier(session)
+
 	// Iterate through the windows and panes defined within the specified
 	// profile and create them within the tmux session.
-	for _, wm := range profile.Windows.Items() {
-		_, err := session.NewWindow(wm.Name)
-		if err != nil {
-			return err
-		}
+	// for _, wm := range profile.Windows.Items() {
+	// 	wc, err := session.NewWindow(wm.Name)
+	// 	if err != nil {
+	// 		return err
+	// 	}
 
-		// for _, pm := range wm.Panes.Items() {
-		// 	glaze.Prettier(wc, pm)
+	// for _, pm := range wm.Panes.Items() {
+	// 	_, err := wc.Split(pm.Split, pm.Placement, pm.Full, pm.Name, pm.Name, pm.StartingDirectory, pm.Size)
+	// 	if err != nil {
+	// 		return err
+	// 	}
 
-		// 	_, err := wc.Split(pm.Split, pm.Placement, pm.Full, pm.Name, pm.StartingDirectory, pm.Size)
-		// 	if err != nil {
-		// 		return err
-		// 	}
+	// glaze.Prettier(pc)
+	// // Run any defined commands in order as defined within the
+	// // current the profile. Add a small delay between each command
+	// // to ensure they are executed in order.
+	// for _, cmd := range pm.Commands {
+	// 	time.Sleep(time.Millisecond * time.Duration(100))
+	// 	pc.SendKeys(cmd)
+	// }
+	// }
 
-		// // Run any defined commands in order as defined within the
-		// // current the profile. Add a small delay between each command
-		// // to ensure they are executed in order.
-		// for _, cmd := range pm.Commands {
-		// 	time.Sleep(time.Millisecond * time.Duration(100))
-		// 	pc.SendKeys(cmd)
-		// }
-		// }
-
-		// if err := wc.SelectLayout(wm.Layout); err != nil {
-		// 	return err
-		// }
-	}
+	// if err := wc.SelectLayout(wm.Layout); err != nil {
+	// 	return err
+	// }
+	// }
 
 	// Tmux creates a default window with a default pane for every
 	// session. Remove the defaults so only windows and panes defined
 	// within the profile are left.
-	windows, err := client.Windows(session)
-	if err != nil {
-		return err
-	}
+	// windows, err := client.Windows(session)
+	// if err != nil {
+	// 	return err
+	// }
 
-	defaultWindow := windows.Find(func(i int, window *tmux.Window) bool {
-		return window.Index == 0
-	})
+	// defaultWindow := windows.Find(func(i int, window *tmux.Window) bool {
+	// 	return window.Index == 0
+	// })
 
-	if defaultWindow != nil {
-		defaultWindow.Kill()
-		windows.Shift()
-	}
+	// if defaultWindow != nil {
+	// 	defaultWindow.Kill()
+	// 	windows.Shift()
+	// }
 
-	for _, window := range windows.Items() {
-		panes, err := client.Panes(window)
-		if err != nil {
-			return err
-		}
+	// for _, window := range windows.Items() {
+	// 	panes, err := client.Panes(window)
+	// 	if err != nil {
+	// 		return err
+	// 	}
 
-		if panes.Length() > 1 {
-			defaultPane := panes.Find(func(i int, pane *tmux.Pane) bool {
-				return pane.Index == 0
-			})
+	// 	if panes.Length() > 1 {
+	// 		defaultPane := panes.Find(func(i int, pane *tmux.Pane) bool {
+	// 			return pane.Index == 0
+	// 		})
 
-			if defaultPane != nil {
-				defaultPane.Kill()
-				panes.Shift()
-			}
-		}
-	}
+	// 		if defaultPane != nil {
+	// 			defaultPane.Kill()
+	// 			panes.Shift()
+	// 		}
+	// 	}
+	// }
 
-	if !ctx.Bool("detached") {
-		if err := client.Attach(session); err != nil {
-			return err
-		}
-	}
+	// if !ctx.Bool("detached") {
+	// 	if err := client.Attach(session); err != nil {
+	// 		return err
+	// 	}
+	// }
 
 	return nil
 }

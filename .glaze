@@ -8,31 +8,13 @@ session "Glaze" {
       WINDOW = "window"
     }
 
-    pane "Primary" {
+    pane "PrimaryOne" {
       env = {
         PANE = "pane"
       }
     }
 
-    pane "Secondary" {
-      env = {
-        PANE = "pane"
-      }
-    }
-  }
-
-  window "WorkspaceTwo" {
-    env = {
-      WINDOW = "window"
-    }
-
-    pane "Primary" {
-      env = {
-        PANE = "pane"
-      }
-    }
-
-    pane "Secondary" {
+    pane "SecondaryOne" {
       env = {
         PANE = "pane"
       }
