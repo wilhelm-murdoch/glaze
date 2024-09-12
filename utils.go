@@ -29,11 +29,12 @@ func JoinWithAnd(choices []string) string {
 
 func joinWith(choices []string, conjunction string) string {
 	length := len(choices)
-	if length == 0 {
+	switch length {
+	case 0:
 		return ""
-	} else if length == 1 {
+	case 1:
 		return choices[0]
-	} else if length == 2 {
+	case 2:
 		return fmt.Sprintf(`%s %s %s`, choices[0], conjunction, choices[1])
 	}
 

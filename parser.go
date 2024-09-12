@@ -10,10 +10,10 @@ import (
 )
 
 type Parser struct {
-	parser      *hclparse.Parser
-	File        *hcl.File
-	diags       hcl.Diagnostics
 	diagsWriter hcl.DiagnosticWriter
+	File        *hcl.File
+	parser      *hclparse.Parser
+	diags       hcl.Diagnostics
 }
 
 func NewParser(path string) *Parser {
