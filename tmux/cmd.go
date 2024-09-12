@@ -9,8 +9,8 @@ import (
 
 // Command represents a command to run within a tmux session.
 type Command struct {
-	args []string
 	cmd  *exec.Cmd
+	args []string
 }
 
 // NewCommand returns a new command with the given arguments.

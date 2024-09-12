@@ -12,13 +12,13 @@ import (
 type Pane struct {
 	Name              string
 	StartingDirectory string
-	Commands          []string
-	IsActive          bool
-	Split             enums.Split
 	Size              string
-	Placement         enums.Placement
-	Full              enums.Full
 	Envs              map[string]string
+	Commands          []string
+	Full              enums.Full
+	Split             enums.Split
+	Placement         enums.Placement
+	IsActive          bool
 }
 
 func (p *Pane) Decode(value cty.Value) hcl.Diagnostics {

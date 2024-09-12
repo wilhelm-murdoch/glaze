@@ -4,13 +4,13 @@ import "fmt"
 
 // Pane represents a tmux pane.
 type Pane struct {
-	Id                int
-	Index             int
+	Window            *Window
 	Name              string
 	StartingDirectory string
 	IsActive          bool
 	IsFirst           bool
-	Window            *Window
+	Index             int
+	Id                int
 }
 
 // Target returns the target pane by its composite id of session name, window id, and pane id.

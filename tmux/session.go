@@ -11,9 +11,9 @@ import (
 // Session represents a tmux session.
 type Session struct {
 	Client            Client
-	Id                int
 	Name              string
 	StartingDirectory string
+	Id                int
 }
 
 // Target returns the target session by its name.
@@ -54,7 +54,7 @@ func (s *Session) NewWindow(windowName string) (*Window, error) {
 
 	parts := strings.SplitN(output, ";", 5)
 
-	id, err := strconv.Atoi(strings.Replace(parts[0], "@", "", -1))
+	id, err := strconv.Atoi(strings.ReplaceAll(parts[0], "@", ""))
 	if err != nil {
 		return window, err
 	}

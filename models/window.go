@@ -12,11 +12,11 @@ import (
 
 type Window struct {
 	Name              string
-	Layout            enums.Layout
-	Focus             bool
 	StartingDirectory string
 	Envs              map[string]string
 	Panes             collection.Collection[*Pane]
+	Layout            enums.Layout
+	Focus             bool
 }
 
 func (w *Window) Decode(value cty.Value) hcl.Diagnostics {

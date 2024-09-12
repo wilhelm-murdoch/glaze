@@ -11,9 +11,9 @@ import (
 
 // Client represents a tmux client.
 type Client struct {
+	CurrentSession *Session
 	socketPath     string
 	socketName     string
-	CurrentSession *Session
 }
 
 // NewClient returns a new client.
@@ -81,7 +81,7 @@ func (c Client) Sessions() (collection.Collection[*Session], error) {
 	for _, line := range strings.Split(output, "\n") {
 		parts := strings.SplitN(line, ";", 3)
 
-		id, err := strconv.Atoi(strings.Replace(parts[0], "$", "", -1))
+		id, err := strconv.Atoi(strings.ReplaceAll(parts[0], "$", ""))
 		if err != nil {
 			return sessions, err
 		}
@@ -128,7 +128,7 @@ func (c Client) Windows(session *Session) (collection.Collection[*Window], error
 	for _, window := range strings.Split(output, "\n") {
 		parts := strings.SplitN(window, ";", 5)
 
-		id, err := strconv.Atoi(strings.Replace(parts[0], "@", "", -1))
+		id, err := strconv.Atoi(strings.ReplaceAll(parts[0], "@", ""))
 		if err != nil {
 			return windows, err
 		}
@@ -182,7 +182,7 @@ func (c Client) Panes(window *Window) (collection.Collection[*Pane], error) {
 	for _, pane := range strings.Split(output, "\n") {
 		parts := strings.SplitN(pane, ";", 5)
 
-		id, err := strconv.Atoi(strings.Replace(parts[0], "%", "", -1))
+		id, err := strconv.Atoi(strings.ReplaceAll(parts[0], "%", ""))
 		if err != nil {
 			return panes, err
 		}

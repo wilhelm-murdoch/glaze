@@ -10,13 +10,13 @@ import (
 
 // Window represents a tmux window.
 type Window struct {
-	Id       int
-	Index    int
+	Session  *Session
 	Name     string
-	Layout   enums.Layout
 	IsActive bool
 	IsFirst  bool
-	Session  *Session
+	Id       int
+	Index    int
+	Layout   enums.Layout
 }
 
 // Target returns the target window by its composite id of session name
@@ -75,7 +75,7 @@ func (w *Window) Split(splitType enums.Split, placement enums.Placement, full en
 
 	parts := strings.SplitN(output, ";", 4)
 
-	id, err := strconv.Atoi(strings.Replace(parts[0], "%", "", -1))
+	id, err := strconv.Atoi(strings.ReplaceAll(parts[0], "%", ""))
 	if err != nil {
 		return pane, err
 	}

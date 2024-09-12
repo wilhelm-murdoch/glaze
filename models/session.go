@@ -11,10 +11,10 @@ import (
 
 type Session struct {
 	Name              string
-	ReattachOnStart   bool
 	StartingDirectory string
 	Envs              map[string]string
 	Windows           collection.Collection[*Window]
+	ReattachOnStart   bool
 }
 
 func (s *Session) Decode(value cty.Value) hcl.Diagnostics {

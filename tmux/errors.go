@@ -9,8 +9,8 @@ import (
 
 // CommandError represents an error that occurred while running a command.
 type CommandError struct {
-	args       []string
 	err        error
+	args       []string
 	ExitStatus int
 }
 
@@ -30,8 +30,8 @@ func (ce CommandError) Error() string {
 
 // CommandErrorWithOutput extends the CommandError struct with the output of the command.
 type CommandErrorWithOutput struct {
-	CommandError
 	Output string
+	CommandError
 }
 
 // Error returns the error message.
