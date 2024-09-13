@@ -13,15 +13,15 @@ jobs:
     strategy:
       matrix:
         include:
-          - {goos: "linux",   goarch: "386",   runson: "ubuntu-latest"}
-          - {goos: "linux",   goarch: "amd64", runson: "ubuntu-latest"}
-          - {goos: "linux",   goarch: "arm",   runson: "ubuntu-latest"}
-          - {goos: "linux",   goarch: "arm64", runson: "ubuntu-latest"}
-          - {goos: "windows", goarch: "386",   runson: "ubuntu-latest"}
-          - {goos: "windows", goarch: "arm",   runson: "ubuntu-latest"}
-          - {goos: "windows", goarch: "amd64", runson: "ubuntu-latest"}
-          - {goos: "darwin",  goarch: "amd64", runson: "macos-latest"}
-          - {goos: "darwin",  goarch: "arm64", runson: "macos-latest"}
+          - { goos: "linux", goarch: "386", runson: "ubuntu-latest" }
+          - { goos: "linux", goarch: "amd64", runson: "ubuntu-latest" }
+          - { goos: "linux", goarch: "arm", runson: "ubuntu-latest" }
+          - { goos: "linux", goarch: "arm64", runson: "ubuntu-latest" }
+          - { goos: "windows", goarch: "386", runson: "ubuntu-latest" }
+          - { goos: "windows", goarch: "arm", runson: "ubuntu-latest" }
+          - { goos: "windows", goarch: "amd64", runson: "ubuntu-latest" }
+          - { goos: "darwin", goarch: "amd64", runson: "macos-latest" }
+          - { goos: "darwin", goarch: "arm64", runson: "macos-latest" }
     steps:
       - name: Get current date
         id: date
@@ -31,7 +31,7 @@ jobs:
           fetch-depth: 1
       - uses: wangyoucao577/go-release-action@v1.25
         with:
-          goversion: "1.20"
+          goversion: "1.22"
           github_token: ${{ secrets.GITHUB_TOKEN }}
           goos: ${{ matrix.goos }}
           goarch: ${{ matrix.goarch }}
@@ -41,3 +41,4 @@ jobs:
           build_flags: "-a -installsuffix cgo"
           extra_files: LICENSE.md README.md
           asset_name: "glaze-${{ matrix.goos }}-${{ matrix.goarch }}"
+
