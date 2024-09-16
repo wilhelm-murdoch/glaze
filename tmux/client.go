@@ -12,15 +12,17 @@ import (
 // Client represents a tmux client.
 type Client struct {
 	CurrentSession *Session
+	debug          bool
 	socketPath     string
 	socketName     string
 }
 
 // NewClient returns a new client.
-func NewClient(socketPath, socketName string) Client {
+func NewClient(socketPath, socketName string, debug bool) Client {
 	return Client{
 		socketPath: socketPath,
 		socketName: socketName,
+		debug:      debug,
 	}
 }
 
@@ -198,6 +200,7 @@ func (c Client) Panes(window *Window) (collection.Collection[*Pane], error) {
 			Name:              parts[2],
 			StartingDirectory: parts[4],
 			IsActive:          parts[3] == "1",
+			IsFirst:           index == 0,
 			Window:            window,
 		})
 	}

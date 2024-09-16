@@ -1,4 +1,4 @@
-session "Glaze" {
+session "TestSession" {
   env = {
     SESSION = "session"
   }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/urfave/cli/v2"
 	"github.com/wilhelm-murdoch/glaze"
@@ -38,7 +39,7 @@ func ActionUp(ctx *cli.Context) error {
 	}
 
 	if !glaze.FileExists(profilePath) {
-		return fmt.Errorf("default glaze profile not found on the specified path, the current directory, or the GLAZE_PATH environment variable")
+		return fmt.Errorf("profile `%s` not found on the specified path, the current directory, or the GLAZE_PATH environment variable", profilePath)
 	}
 
 	parser := glaze.NewParser(profilePath)
@@ -55,51 +56,65 @@ func ActionUp(ctx *cli.Context) error {
 		return nil
 	}
 
-	client := tmux.NewClient(ctx.String("socket-name"), ctx.String("socket-path"))
+	client := tmux.NewClient(
+		ctx.String("socket-name"),
+		ctx.String("socket-path"),
+		ctx.Bool("debug"),
+	)
 
-	if err := client.KillSessionByName(profile.Name); err != nil && ctx.Bool("clear") {
+	if ctx.Bool("clear") {
+		client.KillSessionByName(profile.Name)
+	}
+
+	if client.SessionExists(profile.Name) {
+		session, err := client.FindSessionByName(profile.Name)
+		if err != nil {
+			return err
+		}
+
+		if !ctx.Bool("detached") {
+			if err := client.Attach(session); err != nil {
+				return err
+			}
+		}
+
+		return nil
+	}
+
+	session, err := client.NewSession(profile.Name, profile.StartingDirectory)
+	if err != nil {
 		return err
 	}
 
-	var session *tmux.Session
-	var err error
-	if client.SessionExists(profile.Name) {
-		session, err = client.FindSessionByName(profile.Name)
+	glaze.Prettier(profile)
+
+	// Iterate through the windows and panes defined within the specified profile and create them within the tmux session.
+	for _, wm := range profile.Windows.Items() {
+		wc, err := session.NewWindow(wm.Name)
 		if err != nil {
 			return err
 		}
-	} else {
-		session, err = client.NewSession(profile.Name, profile.StartingDirectory)
-		if err != nil {
-			return err
+
+		panes, _ := client.Panes(wc)
+		defaultPane := panes.Find(func(i int, item *tmux.Pane) bool {
+			return item.IsFirst
+		})
+
+		for _, pm := range wm.Panes.Items() {
+			pc, err := wc.Split(pm.Split, pm.Placement, pm.Full, defaultPane.Name, pm.Name, pm.StartingDirectory, pm.Size)
+			if err != nil {
+				return err
+			}
+
+			// Run any defined commands in order as defined within the
+			// current the profile. Add a small delay between each command
+			// to ensure they are executed in order.
+			for _, cmd := range pm.Commands {
+				time.Sleep(time.Millisecond * time.Duration(100))
+				pc.SendKeys(cmd)
+			}
 		}
 	}
-
-	glaze.Prettier(session)
-
-	// Iterate through the windows and panes defined within the specified
-	// profile and create them within the tmux session.
-	// for _, wm := range profile.Windows.Items() {
-	// 	wc, err := session.NewWindow(wm.Name)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-
-	// for _, pm := range wm.Panes.Items() {
-	// 	_, err := wc.Split(pm.Split, pm.Placement, pm.Full, pm.Name, pm.Name, pm.StartingDirectory, pm.Size)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-
-	// glaze.Prettier(pc)
-	// // Run any defined commands in order as defined within the
-	// // current the profile. Add a small delay between each command
-	// // to ensure they are executed in order.
-	// for _, cmd := range pm.Commands {
-	// 	time.Sleep(time.Millisecond * time.Duration(100))
-	// 	pc.SendKeys(cmd)
-	// }
-	// }
 
 	// if err := wc.SelectLayout(wm.Layout); err != nil {
 	// 	return err
@@ -141,11 +156,11 @@ func ActionUp(ctx *cli.Context) error {
 	// 	}
 	// }
 
-	// if !ctx.Bool("detached") {
-	// 	if err := client.Attach(session); err != nil {
-	// 		return err
-	// 	}
-	// }
+	if !ctx.Bool("detached") {
+		if err := client.Attach(session); err != nil {
+			return err
+		}
+	}
 
 	return nil
 }

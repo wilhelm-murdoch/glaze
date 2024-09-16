@@ -75,11 +75,15 @@ func main() {
 			Flags: []cli.Flag{
 				&cli.BoolFlag{
 					Name:  "detached",
-					Usage: "start a tmux session using glaze detached mode",
+					Usage: "start a tmux session using glaze in detached mode",
 				},
 				&cli.BoolFlag{
 					Name:  "clear",
-					Usage: "clear the current glaze session before starting",
+					Usage: "if it exists, clear the current glaze session before starting",
+				},
+				&cli.BoolFlag{
+					Name:  "debug",
+					Usage: "prints a list of all commands sent to the specified tmux socket",
 				},
 				&cli.StringFlag{
 					Name:  "socket-path",
