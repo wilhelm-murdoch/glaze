@@ -26,7 +26,7 @@ func (w Window) Target() string {
 }
 
 // Split splits the current window into two panes.
-func (w *Window) Split(splitType enums.Split, placement enums.Placement, full enums.Full, parentId, name, startingDirectory, size string) (Pane, error) {
+func (w *Window) Split(parentId, name, startingDirectory string) (Pane, error) {
 	var pane Pane
 
 	format := []string{
@@ -42,25 +42,6 @@ func (w *Window) Split(splitType enums.Split, placement enums.Placement, full en
 		"-t", parentId,
 		"-c", startingDirectory,
 		"-F", strings.Join(format, ";"),
-	}
-
-	splitTypeFlag := "-h"
-	if splitType == enums.SplitVertical {
-		splitTypeFlag = "-v"
-	}
-
-	args = append(args, splitTypeFlag)
-
-	if size != "" {
-		args = append(args, "-l", size)
-	}
-
-	if placement != enums.PlacementUnknown {
-		args = append(args, "-b", fmt.Sprint(placement))
-	}
-
-	if full != enums.FullUnknown {
-		args = append(args, "-f")
 	}
 
 	cmd, err := NewCommand(w.Session.Client, args...)

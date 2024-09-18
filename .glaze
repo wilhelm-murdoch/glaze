@@ -1,23 +1,84 @@
 session "TestSession" {
-  env = {
-    SESSION = "session"
-  }
-
-  window "WorkspaceOne" {
-    env = {
-      WINDOW = "window"
+  window "WindowOne" {
+    layout = "tiled"
+    pane "PaneTwo" {
     }
 
-    pane "PrimaryOne" {
-      env = {
-        PANE = "pane"
-      }
+    pane "PaneOne" {
+      
     }
 
-    pane "SecondaryOne" {
-      env = {
-        PANE = "pane"
-      }
+    pane "PaneOne" {
+      
+    }
+
+    pane "PaneOne" {
+      
     }
   }
+
+  window "WindowOne" {
+    layout = "tiled"
+    pane "PaneTwo" {
+    }
+
+    pane "PaneOne" {
+      
+    }
+
+    pane "PaneOne" {
+      
+    }
+
+    pane "PaneOne" {
+      
+    }
+  }
+
+  window "WindowOne" {
+    layout = "tiled"
+    pane "PaneTwo" {
+    }
+
+    pane "PaneOne" {
+      
+    }
+
+    pane "PaneOne" {
+      
+    }
+
+    pane "PaneOne" {
+      
+    }
+  }
+
+
+  // window "WindowTwo" {
+  //   env = {
+  //     WINDOW = "2"
+  //   }
+
+  //   pane "PaneOne" {
+  //     env = {
+  //       PANE = "1"
+  //     }
+
+  //     commands = [
+  //       "echo I am the first pane in the second window",
+  //     ]
+
+  //     split = "vertical"
+  //   }
+
+  //   pane "PaneTwo" {
+  //     env = {
+  //       PANE = "2"
+  //     }
+
+  //     commands = [
+  //       "echo I am the second pane in the second window",
+  //     ]
+  //   }
+  // }
 }

@@ -55,6 +55,8 @@ func LayoutFromString(s string) Layout {
 		return LayoutMainHorizontal
 	case LayoutMainVerticalString:
 		return LayoutMainVertical
+	case LayoutTiledString:
+		return LayoutTiled
 	}
 
 	return LayoutUnknown

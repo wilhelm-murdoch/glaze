@@ -146,6 +146,7 @@ func (c Client) Windows(session *Session) (collection.Collection[*Window], error
 			Name:     parts[2],
 			Layout:   enums.LayoutFromString(parts[3]),
 			IsActive: parts[4] == "1",
+			IsFirst:  index == 0,
 			Session:  session,
 		})
 	}
