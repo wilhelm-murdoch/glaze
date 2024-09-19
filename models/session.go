@@ -6,7 +6,6 @@ import (
 	"github.com/hashicorp/hcl/v2"
 	"github.com/wilhelm-murdoch/go-collection"
 	"github.com/zclconf/go-cty/cty"
-	"github.com/zclconf/go-cty/cty/gocty"
 )
 
 type Session struct {
@@ -14,7 +13,6 @@ type Session struct {
 	StartingDirectory string
 	Envs              map[string]string
 	Windows           collection.Collection[*Window]
-	ReattachOnStart   bool
 }
 
 func (s *Session) Decode(value cty.Value) hcl.Diagnostics {
@@ -22,12 +20,6 @@ func (s *Session) Decode(value cty.Value) hcl.Diagnostics {
 
 	if !value.GetAttr("name").IsNull() {
 		s.Name = value.GetAttr("name").AsString()
-	}
-
-	if !value.GetAttr("reattach_on_start").IsNull() {
-		gocty.FromCtyValue(value.GetAttr("reattach_on_start"), &s.ReattachOnStart)
-	} else {
-		s.ReattachOnStart = true
 	}
 
 	if !value.GetAttr("starting_directory").IsNull() {

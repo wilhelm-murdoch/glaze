@@ -4,7 +4,6 @@ import (
 	"os"
 
 	"github.com/hashicorp/hcl/v2"
-	"github.com/wilhelm-murdoch/glaze/tmux/enums"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
 )
@@ -14,11 +13,9 @@ type Pane struct {
 	StartingDirectory string
 	Size              string
 	Envs              map[string]string
+	Hooks             map[string]string
 	Commands          []string
-	Full              enums.Full
-	Split             enums.Split
-	Placement         enums.Placement
-	IsActive          bool
+	Focus             bool
 }
 
 func (p *Pane) Decode(value cty.Value) hcl.Diagnostics {
@@ -29,7 +26,7 @@ func (p *Pane) Decode(value cty.Value) hcl.Diagnostics {
 	}
 
 	if !value.GetAttr("focus").IsNull() {
-		gocty.FromCtyValue(value.GetAttr("focus"), &p.IsActive)
+		gocty.FromCtyValue(value.GetAttr("focus"), &p.Focus)
 	}
 
 	if !value.GetAttr("starting_directory").IsNull() {
@@ -40,28 +37,21 @@ func (p *Pane) Decode(value cty.Value) hcl.Diagnostics {
 		}
 	}
 
-	if !value.GetAttr("split").IsNull() {
-		p.Split = enums.SplitFromString(value.GetAttr("split").AsString())
-	} else {
-		p.Split = enums.SplitVertical
-	}
-
 	if !value.GetAttr("size").IsNull() {
 		p.Size = value.GetAttr("size").AsString()
-	}
-
-	if !value.GetAttr("full").IsNull() {
-		p.Full = enums.FullFromString(value.GetAttr("full").AsString())
-	}
-
-	if !value.GetAttr("placement").IsNull() {
-		p.Placement = enums.PlacementFromString(value.GetAttr("placement").AsString())
 	}
 
 	if !value.GetAttr("envs").IsNull() {
 		p.Envs = make(map[string]string)
 		for name, value := range value.GetAttr("envs").AsValueMap() {
 			p.Envs[name] = value.AsString()
+		}
+	}
+
+	if !value.GetAttr("hooks").IsNull() {
+		p.Hooks = make(map[string]string)
+		for name, value := range value.GetAttr("hooks").AsValueMap() {
+			p.Hooks[name] = value.AsString()
 		}
 	}
 

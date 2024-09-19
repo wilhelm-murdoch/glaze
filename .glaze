@@ -1,55 +1,71 @@
 session "TestSession" {
+  // options
+  // hooks
   window "WindowOne" {
     layout = "tiled"
+
+    options = {
+      pane-border-lines = "double"
+      monitor-activity  = "on"
+    }
+
+    hooks = {}
+
     pane "PaneTwo" {
+      options = {
+        pane-border-lines = "double"
+        monitor-activity  = "on"
+      }
+
+      hooks = {}
     }
 
     pane "PaneOne" {
-      
+
     }
 
     pane "PaneOne" {
-      
+
     }
 
     pane "PaneOne" {
-      
+
     }
   }
 
-  window "WindowOne" {
-    layout = "tiled"
+  window "WindowTwo" {
+    focus = true
     pane "PaneTwo" {
     }
 
     pane "PaneOne" {
-      
+
     }
 
     pane "PaneOne" {
-      
+      focus = true
     }
 
     pane "PaneOne" {
-      
+
     }
   }
 
-  window "WindowOne" {
+  window "WindowThree" {
     layout = "tiled"
     pane "PaneTwo" {
     }
 
     pane "PaneOne" {
-      
+      focus = true
     }
 
     pane "PaneOne" {
-      
+
     }
 
     pane "PaneOne" {
-      
+
     }
   }
 

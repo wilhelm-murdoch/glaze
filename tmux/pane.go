@@ -38,6 +38,15 @@ func (p Pane) SetEnv(key string, value string) error {
 	return cmd.Exec()
 }
 
+func (p Pane) Select() error {
+	cmd, err := NewCommand(p.Window.Session.Client, "selectp", "-t", p.Target())
+	if err != nil {
+		return err
+	}
+
+	return cmd.Exec()
+}
+
 // Kill closes the current pane.
 func (p Pane) Kill() error {
 	cmd, err := NewCommand(p.Window.Session.Client, "killp", "-t", p.Target())

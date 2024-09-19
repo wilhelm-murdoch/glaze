@@ -90,9 +90,13 @@ func main() {
 		}, {
 			Name:  "fmt",
 			Usage: "rewrites the target glaze profile file to a canonical format",
-			Action: func(ctx *cli.Context) error {
-				return actions.ActionFmt(ctx.Args().First())
+			Flags: []cli.Flag{
+				&cli.BoolFlag{
+					Name:  "stdout",
+					Usage: "writes the formatted glaze output to your terminal",
+				},
 			},
+			Action: actions.ActionFmt,
 		}, {
 			Name:  "save",
 			Usage: "running this within a tmux session will save its current state to the specified glaze profile",

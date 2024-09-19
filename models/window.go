@@ -14,6 +14,7 @@ type Window struct {
 	Name              string
 	StartingDirectory string
 	Envs              map[string]string
+	Options           map[string]string
 	Panes             collection.Collection[*Pane]
 	Layout            enums.Layout
 	Focus             bool
@@ -48,6 +49,13 @@ func (w *Window) Decode(value cty.Value) hcl.Diagnostics {
 		w.Envs = make(map[string]string)
 		for name, value := range value.GetAttr("envs").AsValueMap() {
 			w.Envs[name] = value.AsString()
+		}
+	}
+
+	if !value.GetAttr("options").IsNull() {
+		w.Options = make(map[string]string)
+		for name, value := range value.GetAttr("options").AsValueMap() {
+			w.Options[name] = value.AsString()
 		}
 	}
 

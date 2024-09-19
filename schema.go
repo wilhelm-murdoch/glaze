@@ -20,10 +20,6 @@ var (
 				Index: 0,
 				Name:  "name",
 			},
-			"reattach_on_start": &hcldec.AttrSpec{
-				Name: "reattach_on_start",
-				Type: cty.Bool,
-			},
 			"envs": &hcldec.AttrSpec{
 				Name: "env",
 				Type: cty.Map(cty.String),
@@ -47,6 +43,10 @@ var (
 					},
 					"envs": &hcldec.AttrSpec{
 						Name: "env",
+						Type: cty.Map(cty.String),
+					},
+					"options": &hcldec.AttrSpec{
+						Name: "options",
 						Type: cty.Map(cty.String),
 					},
 					"focus": &hcldec.AttrSpec{
@@ -84,6 +84,10 @@ var (
 									Name: "env",
 									Type: cty.Map(cty.String),
 								},
+								"hooks": &hcldec.AttrSpec{
+									Name: "hooks",
+									Type: cty.Map(cty.String),
+								},
 								"focus": &hcldec.AttrSpec{
 									Name: "focus",
 									Type: cty.Bool,
@@ -119,33 +123,6 @@ var (
 										return diags
 									},
 								},
-								"placement": &hcldec.ValidateSpec{
-									Wrapped: &hcldec.AttrSpec{
-										Name: "placement",
-										Type: cty.String,
-									},
-									Func: func(value cty.Value) hcl.Diagnostics {
-										return ContainsDiagnostic("placement", value, enums.PlacementList)
-									},
-								},
-								"full": &hcldec.ValidateSpec{
-									Wrapped: &hcldec.AttrSpec{
-										Name: "full",
-										Type: cty.String,
-									},
-									Func: func(value cty.Value) hcl.Diagnostics {
-										return ContainsDiagnostic("full", value, enums.FullList)
-									},
-								},
-								"split": &hcldec.ValidateSpec{
-									Wrapped: &hcldec.AttrSpec{
-										Name: "split",
-										Type: cty.String,
-									},
-									Func: func(value cty.Value) hcl.Diagnostics {
-										return ContainsDiagnostic("split", value, enums.SplitList)
-									},
-								},
 								"starting_directory": &hcldec.ValidateSpec{
 									Wrapped: &hcldec.AttrSpec{
 										Name: "starting_directory",
@@ -163,35 +140,9 @@ var (
 							Func: func(value cty.Value) hcl.Diagnostics {
 								var diags hcl.Diagnostics
 
-								split := value.GetAttr("split")
-								full := value.GetAttr("full")
-								placement := value.GetAttr("placement")
-								if split.IsNull() || enums.SplitFromString(split.AsString()) == enums.SplitVertical {
-									if !placement.IsNull() && enums.PlacementFromString(placement.AsString()) == enums.PlacementAbove {
-										diags = diags.Append(WrongAttributeDiagnostic("placement", placement.AsString(), enums.PlacementLeftString))
-									}
+								// Placeholder for future schema validations ...
 
-									if !full.IsNull() && enums.FullFromString(full.AsString()) == enums.FullHeight {
-										diags = diags.Append(WrongAttributeDiagnostic("full", full.AsString(), enums.FullWidthString))
-									}
-
-									return diags
-								}
-
-								if !split.IsNull() && enums.SplitFromString(split.AsString()) == enums.SplitHorizontal {
-									if !placement.IsNull() && enums.PlacementFromString(placement.AsString()) == enums.PlacementLeft {
-										diags = diags.Append(WrongAttributeDiagnostic("placement", placement.AsString(), enums.PlacementAboveString))
-
-									}
-
-									if !full.IsNull() && enums.FullFromString(full.AsString()) == enums.FullWidth {
-										diags = diags.Append(WrongAttributeDiagnostic("full", full.AsString(), enums.FullHeightString))
-									}
-
-									return diags
-								}
-
-								return nil
+								return diags
 							},
 						},
 					},

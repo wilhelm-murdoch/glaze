@@ -99,6 +99,15 @@ func (w Window) Kill() error {
 	return cmd.Exec()
 }
 
+func (w Window) Select() error {
+	cmd, err := NewCommand(w.Session.Client, "selectw", "-t", w.Target())
+	if err != nil {
+		return err
+	}
+
+	return cmd.Exec()
+}
+
 func (w Window) SelectLayout(layout enums.Layout) error {
 	cmd, err := NewCommand(w.Session.Client, "selectl", "-t", w.Target(), fmt.Sprint(layout))
 	if err != nil {

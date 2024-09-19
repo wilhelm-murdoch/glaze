@@ -118,12 +118,19 @@ func ActionUp(ctx *cli.Context) error {
 				if err := pc.SendKeys(cmd); err != nil {
 					return fmt.Errorf("could not execute command `%s` for pane `%s` in window `%s`: %s", cmd, pc.Name, wc.Name, err)
 				}
+			}
 
+			if pm.Focus {
+				pc.Select()
 			}
 		}
 
 		if err := wc.SelectLayout(wm.Layout); err != nil {
 			return fmt.Errorf("could not select layout `%s` for window `%s`: %s", wm.Layout, wc.Name, err)
+		}
+
+		if wm.Focus {
+			wc.Select()
 		}
 
 		// Remove the default pane directly from the session.
@@ -135,7 +142,7 @@ func ActionUp(ctx *cli.Context) error {
 	// within the profile are left.
 	windows, err := client.Windows(session)
 	if err != nil {
-		return err
+		return fmt.Errorf("could not read windows for session `%s`: %s", session.Name, err)
 	}
 
 	defaultWindow := windows.Find(func(i int, window *tmux.Window) bool {
@@ -144,7 +151,6 @@ func ActionUp(ctx *cli.Context) error {
 
 	if defaultWindow != nil {
 		defaultWindow.Kill()
-		windows.Shift()
 	}
 
 	if !ctx.Bool("detached") {
