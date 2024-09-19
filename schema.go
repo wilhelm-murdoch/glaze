@@ -11,6 +11,21 @@ import (
 )
 
 var (
+	envsSpec = &hcldec.AttrSpec{
+		Name: "env",
+		Type: cty.Map(cty.String),
+	}
+
+	optionsSpec = &hcldec.AttrSpec{
+		Name: "options",
+		Type: cty.Map(cty.String),
+	}
+
+	hooksSpec = &hcldec.AttrSpec{
+		Name: "hooks",
+		Type: cty.Map(cty.String),
+	}
+
 	PrimaryGlazeSpec = &hcldec.BlockListSpec{
 		TypeName: "session",
 		MinItems: 1,
@@ -20,10 +35,9 @@ var (
 				Index: 0,
 				Name:  "name",
 			},
-			"envs": &hcldec.AttrSpec{
-				Name: "env",
-				Type: cty.Map(cty.String),
-			},
+			"envs":    envsSpec,
+			"options": optionsSpec,
+			"hooks":   hooksSpec,
 			"starting_directory": &hcldec.ValidateSpec{
 				Wrapped: &hcldec.AttrSpec{
 					Name: "starting_directory",
@@ -41,14 +55,9 @@ var (
 						Index: 0,
 						Name:  "name",
 					},
-					"envs": &hcldec.AttrSpec{
-						Name: "env",
-						Type: cty.Map(cty.String),
-					},
-					"options": &hcldec.AttrSpec{
-						Name: "options",
-						Type: cty.Map(cty.String),
-					},
+					"envs":    envsSpec,
+					"options": optionsSpec,
+					"hooks":   hooksSpec,
 					"focus": &hcldec.AttrSpec{
 						Name: "focus",
 						Type: cty.Bool,
@@ -80,14 +89,9 @@ var (
 									Index: 0,
 									Name:  "name",
 								},
-								"envs": &hcldec.AttrSpec{
-									Name: "env",
-									Type: cty.Map(cty.String),
-								},
-								"hooks": &hcldec.AttrSpec{
-									Name: "hooks",
-									Type: cty.Map(cty.String),
-								},
+								"envs":    envsSpec,
+								"options": optionsSpec,
+								"hooks":   hooksSpec,
 								"focus": &hcldec.AttrSpec{
 									Name: "focus",
 									Type: cty.Bool,

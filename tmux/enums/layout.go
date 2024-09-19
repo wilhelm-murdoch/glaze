@@ -20,7 +20,7 @@ func (l Layout) String() string {
 }
 
 const (
-	LayoutEvenHorizontal Layout = iota
+	LayoutEvenHorizontal Layout = iota + 1
 	LayoutEvenVertical
 	LayoutMainHorizontal
 	LayoutMainVertical
