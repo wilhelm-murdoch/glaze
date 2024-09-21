@@ -12,7 +12,11 @@ import (
 	"github.com/wilhelm-murdoch/glaze/tmux"
 )
 
-func ActionUp(ctx *cli.Context) error {
+type Up struct {
+	glaze.Common
+}
+
+func (c Up) Run(ctx *cli.Context) error {
 	profilePath := ctx.Args().First()
 
 	if ctx.String("socket-name") != "" && ctx.String("socket-path") != "" {
@@ -48,7 +52,7 @@ func ActionUp(ctx *cli.Context) error {
 		return parser.WriteDiags()
 	}
 
-	profile := parser.Decode(glaze.PrimaryGlazeSpec)
+	profile := parser.Decode(glaze.PrimaryGlazeSpec, ctx.StringSlice("var"))
 
 	if parser.HasErrors() {
 		return parser.WriteDiags()

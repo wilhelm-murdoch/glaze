@@ -10,7 +10,11 @@ import (
 	"github.com/wilhelm-murdoch/glaze"
 )
 
-func ActionFmt(ctx *cli.Context) error {
+type Fmt struct {
+	glaze.Common
+}
+
+func (f Fmt) Run(ctx *cli.Context) error {
 	profilePath := ctx.Args().First()
 
 	parser := glaze.NewParser(profilePath)

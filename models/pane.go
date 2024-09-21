@@ -21,6 +21,7 @@ type Pane struct {
 func (p *Pane) Decode(value cty.Value) hcl.Diagnostics {
 	var diags hcl.Diagnostics
 
+	p.Name = "default"
 	if !value.GetAttr("name").IsNull() {
 		p.Name = value.GetAttr("name").AsString()
 	}

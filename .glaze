@@ -1,7 +1,7 @@
-session "TestSession" {
+session {
   // options
   // hooks
-  window "WindowOne" {
+  window {
     layout = "tiled"
 
     options = {
@@ -11,90 +11,47 @@ session "TestSession" {
 
     hooks = {}
 
-    pane "PaneTwo" {
+    pane {
       options = {
         pane-border-lines = "double"
         monitor-activity  = "on"
       }
 
-      hooks = {}
+      hooks = {
+        
+      }
     }
 
-    pane "PaneOne" {
+    pane {
+      name = "sup"
+    }
+
+    pane {
 
     }
 
-    pane "PaneOne" {
-
-    }
-
-    pane "PaneOne" {
+    pane {
 
     }
   }
 
-  window "WindowTwo" {
+  window {
     focus = true
-    pane "PaneTwo" {
-    }
 
-    pane "PaneOne" {
+    pane {
 
     }
 
-    pane "PaneOne" {
-      focus = true
-    }
-
-    pane "PaneOne" {
-
-    }
-  }
-
-  window "WindowThree" {
-    layout = "tiled"
-    pane "PaneTwo" {
-    }
-
-    pane "PaneOne" {
-      focus = true
-    }
-
-    pane "PaneOne" {
+    pane {
 
     }
 
-    pane "PaneOne" {
+    pane {
+
+    }
+
+    pane {
 
     }
   }
-
-
-  // window "WindowTwo" {
-  //   env = {
-  //     WINDOW = "2"
-  //   }
-
-  //   pane "PaneOne" {
-  //     env = {
-  //       PANE = "1"
-  //     }
-
-  //     commands = [
-  //       "echo I am the first pane in the second window",
-  //     ]
-
-  //     split = "vertical"
-  //   }
-
-  //   pane "PaneTwo" {
-  //     env = {
-  //       PANE = "2"
-  //     }
-
-  //     commands = [
-  //       "echo I am the second pane in the second window",
-  //     ]
-  //   }
-  // }
 }

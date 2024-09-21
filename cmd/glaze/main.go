@@ -53,10 +53,10 @@ func main() {
 		}},
 		Copyright: fmt.Sprintf(`(c) %d Wilhelm Codes ( https://wilhelm.codes )`, currentYear),
 		Before: func(ctx *cli.Context) error {
-			_, err := exec.LookPath(TmuxBinaryName)
-			if err != nil {
+			if _, err := exec.LookPath(TmuxBinaryName); err != nil {
 				return err
 			}
+
 			return nil
 		},
 		Commands: []*cli.Command{{
@@ -85,8 +85,14 @@ func main() {
 					Value: "",
 					Usage: "optional name for the tmux socket",
 				},
+				&cli.StringSliceFlag{
+					Name:  "var",
+					Usage: "set multiple variables in the form of \"key=value\"",
+				},
 			},
-			Action: actions.ActionUp,
+			Action: func(ctx *cli.Context) error {
+				return actions.Up{}.Run(ctx)
+			},
 		}, {
 			Name:  "fmt",
 			Usage: "rewrites the target glaze profile file to a canonical format",
@@ -96,12 +102,14 @@ func main() {
 					Usage: "writes the formatted glaze output to your terminal",
 				},
 			},
-			Action: actions.ActionFmt,
+			Action: func(ctx *cli.Context) error {
+				return actions.Fmt{}.Run(ctx)
+			},
 		}, {
 			Name:  "save",
 			Usage: "running this within a tmux session will save its current state to the specified glaze profile",
 			Action: func(ctx *cli.Context) error {
-				return actions.ActionSave(ctx.Args().First())
+				return actions.Save{}.Run(ctx)
 			},
 		}},
 	}

@@ -23,6 +23,7 @@ type Window struct {
 func (w *Window) Decode(value cty.Value) hcl.Diagnostics {
 	var diags hcl.Diagnostics
 
+	w.Name = "default"
 	if !value.GetAttr("name").IsNull() {
 		w.Name = value.GetAttr("name").AsString()
 	}

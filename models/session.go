@@ -18,6 +18,7 @@ type Session struct {
 func (s *Session) Decode(value cty.Value) hcl.Diagnostics {
 	var diags hcl.Diagnostics
 
+	s.Name = "default"
 	if !value.GetAttr("name").IsNull() {
 		s.Name = value.GetAttr("name").AsString()
 	}

@@ -31,9 +31,9 @@ var (
 		MinItems: 1,
 		MaxItems: 1,
 		Nested: &hcldec.ObjectSpec{
-			"name": &hcldec.BlockLabelSpec{
-				Index: 0,
-				Name:  "name",
+			"name": &hcldec.AttrSpec{
+				Name: "name",
+				Type: cty.String,
 			},
 			"envs":    envsSpec,
 			"options": optionsSpec,
@@ -51,9 +51,9 @@ var (
 				TypeName: "window",
 				MinItems: 1,
 				Nested: &hcldec.ObjectSpec{
-					"name": &hcldec.BlockLabelSpec{
-						Index: 0,
-						Name:  "name",
+					"name": &hcldec.AttrSpec{
+						Name: "name",
+						Type: cty.String,
 					},
 					"envs":    envsSpec,
 					"options": optionsSpec,
@@ -85,9 +85,9 @@ var (
 						MinItems: 1,
 						Nested: &hcldec.ValidateSpec{
 							Wrapped: &hcldec.ObjectSpec{
-								"name": &hcldec.BlockLabelSpec{
-									Index: 0,
-									Name:  "name",
+								"name": &hcldec.AttrSpec{
+									Name: "name",
+									Type: cty.String,
 								},
 								"envs":    envsSpec,
 								"options": optionsSpec,
