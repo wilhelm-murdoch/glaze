@@ -1,18 +1,17 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
 	"os/exec"
+	"strings"
 	"time"
 
 	"github.com/urfave/cli/v2"
+	"github.com/wilhelm-murdoch/glaze"
 	"github.com/wilhelm-murdoch/glaze/cmd/glaze/actions"
-)
-
-const (
-	TmuxBinaryName = "tmux"
 )
 
 var (
@@ -53,7 +52,7 @@ func main() {
 		}},
 		Copyright: fmt.Sprintf(`(c) %d Wilhelm Codes ( https://wilhelm.codes )`, currentYear),
 		Before: func(ctx *cli.Context) error {
-			if _, err := exec.LookPath(TmuxBinaryName); err != nil {
+			if _, err := exec.LookPath("tmux"); err != nil {
 				return err
 			}
 
@@ -79,15 +78,48 @@ func main() {
 					Name:  "socket-path",
 					Value: "",
 					Usage: "optional path to the tmux socket",
+					Action: func(ctx *cli.Context, value string) error {
+						if ctx.String("socket-name") != "" && value != "" {
+							return errors.New("cannot specify both --socket-name and --socket-path flags")
+						}
+
+						if value != "" && !glaze.FileExists(value) {
+							return fmt.Errorf("specified --socket-path of %s does not exist", value)
+						}
+
+						return nil
+					},
 				},
 				&cli.StringFlag{
 					Name:  "socket-name",
 					Value: "",
 					Usage: "optional name for the tmux socket",
+					Action: func(ctx *cli.Context, value string) error {
+						if ctx.String("socket-path") != "" && value != "" {
+							return errors.New("cannot specify both --socket-name and --socket-path flags")
+						}
+
+						return nil
+					},
 				},
 				&cli.StringSliceFlag{
 					Name:  "var",
 					Usage: "set multiple variables in the form of \"key=value\"",
+					Action: func(ctx *cli.Context, value []string) error {
+						for _, variable := range value {
+							if !strings.Contains(variable, "=") {
+								return fmt.Errorf("the --var `%s` does not match the required format of `key=value`", variable)
+							}
+
+							parts := strings.SplitN(variable, "=", 2)
+
+							if strings.HasSuffix(parts[0], " ") {
+								return fmt.Errorf("the --var name `%s` appears to have trailing spaces and does not match the required format of `key=value`", parts[0])
+							}
+						}
+
+						return nil
+					},
 				},
 			},
 			Action: func(ctx *cli.Context) error {

@@ -1,7 +1,6 @@
 package glaze
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/hashicorp/hcl/v2"
@@ -29,17 +28,8 @@ func NewParser(path string) *Parser {
 	}
 }
 
-func (p *Parser) Decode(s hcldec.Spec, variables []string) *models.Session {
-	var (
-		session *models.Session
-		ctx     *hcl.EvalContext
-	)
-
-	if len(variables) != 0 {
-		for _, variable := range variables {
-			fmt.Println(variable)
-		}
-	}
+func (p *Parser) Decode(s hcldec.Spec, ctx *hcl.EvalContext) *models.Session {
+	var session *models.Session
 
 	decoded, diags := hcldec.Decode(p.File.Body, s, ctx)
 	if diags.HasErrors() {

@@ -1,10 +1,7 @@
 package actions
 
 import (
-	"errors"
 	"fmt"
-	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/urfave/cli/v2"
@@ -16,34 +13,10 @@ type Up struct {
 	glaze.Common
 }
 
-func (c Up) Run(ctx *cli.Context) error {
-	profilePath := ctx.Args().First()
-
-	if ctx.String("socket-name") != "" && ctx.String("socket-path") != "" {
-		return errors.New("cannot specify both --socket-name and --socket-path flags")
-	}
-
-	if ctx.String("socket-path") != "" {
-		if !glaze.FileExists(ctx.String("socket-path")) {
-			return fmt.Errorf("specified --socket-path of %s does not exist", ctx.String("socket-path"))
-		}
-	}
-
-	if profilePath == "" {
-		cwd, err := os.Getwd()
-		if err != nil {
-			return fmt.Errorf("could not read current working directory: %s", err)
-		}
-
-		profilePath = filepath.Join(cwd, ".glaze")
-
-		if !glaze.FileExists(profilePath) && os.Getenv("GLAZE_PATH") != "" {
-			profilePath = filepath.Join(os.Getenv("GLAZE_PATH"), ".glaze")
-		}
-	}
-
-	if !glaze.FileExists(profilePath) {
-		return fmt.Errorf("profile `%s` not found on the specified path, the current directory, or the GLAZE_PATH environment variable", profilePath)
+func (u Up) Run(ctx *cli.Context) error {
+	profilePath, err := u.ResolveProfilePath(ctx.Args().First())
+	if err != nil {
+		return err
 	}
 
 	parser := glaze.NewParser(profilePath)
@@ -52,7 +25,17 @@ func (c Up) Run(ctx *cli.Context) error {
 		return parser.WriteDiags()
 	}
 
-	profile := parser.Decode(glaze.PrimaryGlazeSpec, ctx.StringSlice("var"))
+	variables, err := u.CollectVariables(ctx.StringSlice("var"))
+	if err != nil {
+		return fmt.Errorf("", err)
+	}
+
+	parserCtx, err := u.BuildEvalContext(variables)
+	if err != nil {
+		return fmt.Errorf("could not build parser context for `%s`: %s", profilePath, err)
+	}
+
+	profile := parser.Decode(glaze.PrimaryGlazeSpec, parserCtx)
 
 	if parser.HasErrors() {
 		return parser.WriteDiags()
