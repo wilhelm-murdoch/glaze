@@ -86,8 +86,8 @@ func (c *Common) CollectVariables(flaggedVariables []string) (map[string]cty.Val
 	return variables, nil
 }
 
-func (c *Common) BuildEvalContext(variables map[string]cty.Value) (*hcl.EvalContext, error) {
-	ctx := &hcl.EvalContext{
+func (c *Common) BuildEvalContext(variables map[string]cty.Value) *hcl.EvalContext {
+	return &hcl.EvalContext{
 		Variables: variables,
 		Functions: map[string]function.Function{
 			"replace":      stdlib.ReplaceFunc,
@@ -106,6 +106,4 @@ func (c *Common) BuildEvalContext(variables map[string]cty.Value) (*hcl.EvalCont
 			"chomp":        stdlib.ChompFunc,
 		},
 	}
-
-	return ctx, nil
 }

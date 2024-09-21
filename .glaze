@@ -23,7 +23,7 @@ session {
     }
 
     pane {
-      name = "sup"
+      name = "${lower(name)}"
     }
 
     pane {

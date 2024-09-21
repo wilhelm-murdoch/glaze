@@ -8,6 +8,8 @@ import (
 	"github.com/zclconf/go-cty/cty/gocty"
 )
 
+const DefaultGlazePaneName = "default"
+
 type Pane struct {
 	Name              string
 	StartingDirectory string
@@ -21,7 +23,7 @@ type Pane struct {
 func (p *Pane) Decode(value cty.Value) hcl.Diagnostics {
 	var diags hcl.Diagnostics
 
-	p.Name = "default"
+	p.Name = DefaultGlazePaneName
 	if !value.GetAttr("name").IsNull() {
 		p.Name = value.GetAttr("name").AsString()
 	}

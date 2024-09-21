@@ -10,6 +10,8 @@ import (
 	"github.com/zclconf/go-cty/cty/gocty"
 )
 
+const DefaultGlazeWindowName = "default"
+
 type Window struct {
 	Name              string
 	StartingDirectory string

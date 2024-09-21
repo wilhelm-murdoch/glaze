@@ -8,6 +8,8 @@ import (
 	"github.com/zclconf/go-cty/cty"
 )
 
+const DefaultGlazeSesssionName = "default"
+
 type Session struct {
 	Name              string
 	StartingDirectory string
@@ -18,7 +20,7 @@ type Session struct {
 func (s *Session) Decode(value cty.Value) hcl.Diagnostics {
 	var diags hcl.Diagnostics
 
-	s.Name = "default"
+	s.Name = DefaultGlazeSesssionName
 	if !value.GetAttr("name").IsNull() {
 		s.Name = value.GetAttr("name").AsString()
 	}

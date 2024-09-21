@@ -30,12 +30,7 @@ func (u Up) Run(ctx *cli.Context) error {
 		return fmt.Errorf("", err)
 	}
 
-	parserCtx, err := u.BuildEvalContext(variables)
-	if err != nil {
-		return fmt.Errorf("could not build parser context for `%s`: %s", profilePath, err)
-	}
-
-	profile := parser.Decode(glaze.PrimaryGlazeSpec, parserCtx)
+	profile := parser.Decode(glaze.PrimaryGlazeSpec, u.BuildEvalContext(variables))
 
 	if parser.HasErrors() {
 		return parser.WriteDiags()
