@@ -8,9 +8,43 @@ import (
 	"strings"
 
 	"github.com/hashicorp/hcl/v2"
+	"github.com/hashicorp/hcl/v2/hclparse"
 	"github.com/wilhelm-murdoch/glaze/tmux"
 	"github.com/zclconf/go-cty/cty"
 )
+
+type DiagnosticsManager struct {
+	hcl.Diagnostics
+	hcl.DiagnosticWriter
+}
+
+func (dm *DiagnosticsManager) Write() error {
+	if err := dm.DiagnosticWriter.WriteDiagnostics(dm.Diagnostics); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (dm *DiagnosticsManager) Extend(diags hcl.Diagnostics) hcl.Diagnostics {
+	dm.Diagnostics = dm.Diagnostics.Extend(diags)
+	return dm.Diagnostics
+}
+
+func NewDiagnosticsManager(filePath string) *DiagnosticsManager {
+	parser := hclparse.NewParser()
+	file, diags := parser.ParseHCLFile(filePath)
+
+	diagsManager := &DiagnosticsManager{
+		DiagnosticWriter: hcl.NewDiagnosticTextWriter(os.Stdout, map[string]*hcl.File{filePath: file}, 78, true),
+	}
+
+	if diags.HasErrors() {
+		diagsManager.Extend(diags)
+	}
+
+	return diagsManager
+}
 
 func ContainsDiagnostic(field string, value cty.Value, list []string) hcl.Diagnostics {
 	var out hcl.Diagnostics

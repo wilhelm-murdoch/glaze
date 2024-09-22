@@ -10,17 +10,25 @@ import (
 	"github.com/wilhelm-murdoch/glaze"
 )
 
-type Fmt struct {
-	glaze.Common
-}
+func Fmt(ctx *cli.Context) error {
+	profilePath, err := glaze.ResolveProfilePath(ctx.Args().First())
+	if err != nil {
+		return err
+	}
 
-func (f Fmt) Run(ctx *cli.Context) error {
-	profilePath := ctx.Args().First()
+	diagsManager := glaze.NewDiagnosticsManager(profilePath)
+	if diagsManager.HasErrors() {
+		return diagsManager.Write()
+	}
 
-	parser := glaze.NewParser(profilePath)
+	if diagsManager.HasErrors() {
+		return diagsManager.Write()
+	}
 
-	if parser.HasErrors() {
-		return parser.WriteDiags()
+	parser, parserDiags := glaze.NewParser(profilePath)
+	if parserDiags.HasErrors() {
+		diagsManager.Extend(parserDiags)
+		return diagsManager.Write()
 	}
 
 	formatted := string(hclwrite.Format(parser.File.Bytes))
@@ -31,15 +39,15 @@ func (f Fmt) Run(ctx *cli.Context) error {
 	}
 
 	if err := os.WriteFile(profilePath, []byte(formatted), 0644); err != nil {
-		parser.AppendDiag(&hcl.Diagnostic{
+		diagsManager.Append(&hcl.Diagnostic{
 			Severity: hcl.DiagError,
 			Summary:  "Failed to write file",
 			Detail:   err.Error(),
 		})
 	}
 
-	if parser.HasErrors() {
-		return parser.WriteDiags()
+	if diagsManager.HasErrors() {
+		return diagsManager.Write()
 	}
 
 	return nil

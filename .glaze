@@ -1,6 +1,10 @@
 session {
   name = "TestSession"
 
+  options = {
+    activity-action = "any"
+  }
+
   window {
     layout = "tiled"
 

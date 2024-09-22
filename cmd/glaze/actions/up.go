@@ -9,31 +9,32 @@ import (
 	"github.com/wilhelm-murdoch/glaze/tmux"
 )
 
-type Up struct {
-	glaze.Common
-}
-
-func (u Up) Run(ctx *cli.Context) error {
-	profilePath, err := u.ResolveProfilePath(ctx.Args().First())
+func Up(ctx *cli.Context) error {
+	profilePath, err := glaze.ResolveProfilePath(ctx.Args().First())
 	if err != nil {
 		return err
 	}
 
-	parser := glaze.NewParser(profilePath)
-
-	if parser.HasErrors() {
-		return parser.WriteDiags()
+	diagsManager := glaze.NewDiagnosticsManager(profilePath)
+	if diagsManager.HasErrors() {
+		return diagsManager.Write()
 	}
 
-	variables, err := u.CollectVariables(ctx.StringSlice("var"))
+	parser, parserDiags := glaze.NewParser(profilePath)
+	if parserDiags.HasErrors() {
+		diagsManager.Extend(parserDiags)
+		return diagsManager.Write()
+	}
+
+	variables, err := glaze.CollectVariables(ctx.StringSlice("var"))
 	if err != nil {
 		return fmt.Errorf("could not parse specified variables: %s", err)
 	}
 
-	profile := parser.Decode(glaze.PrimaryGlazeSpec, u.BuildEvalContext(variables))
-
-	if parser.HasErrors() {
-		return parser.WriteDiags()
+	profile, decodeDiags := parser.Decode(glaze.PrimaryGlazeSpec, glaze.BuildEvalContext(variables))
+	if decodeDiags.HasErrors() {
+		diagsManager.Extend(decodeDiags)
+		return diagsManager.Write()
 	}
 
 	client := tmux.NewClient(

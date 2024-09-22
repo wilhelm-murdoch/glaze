@@ -127,9 +127,7 @@ func main() {
 					},
 				},
 			},
-			Action: func(ctx *cli.Context) error {
-				return actions.Up{}.Run(ctx)
-			},
+			Action: actions.Up,
 		}, {
 			Name:  "fmt",
 			Usage: "rewrites the target glaze profile file to a canonical format",
@@ -139,15 +137,11 @@ func main() {
 					Usage: "writes the formatted glaze output to your terminal",
 				},
 			},
-			Action: func(ctx *cli.Context) error {
-				return actions.Fmt{}.Run(ctx)
-			},
+			Action: actions.Fmt,
 		}, {
-			Name:  "save",
-			Usage: "running this within a tmux session will save its current state to the specified glaze profile",
-			Action: func(ctx *cli.Context) error {
-				return actions.Save{}.Run(ctx)
-			},
+			Name:   "save",
+			Usage:  "running this within a tmux session will save its current state to the specified glaze profile",
+			Action: actions.Save,
 		}},
 	}
 

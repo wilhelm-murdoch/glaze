@@ -7,12 +7,8 @@ import (
 	"github.com/wilhelm-murdoch/glaze"
 )
 
-type Save struct {
-	glaze.Common
-}
-
-func (s Save) Run(ctx *cli.Context) error {
-	profilePath, err := s.ResolveProfilePath(ctx.Args().First())
+func Save(ctx *cli.Context) error {
+	profilePath, err := glaze.ResolveProfilePath(ctx.Args().First())
 	if err != nil {
 		return err
 	}

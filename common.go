@@ -12,14 +12,9 @@ import (
 	"github.com/zclconf/go-cty/cty/function/stdlib"
 )
 
-const GlazeEnvPrefix = "GLAZE_ENV_"
+const glazeEnvPrefix = "GLAZE_ENV_"
 
-type Common struct {
-	diags      *hcl.Diagnostics
-	diagWriter hcl.DiagnosticWriter
-}
-
-func (c *Common) ResolveProfilePath(profilePath string) (string, error) {
+func ResolveProfilePath(profilePath string) (string, error) {
 	if profilePath == "" {
 		cwd, err := os.Getwd()
 		if err != nil {
@@ -40,17 +35,17 @@ func (c *Common) ResolveProfilePath(profilePath string) (string, error) {
 	return profilePath, nil
 }
 
-func (c *Common) CollectVariables(flaggedVariables []string) (map[string]cty.Value, error) {
+func CollectVariables(flaggedVariables []string) (map[string]cty.Value, error) {
 	variables := make(map[string]cty.Value)
 
 	// We import environmental variables first:
 	{
 		for _, env := range os.Environ() {
-			if !strings.HasPrefix(env, GlazeEnvPrefix) {
+			if !strings.HasPrefix(env, glazeEnvPrefix) {
 				continue
 			}
 
-			env = strings.TrimPrefix(env, GlazeEnvPrefix)
+			env = strings.TrimPrefix(env, glazeEnvPrefix)
 
 			if !strings.Contains(env, "=") {
 				continue
@@ -87,7 +82,7 @@ func (c *Common) CollectVariables(flaggedVariables []string) (map[string]cty.Val
 	return variables, nil
 }
 
-func (c *Common) BuildEvalContext(variables map[string]cty.Value) *hcl.EvalContext {
+func BuildEvalContext(variables map[string]cty.Value) *hcl.EvalContext {
 	return &hcl.EvalContext{
 		Variables: variables,
 		Functions: map[string]function.Function{

@@ -2,23 +2,6 @@ package enums
 
 type Layout int
 
-func (l Layout) String() string {
-	switch l {
-	case LayoutEvenHorizontal:
-		return LayoutEvenHorizontalString
-	case LayoutEvenVertical:
-		return LayoutEvenVerticalString
-	case LayoutMainHorizontal:
-		return LayoutMainHorizontalString
-	case LayoutMainVertical:
-		return LayoutMainVerticalString
-	case LayoutTiled:
-		return LayoutTiledString
-	}
-
-	return LayoutUnknownString
-}
-
 const (
 	LayoutEvenHorizontal Layout = iota + 1
 	LayoutEvenVertical
@@ -43,6 +26,23 @@ var LayoutList = []string{
 	LayoutMainHorizontalString,
 	LayoutMainVerticalString,
 	LayoutTiledString,
+}
+
+func (l Layout) String() string {
+	switch l {
+	case LayoutEvenHorizontal:
+		return LayoutEvenHorizontalString
+	case LayoutEvenVertical:
+		return LayoutEvenVerticalString
+	case LayoutMainHorizontal:
+		return LayoutMainHorizontalString
+	case LayoutMainVertical:
+		return LayoutMainVerticalString
+	case LayoutTiled:
+		return LayoutTiledString
+	}
+
+	return LayoutUnknownString
 }
 
 func LayoutFromString(s string) Layout {
