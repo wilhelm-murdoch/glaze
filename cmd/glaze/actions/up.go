@@ -27,7 +27,7 @@ func (u Up) Run(ctx *cli.Context) error {
 
 	variables, err := u.CollectVariables(ctx.StringSlice("var"))
 	if err != nil {
-		return fmt.Errorf("", err)
+		return fmt.Errorf("could not parse specified variables: %s", err)
 	}
 
 	profile := parser.Decode(glaze.PrimaryGlazeSpec, u.BuildEvalContext(variables))

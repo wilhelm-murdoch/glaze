@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -13,6 +12,8 @@ import (
 	"github.com/wilhelm-murdoch/glaze"
 	"github.com/wilhelm-murdoch/glaze/cmd/glaze/actions"
 )
+
+const defaultErrCode = 1
 
 var (
 	// Version describes the version of the current build.
@@ -80,11 +81,11 @@ func main() {
 					Usage: "optional path to the tmux socket",
 					Action: func(ctx *cli.Context, value string) error {
 						if ctx.String("socket-name") != "" && value != "" {
-							return errors.New("cannot specify both --socket-name and --socket-path flags")
+							return cli.Exit("cannot specify both --socket-name and --socket-path flags", defaultErrCode)
 						}
 
 						if value != "" && !glaze.FileExists(value) {
-							return fmt.Errorf("specified --socket-path of %s does not exist", value)
+							return cli.Exit(fmt.Sprintf("specified --socket-path of %s does not exist", value), defaultErrCode)
 						}
 
 						return nil
@@ -96,7 +97,7 @@ func main() {
 					Usage: "optional name for the tmux socket",
 					Action: func(ctx *cli.Context, value string) error {
 						if ctx.String("socket-path") != "" && value != "" {
-							return errors.New("cannot specify both --socket-name and --socket-path flags")
+							return cli.Exit("cannot specify both --socket-name and --socket-path flags", defaultErrCode)
 						}
 
 						return nil
@@ -108,13 +109,17 @@ func main() {
 					Action: func(ctx *cli.Context, value []string) error {
 						for _, variable := range value {
 							if !strings.Contains(variable, "=") {
-								return fmt.Errorf("the --var `%s` does not match the required format of `key=value`", variable)
+								return cli.Exit(
+									fmt.Sprintf("the --var `%s` does not match the required format of `key=value`", variable), defaultErrCode,
+								)
 							}
 
 							parts := strings.SplitN(variable, "=", 2)
 
 							if strings.HasSuffix(parts[0], " ") {
-								return fmt.Errorf("the --var name `%s` appears to have trailing spaces and does not match the required format of `key=value`", parts[0])
+								return cli.Exit(
+									fmt.Sprintf("the --var name `%s` appears to have trailing spaces and does not match the required format of `key=value`", parts[0]), defaultErrCode,
+								)
 							}
 						}
 

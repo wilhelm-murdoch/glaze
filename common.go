@@ -15,7 +15,8 @@ import (
 const GlazeEnvPrefix = "GLAZE_ENV_"
 
 type Common struct {
-	diagnostics *hcl.Diagnostics
+	diags      *hcl.Diagnostics
+	diagWriter hcl.DiagnosticWriter
 }
 
 func (c *Common) ResolveProfilePath(profilePath string) (string, error) {

@@ -1,6 +1,6 @@
 session {
-  // options
-  // hooks
+  name = "TestSession"
+
   window {
     layout = "tiled"
 
@@ -9,49 +9,25 @@ session {
       monitor-activity  = "on"
     }
 
-    hooks = {}
-
     pane {
       options = {
         pane-border-lines = "double"
         monitor-activity  = "on"
       }
-
-      hooks = {
-        
-      }
     }
 
-    pane {
-      name = "${lower(name)}"
-    }
-
-    pane {
-
-    }
-
-    pane {
-
-    }
+    pane {}
+    pane {}
+    pane {}
   }
 
   window {
     focus = true
 
+    pane {}
     pane {
-
+      focus = true
     }
-
-    pane {
-
-    }
-
-    pane {
-
-    }
-
-    pane {
-
-    }
+    pane {}
   }
 }
