@@ -53,7 +53,7 @@ func ContainsDiagnostic(field string, value cty.Value, list []string) hcl.Diagno
 		return hcl.Diagnostics{{
 			Severity: hcl.DiagError,
 			Summary:  fmt.Sprintf(`Invalid %s specified`, field),
-			Detail:   fmt.Sprintf(`The %s value of "%s" is not supported among: %s`, field, value.AsString(), strings.Join(list, ", ")),
+			Detail:   fmt.Sprintf(`The %s value of "%s" is not supported among: %s.`, field, value.AsString(), strings.Join(list, ", ")),
 		}}
 	}
 
@@ -69,7 +69,7 @@ func DirectoryDiagnostic(field string, value cty.Value) hcl.Diagnostics {
 			return hcl.Diagnostics{{
 				Severity: hcl.DiagError,
 				Summary:  fmt.Sprintf(`Invalid %s specified`, field),
-				Detail:   fmt.Sprintf(`The %s of "%s" does not exist or is not a directory`, field, value.AsString()),
+				Detail:   fmt.Sprintf(`The %s of "%s" does not exist or is not a directory.`, field, value.AsString()),
 			}}
 		}
 	}
@@ -81,6 +81,6 @@ func WrongAttributeDiagnostic(field, have, want string) hcl.Diagnostic {
 	return hcl.Diagnostic{
 		Severity: hcl.DiagError,
 		Summary:  fmt.Sprintf(`Invalid %s specified`, field),
-		Detail:   fmt.Sprintf(`The %s value "%s" should be "%s"`, field, have, want),
+		Detail:   fmt.Sprintf(`The %s value "%s" should be "%s".`, field, have, want),
 	}
 }

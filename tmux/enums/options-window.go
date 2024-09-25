@@ -1,6 +1,10 @@
 package enums
 
-import "slices"
+import (
+	"slices"
+	"strconv"
+	"strings"
+)
 
 type OptionsWindow int
 
@@ -296,8 +300,161 @@ func OptionsWindowFromString(s string) OptionsWindow {
 	return OptionsWindowUnknown
 }
 
-var OptionsWindowValidators = map[string]func(v string) bool{
-	OptionsWindowAggressiveResizeString: func(v string) bool {
-		return slices.Contains([]string{"on", "off"}, v)
+var OptionsWindowValidators = map[string]func(v string) (bool, []string){
+	OptionsWindowAggressiveResizeString: func(v string) (bool, []string) {
+		choices := []string{"on", "off"}
+
+		if found := slices.Contains(choices, v); !found {
+			return false, choices
+		}
+
+		return true, nil
+	},
+	OptionsWindowAutomaticRenameString: func(v string) (bool, []string) {
+		choices := []string{"on", "off"}
+
+		if found := slices.Contains(choices, v); !found {
+			return false, choices
+		}
+
+		return true, nil
+	},
+	OptionsWindowAutomaticRenameFormatString: func(v string) (bool, []string) {
+		// Any string here will do for now. Tmux will report the error and it will
+		// bubble up to the user. May add additional sub-validators in the future.
+		return true, nil
+	},
+	OptionsWindowClockModeColourString: func(v string) (bool, []string) { return true, nil },
+	OptionsWindowClockModeStyleString: func(v string) (bool, []string) {
+		choices := []string{"12", "24"}
+
+		if found := slices.Contains(choices, v); !found {
+			return false, choices
+		}
+
+		return true, nil
+	},
+	OptionsWindowFillCharacterString: func(v string) (bool, []string) {
+		if len(strings.TrimSpace(v)) != 1 {
+			return false, nil
+		}
+
+		return true, nil
+	},
+	OptionsWindowMainPaneHeightString:            func(v string) (bool, []string) { return true, nil },
+	OptionsWindowMainPaneWidthString:             func(v string) (bool, []string) { return true, nil },
+	OptionsWindowCopyModeMatchStyleString:        func(v string) (bool, []string) { return true, nil },
+	OptionsWindowCopyModeMarkStyleString:         func(v string) (bool, []string) { return true, nil },
+	OptionsWindowCopyModeCurrentMatchStyleString: func(v string) (bool, []string) { return true, nil },
+	OptionsWindowModeKeysString: func(v string) (bool, []string) {
+		choices := []string{"vi", "emacs"}
+
+		if found := slices.Contains(choices, v); !found {
+			return false, choices
+		}
+
+		return true, nil
+	},
+	OptionsWindowModeStyleString: func(v string) (bool, []string) { return true, nil },
+	OptionsWindowMonitorActivityString: func(v string) (bool, []string) {
+		choices := []string{"on", "off"}
+
+		if found := slices.Contains(choices, v); !found {
+			return false, choices
+		}
+
+		return true, nil
+	},
+	OptionsWindowMonitorBellString: func(v string) (bool, []string) {
+		choices := []string{"on", "off"}
+
+		if found := slices.Contains(choices, v); !found {
+			return false, choices
+		}
+
+		return true, nil
+	},
+	OptionsWindowMonitorSilenceString: func(v string) (bool, []string) {
+		if _, err := strconv.Atoi(v); err != nil {
+			return false, nil
+		}
+
+		return true, nil
+	},
+	OptionsWindowOtherPaneHeightString:       func(v string) (bool, []string) { return true, nil },
+	OptionsWindowOtherPaneWidthString:        func(v string) (bool, []string) { return true, nil },
+	OptionsWindowPaneActiveBorderStyleString: func(v string) (bool, []string) { return true, nil },
+	OptionsWindowPaneBaseIndexString: func(v string) (bool, []string) {
+		if _, err := strconv.Atoi(v); err != nil {
+			return false, nil
+		}
+
+		return true, nil
+	},
+	OptionsWindowPaneBorderFormatString: func(v string) (bool, []string) { return true, nil },
+	OptionsWindowPaneBorderIndicatorsString: func(v string) (bool, []string) {
+		choices := []string{"off", "colour", "arrows", "both"}
+
+		if found := slices.Contains(choices, v); !found {
+			return false, choices
+		}
+
+		return true, nil
+	},
+	OptionsWindowPaneBorderLinesString: func(v string) (bool, []string) {
+		choices := []string{"single", "double", "heavy", "simple", "number"}
+
+		if found := slices.Contains(choices, v); !found {
+			return false, choices
+		}
+
+		return true, nil
+	},
+	OptionsWindowPaneBorderStatusString: func(v string) (bool, []string) {
+		choices := []string{"off", "top", "bottom"}
+
+		if found := slices.Contains(choices, v); !found {
+			return false, choices
+		}
+
+		return true, nil
+	},
+	OptionsWindowPaneBorderStyleString:  func(v string) (bool, []string) { return true, nil },
+	OptionsWindowPopupStyleString:       func(v string) (bool, []string) { return true, nil },
+	OptionsWindowPopupBorderStyleString: func(v string) (bool, []string) { return true, nil },
+	OptionsWindowPopupBorderLinesString: func(v string) (bool, []string) {
+		choices := []string{"single", "rounded", "double", "heavy", "simple", "padded", "none"}
+
+		if found := slices.Contains(choices, v); !found {
+			return false, choices
+		}
+
+		return true, nil
+	},
+	OptionsWindowWindowStatusActivityStyleString: func(v string) (bool, []string) { return true, nil },
+	OptionsWindowWindowStatusBellStyleString:     func(v string) (bool, []string) { return true, nil },
+	OptionsWindowWindowStatusCurrentFormatString: func(v string) (bool, []string) { return true, nil },
+	OptionsWindowWindowStatusCurrentStyleString:  func(v string) (bool, []string) { return true, nil },
+	OptionsWindowWindowStatusFormatString:        func(v string) (bool, []string) { return true, nil },
+	OptionsWindowWindowStatusLastStyleString:     func(v string) (bool, []string) { return true, nil },
+	OptionsWindowWindowStatusSeparatorString:     func(v string) (bool, []string) { return true, nil },
+	OptionsWindowWindowStatusStyleString:         func(v string) (bool, []string) { return true, nil },
+	OptionsWindowWindowSizeString: func(v string) (bool, []string) {
+		choices := []string{"largest", "smallest", "manual", "latest"}
+
+		if found := slices.Contains(choices, v); !found {
+			return false, choices
+		}
+
+		return true, nil
+	},
+	OptionsWindowWrapSearchString: func(v string) (bool, []string) {
+		choices := []string{"on", "off"}
+
+		if found := slices.Contains(choices, v); !found {
+			return false, choices
+		}
+
+		return true, nil
 	},
 }

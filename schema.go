@@ -1,8 +1,10 @@
 package glaze
 
 import (
+	"fmt"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hcldec"
@@ -55,9 +57,59 @@ var (
 						Name: "name",
 						Type: cty.String,
 					},
-					"envs":    envsSpec,
-					"options": optionsSpec,
-					"hooks":   hooksSpec,
+					"envs": envsSpec,
+					"options": &hcldec.ValidateSpec{
+						Wrapped: &hcldec.AttrSpec{
+							Name: "options",
+							Type: cty.Map(cty.String),
+						},
+						Func: func(value cty.Value) hcl.Diagnostics {
+							var out hcl.Diagnostics
+
+							if !value.IsNull() {
+								for option, value := range value.AsValueMap() {
+									if strings.TrimSpace(value.AsString()) == "" {
+										out = out.Append(&hcl.Diagnostic{
+											Severity: hcl.DiagError,
+											Summary:  "Invalid window option value specified",
+											Detail:   fmt.Sprintf(`The window option of "%s" cannot be blank.`, option),
+										})
+
+										continue
+									}
+
+									if known := enums.OptionsWindowFromString(option); known == enums.OptionsWindowUnknown {
+										out = out.Append(&hcl.Diagnostic{
+											Severity: hcl.DiagError,
+											Summary:  "Invalid window option specified",
+											Detail:   fmt.Sprintf(`The window option of "%s" does not exist.`, option),
+										})
+									}
+
+									validator, ok := enums.OptionsWindowValidators[option]
+									if !ok {
+										out = out.Append(&hcl.Diagnostic{
+											Severity: hcl.DiagInvalid,
+											Summary:  "Invalid validator specified",
+											Detail:   fmt.Sprintf(`The window option "%s" does not have a defined validator.`, option),
+										})
+
+										continue
+									}
+
+									ok, choices := validator(value.AsString())
+									if !ok {
+										if len(choices) > 0 {
+											out = out.Extend(ContainsDiagnostic(fmt.Sprintf(`window option "%s"`, option), value, choices))
+										}
+									}
+								}
+							}
+
+							return out
+						},
+					},
+					"hooks": hooksSpec,
 					"focus": &hcldec.AttrSpec{
 						Name: "focus",
 						Type: cty.Bool,

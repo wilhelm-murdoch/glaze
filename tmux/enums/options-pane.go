@@ -125,4 +125,16 @@ var OptionsPaneValidators = map[string]func(v string) bool{
 	OptionsPaneAllowPassthroughString: func(v string) bool {
 		return slices.Contains([]string{"on", "off", "all"}, v)
 	},
+	OptionsPaneAllowRenameString:        func(v string) bool { return true },
+	OptionsPaneAllowSetTitleString:      func(v string) bool { return true },
+	OptionsPaneAlternateScreenString:    func(v string) bool { return true },
+	OptionsPaneCursorColourString:       func(v string) bool { return true },
+	OptionsPanePaneColoursString:        func(v string) bool { return true },
+	OptionsPaneCursorStyleString:        func(v string) bool { return true },
+	OptionsPaneRemainOnExitString:       func(v string) bool { return true },
+	OptionsPaneRemainOnExitFormatString: func(v string) bool { return true },
+	OptionsPaneScrollOnClearString:      func(v string) bool { return true },
+	OptionsPaneSynchronizePanesString:   func(v string) bool { return true },
+	OptionsPaneWindowActiveStyleString:  func(v string) bool { return true },
+	OptionsPaneWindowStyleString:        func(v string) bool { return true },
 }
