@@ -1,6 +1,9 @@
 package enums
 
-import "slices"
+import (
+	"slices"
+	"strconv"
+)
 
 type OptionsSession int
 
@@ -362,47 +365,235 @@ func OptionsSessionFromString(s string) OptionsSession {
 	return OptionsSessionUnknown
 }
 
-var OptionsSessionValidators = map[string]func(v string) bool{
-	OptionsSessionActivityActionString: func(v string) bool {
-		return slices.Contains([]string{"any", "none", "current", "other"}, v)
+var OptionsSessionValidators = map[string]func(v string) (bool, []string){
+	OptionsSessionActivityActionString: func(v string) (bool, []string) {
+		return slices.Contains([]string{"any", "none", "current", "other"}, v), nil
 	},
-	OptionsSessionDetachOnDestroyString:          func(v string) bool { return true },
-	OptionsSessionDisplayPanesActiveColourString: func(v string) bool { return true },
-	OptionsSessionDisplayPanesColourString:       func(v string) bool { return true },
-	OptionsSessionDisplayPanesTimeString:         func(v string) bool { return true },
-	OptionsSessionDisplayTimeString:              func(v string) bool { return true },
-	OptionsSessionHistoryLimitString:             func(v string) bool { return true },
-	OptionsSessionKeyTableString:                 func(v string) bool { return true },
-	OptionsSessionLockAfterTimeString:            func(v string) bool { return true },
-	OptionsSessionLockCommandString:              func(v string) bool { return true },
-	OptionsSessionMenuStyleString:                func(v string) bool { return true },
-	OptionsSessionMenuSelectedStyleString:        func(v string) bool { return true },
-	OptionsSessionMenuBorderStyleString:          func(v string) bool { return true },
-	OptionsSessionMenuBorderLinesString:          func(v string) bool { return true },
-	OptionsSessionMessageCommandStyleString:      func(v string) bool { return true },
-	OptionsSessionMessageLineString:              func(v string) bool { return true },
-	OptionsSessionMessageStyleString:             func(v string) bool { return true },
-	OptionsSessionMouseString:                    func(v string) bool { return true },
-	OptionsSessionPrefixString:                   func(v string) bool { return true },
-	OptionsSessionPrefix2String:                  func(v string) bool { return true },
-	OptionsSessionRenumberWindowsString:          func(v string) bool { return true },
-	OptionsSessionRepeatTimeString:               func(v string) bool { return true },
-	OptionsSessionSetTitlesString:                func(v string) bool { return true },
-	OptionsSessionSilenceActionString:            func(v string) bool { return true },
-	OptionsSessionStatusString:                   func(v string) bool { return true },
-	OptionsSessionStatusIntervalString:           func(v string) bool { return true },
-	OptionsSessionStatusJustifyString:            func(v string) bool { return true },
-	OptionsSessionStatusKeysString:               func(v string) bool { return true },
-	OptionsSessionStatusLeftString:               func(v string) bool { return true },
-	OptionsSessionStatusLeftLengthString:         func(v string) bool { return true },
-	OptionsSessionStatusLeftStyleString:          func(v string) bool { return true },
-	OptionsSessionStatusPositionString:           func(v string) bool { return true },
-	OptionsSessionStatusRightString:              func(v string) bool { return true },
-	OptionsSessionStatusRightLengthString:        func(v string) bool { return true },
-	OptionsSessionStatusRightStyleString:         func(v string) bool { return true },
-	OptionsSessionStatusStyleString:              func(v string) bool { return true },
-	OptionsSessionVisualActivityString:           func(v string) bool { return true },
-	OptionsSessionVisualBellString:               func(v string) bool { return true },
-	OptionsSessionVisualSilenceString:            func(v string) bool { return true },
-	OptionsSessionWordSeparatorsString:           func(v string) bool { return true },
+	OptionsSessionDetachOnDestroyString: func(v string) (bool, []string) {
+		return slices.Contains([]string{"off", "on", "no-detatched", "previous", "next"}, v), nil
+	},
+	OptionsSessionDisplayPanesActiveColourString: validateColour,
+	OptionsSessionDisplayPanesColourString:       validateColour,
+	OptionsSessionDisplayPanesTimeString: func(v string) (bool, []string) {
+		integer, err := strconv.Atoi(v)
+		if err != nil {
+			return false, nil
+		}
+
+		if integer < 0 {
+			return false, nil
+		}
+		return true, nil
+	},
+	OptionsSessionDisplayTimeString: func(v string) (bool, []string) {
+		integer, err := strconv.Atoi(v)
+		if err != nil {
+			return false, nil
+		}
+
+		if integer < 0 {
+			return false, nil
+		}
+		return true, nil
+	},
+	OptionsSessionHistoryLimitString: func(v string) (bool, []string) {
+		integer, err := strconv.Atoi(v)
+		if err != nil {
+			return false, nil
+		}
+
+		if integer < 0 {
+			return false, nil
+		}
+		return true, nil
+	},
+	OptionsSessionKeyTableString: func(v string) (bool, []string) { return true, nil },
+	OptionsSessionLockAfterTimeString: func(v string) (bool, []string) {
+		integer, err := strconv.Atoi(v)
+		if err != nil {
+			return false, nil
+		}
+
+		if integer < 0 {
+			return false, nil
+		}
+		return true, nil
+	},
+	OptionsSessionLockCommandString: func(v string) (bool, []string) { return true, nil },
+	OptionsSessionMenuBorderLinesString: func(v string) (bool, []string) {
+		choices := []string{"single", "rounded", "double", "heavy", "simple", "padded", "none"}
+
+		if found := slices.Contains(choices, v); !found {
+			return false, choices
+		}
+
+		return true, nil
+	},
+	OptionsSessionMessageLineString: func(v string) (bool, []string) {
+		choices := []string{"0", "1", "2", "3", "4"}
+
+		if found := slices.Contains(choices, v); !found {
+			return false, choices
+		}
+
+		return true, nil
+	},
+	OptionsSessionMouseString: func(v string) (bool, []string) {
+		choices := []string{"on", "off"}
+
+		if found := slices.Contains(choices, v); !found {
+			return false, choices
+		}
+
+		return true, nil
+	},
+	OptionsSessionPrefixString:  func(v string) (bool, []string) { return true, nil },
+	OptionsSessionPrefix2String: func(v string) (bool, []string) { return true, nil },
+	OptionsSessionRenumberWindowsString: func(v string) (bool, []string) {
+		choices := []string{"on", "off"}
+
+		if found := slices.Contains(choices, v); !found {
+			return false, choices
+		}
+
+		return true, nil
+	},
+	OptionsSessionRepeatTimeString: func(v string) (bool, []string) {
+		integer, err := strconv.Atoi(v)
+		if err != nil {
+			return false, nil
+		}
+
+		if integer < 0 {
+			return false, nil
+		}
+		return true, nil
+	},
+	OptionsSessionSetTitlesString: func(v string) (bool, []string) {
+		choices := []string{"on", "off"}
+
+		if found := slices.Contains(choices, v); !found {
+			return false, choices
+		}
+
+		return true, nil
+	},
+	OptionsSessionSilenceActionString: func(v string) (bool, []string) {
+		choices := []string{"any", "none", "current", "other"}
+
+		if found := slices.Contains(choices, v); !found {
+			return false, choices
+		}
+
+		return true, nil
+	},
+	OptionsSessionStatusString: func(v string) (bool, []string) {
+		choices := []string{"off", "on", "2", "3", "4", "5"}
+
+		if found := slices.Contains(choices, v); !found {
+			return false, choices
+		}
+
+		return true, nil
+	},
+	OptionsSessionStatusIntervalString: func(v string) (bool, []string) {
+		integer, err := strconv.Atoi(v)
+		if err != nil {
+			return false, nil
+		}
+
+		if integer < 0 {
+			return false, nil
+		}
+		return true, nil
+	},
+	OptionsSessionStatusJustifyString: func(v string) (bool, []string) {
+		choices := []string{"left", "centre", "right", "absolute-centre"}
+
+		if found := slices.Contains(choices, v); !found {
+			return false, choices
+		}
+
+		return true, nil
+	},
+	OptionsSessionStatusKeysString: func(v string) (bool, []string) {
+		choices := []string{"vi", "emacs"}
+
+		if found := slices.Contains(choices, v); !found {
+			return false, choices
+		}
+
+		return true, nil
+	},
+	OptionsSessionStatusLeftString: func(v string) (bool, []string) { return true, nil },
+	OptionsSessionStatusLeftLengthString: func(v string) (bool, []string) {
+		integer, err := strconv.Atoi(v)
+		if err != nil {
+			return false, nil
+		}
+
+		if integer < 0 {
+			return false, nil
+		}
+		return true, nil
+	},
+	OptionsSessionStatusPositionString: func(v string) (bool, []string) {
+		choices := []string{"top", "bottom"}
+
+		if found := slices.Contains(choices, v); !found {
+			return false, choices
+		}
+
+		return true, nil
+	},
+	OptionsSessionStatusRightString: func(v string) (bool, []string) { return true, nil },
+	OptionsSessionStatusRightLengthString: func(v string) (bool, []string) {
+		integer, err := strconv.Atoi(v)
+		if err != nil {
+			return false, nil
+		}
+
+		if integer < 0 {
+			return false, nil
+		}
+		return true, nil
+	},
+	OptionsSessionVisualActivityString: func(v string) (bool, []string) {
+		choices := []string{"on", "off"}
+
+		if found := slices.Contains(choices, v); !found {
+			return false, choices
+		}
+
+		return true, nil
+	},
+	OptionsSessionVisualBellString: func(v string) (bool, []string) {
+		choices := []string{"on", "off"}
+
+		if found := slices.Contains(choices, v); !found {
+			return false, choices
+		}
+
+		return true, nil
+	},
+	OptionsSessionVisualSilenceString: func(v string) (bool, []string) {
+		choices := []string{"on", "off", "both"}
+
+		if found := slices.Contains(choices, v); !found {
+			return false, choices
+		}
+
+		return true, nil
+	},
+	OptionsSessionWordSeparatorsString: func(v string) (bool, []string) { return true, nil },
+
+	// STYLE options are supported, but not yet validated properly:
+	OptionsSessionMessageCommandStyleString: func(v string) (bool, []string) { return true, nil },
+	OptionsSessionMessageStyleString:        func(v string) (bool, []string) { return true, nil },
+	OptionsSessionStatusLeftStyleString:     func(v string) (bool, []string) { return true, nil },
+	OptionsSessionStatusRightStyleString:    func(v string) (bool, []string) { return true, nil },
+	OptionsSessionStatusStyleString:         func(v string) (bool, []string) { return true, nil },
+	OptionsSessionMenuStyleString:           func(v string) (bool, []string) { return true, nil },
+	OptionsSessionMenuSelectedStyleString:   func(v string) (bool, []string) { return true, nil },
+	OptionsSessionMenuBorderStyleString:     func(v string) (bool, []string) { return true, nil },
 }

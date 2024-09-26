@@ -2,71 +2,98 @@ session {
   name = "TestSession"
 
   options = {
-    activity-action = "any"
+    activity-action             = ""
+    assume-paste-time           = ""
+    base-index                  = ""
+    bell-action                 = ""
+    default-command             = ""
+    default-shell               = ""
+    default-size                = ""
+    destroy-unattached          = ""
+    detach-on-destroy           = ""
+    display-panes-active-colour = ""
+    display-panes-colour        = ""
+    display-panes-time          = ""
+    display-time                = ""
+    history-limit               = ""
+    key-table                   = ""
+    lock-after-time             = ""
+    lock-command                = ""
+    menu-border-lines           = ""
+    message-line                = ""
+    mouse                       = ""
+    prefix                      = ""
+    prefix2                     = ""
+    renumber-windows            = ""
+    repeat-time                 = ""
+    set-titles                  = ""
+    silence-action              = ""
+    status                      = ""
+    status-interval             = ""
+    status-justify              = ""
+    status-keys                 = ""
+    status-left                 = ""
+    status-left-length          = ""
+    status-left-style           = ""
+    status-position             = ""
+    status-right                = ""
+    status-right-length         = ""
+    status-style                = ""
+    visual-activity             = ""
+    visual-bell                 = ""
+    visual-silence              = ""
+    word-separators             = ""
   }
 
-  experimental = {
-    validate_options_styles  = true
-    validate_options_formats = true
-  }
+  // popup {
 
-  popup {
+  // }
 
-  }
+  // menu {
 
-  menu {
-    
-  }
+  // }
 
   window {
     layout = "tiled"
 
     options = {
-      pane-border-lines             = "double"
-      monitor-activity              = "on"
-      aggressive-resize             = "off"
-      automatic-rename              = "on"
-      // automatic-rename-format       = "" // validate FORMATS
-      // clock-mode-colour             = "" // validate against full colour pallette
-      clock-mode-style              = "24"
-      fill-character                = "1" // cannot be blank, but only len(v) == 1
-      // main-pane-height              = "" // number or %
-      // main-pane-width               = "" // number or %
-      // copy-mode-match-style         = "" // validate STYLES
-      // copy-mode-mark-style          = "" // validate STYLES
-      // copy-mode-current-match-style = "" // validate STYLES
-      mode-keys                     = "vi"
-      // mode-style                    = "" // validate STYLES
-      monitor-bell                  = "on"
-      monitor-silence               = "0"
-      // other-pane-height             = "" // number or %
-      // other-pane-width              = "" // number or %
-      // pane-active-border-style      = "" // validate STYLES
-      pane-base-index               = "0"
-      // pane-border-format            = "" // validate FORMATS
-      pane-border-indicators        = "off"
-      pane-border-lines             = "double"
-      pane-border-status            = "off"
-      // pane-border-style             = "" // validate STYLES
-      // popup-style                   = "" // validate STYLES
-      // popup-border-style            = "" // validate STYLES
-      popup-border-lines            = "single"
-      // window-status-activity-style  = "" // validate STYLES
-      // window-status-bell-style      = "" // validate STYLES
-      // window-status-current-format  = "" // validate FORMATS
-      // window-status-current-style   = "" // validate STYLES
-      // window-status-format          = "" // validate FORMATS
-      // window-status-last-style      = "" // validate STYLES
-      // window-status-separator       = "" // any string length value
-      // window-status-style           = "" // validate STYLES
-      window-size                   = "latest"
-      wrap-search                   = "on"
+      aggressive-resize             = ""
+      automatic-rename              = ""
+      clock-mode-colour             = ""
+      fill-character                = ""
+      main-pane-height              = ""
+      main-pane-width               = ""
+      mode-keys                     = ""
+      mode-style                    = ""
+      monitor-activity              = ""
+      monitor-bell                  = ""
+      monitor-silence               = ""
+      other-pane-height             = ""
+      other-pane-width              = ""
+      pane-base-index               = ""
+      pane-border-indicators        = ""
+      pane-border-lines             = ""
+      pane-border-status            = ""
+      popup-style                   = ""
+      popup-border-lines            = ""
+      window-status-last-style      = ""
+      window-status-separator       = ""
+      window-size                   = ""
+      wrap-search                   = ""
     }
 
     pane {
       options = {
-        pane-border-lines = "double"
-        monitor-activity  = "on"
+        allow-passthrough     = ""
+        allow-rename          = ""
+        allow-set-title       = ""
+        alternate-screen      = ""
+        cursor-colour         = ""
+        pane-colours          = ""
+        cursor-style          = ""
+        remain-on-exit        = ""
+        scroll-on-clear       = ""
+        synchronize-panes     = ""
       }
     }
 
