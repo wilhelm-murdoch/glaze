@@ -1,13 +1,5 @@
 package enums
 
-import (
-	"fmt"
-	"regexp"
-	"slices"
-	"strconv"
-	"strings"
-)
-
 type OptionsWindow int
 
 const (
@@ -302,213 +294,62 @@ func OptionsWindowFromString(s string) OptionsWindow {
 	return OptionsWindowUnknown
 }
 
-var validateDimension = func(v string) (bool, []string) {
-	// Check if the value ends with '%'
-	if strings.HasSuffix(v, "%") {
-		percentage, err := fmt.Sscanf(strings.TrimPrefix(v, "%"), "%d", new(int))
-		if err != nil {
-			return false, nil
-		}
+var OptionsWindowValidators = map[string]ValidatorFunc{
+	OptionsWindowAggressiveResizeString:      validatorToggle,
+	OptionsWindowAutomaticRenameString:       validatorToggle,
+	OptionsWindowClockModeColourString:       validatorColour,
+	OptionsWindowFillCharacterString:         validatorNonEmpty,
+	OptionsWindowMainPaneHeightString:        validatorDimension,
+	OptionsWindowMainPaneWidthString:         validatorDimension,
+	OptionsWindowMonitorActivityString:       validatorToggle,
+	OptionsWindowMonitorBellString:           validatorToggle,
+	OptionsWindowMonitorSilenceString:        validatorIsNumber,
+	OptionsWindowOtherPaneHeightString:       validatorDimension,
+	OptionsWindowOtherPaneWidthString:        validatorDimension,
+	OptionsWindowPaneBaseIndexString:         validatorIsNumber,
+	OptionsWindowWrapSearchString:            validatorToggle,
+	OptionsWindowWindowStatusSeparatorString: validatorDefault,
 
-		if percentage <= 1 || percentage >= 100 {
-			return false, nil
-		}
-
-		return true, nil
-	}
-
-	if _, err := strconv.Atoi(v); err != nil {
-		return false, nil
-	}
-
-	return true, nil
-}
-
-var validateColour = func(v string) (bool, []string) {
-	validColors := []string{
-		"black", "red", "green", "yellow", "blue", "magenta", "cyan", "white",
-		"brightred", "brightgreen", "brightyellow", "default", "terminal",
-	}
-
-	// Check if color is in the list of valid named colors
-	for _, validColor := range validColors {
-		if v == validColor {
-			return true, nil
-		}
-	}
-
-	// Check for "colour0" to "colour255"
-	if strings.HasPrefix(v, "colour") {
-		numPart := strings.TrimPrefix(v, "colour")
-		if n, err := fmt.Sscanf(numPart, "%d", new(int)); err == nil && n >= 0 && n <= 255 {
-			return true, nil
-		}
-	}
-
-	// Check for hexadecimal RGB strings like '#FFFFFF'
-	hexColorPattern := regexp.MustCompile(`^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$`)
-	if hexColorPattern.MatchString(v) {
-		return true, nil
-	}
-
-	return false, nil
-}
-
-var OptionsWindowValidators = map[string]func(v string) (bool, []string){
-	OptionsWindowAggressiveResizeString: func(v string) (bool, []string) {
-		choices := []string{"on", "off"}
-
-		if found := slices.Contains(choices, v); !found {
-			return false, choices
-		}
-
-		return true, nil
-	},
-	OptionsWindowAutomaticRenameString: func(v string) (bool, []string) {
-		choices := []string{"on", "off"}
-
-		if found := slices.Contains(choices, v); !found {
-			return false, choices
-		}
-
-		return true, nil
-	},
-	OptionsWindowClockModeColourString: validateColour,
 	OptionsWindowClockModeStyleString: func(v string) (bool, []string) {
-		choices := []string{"12", "24"}
-
-		if found := slices.Contains(choices, v); !found {
-			return false, choices
-		}
-
-		return true, nil
+		return validatorContains(v, "12", "24")
 	},
-	OptionsWindowFillCharacterString: func(v string) (bool, []string) {
-		if len(strings.TrimSpace(v)) != 1 {
-			return false, nil
-		}
-
-		return true, nil
-	},
-	OptionsWindowMainPaneHeightString: validateDimension,
-	OptionsWindowMainPaneWidthString:  validateDimension,
 	OptionsWindowModeKeysString: func(v string) (bool, []string) {
-		choices := []string{"vi", "emacs"}
-
-		if found := slices.Contains(choices, v); !found {
-			return false, choices
-		}
-
-		return true, nil
-	},
-	OptionsWindowMonitorActivityString: func(v string) (bool, []string) {
-		choices := []string{"on", "off"}
-
-		if found := slices.Contains(choices, v); !found {
-			return false, choices
-		}
-
-		return true, nil
-	},
-	OptionsWindowMonitorBellString: func(v string) (bool, []string) {
-		choices := []string{"on", "off"}
-
-		if found := slices.Contains(choices, v); !found {
-			return false, choices
-		}
-
-		return true, nil
-	},
-	OptionsWindowMonitorSilenceString: func(v string) (bool, []string) {
-		if _, err := strconv.Atoi(v); err != nil {
-			return false, nil
-		}
-
-		return true, nil
-	},
-	OptionsWindowOtherPaneHeightString: validateDimension,
-	OptionsWindowOtherPaneWidthString:  validateDimension,
-	OptionsWindowPaneBaseIndexString: func(v string) (bool, []string) {
-		if _, err := strconv.Atoi(v); err != nil {
-			return false, nil
-		}
-
-		return true, nil
+		return validatorContains(v, "vi", "emacs")
 	},
 	OptionsWindowPaneBorderIndicatorsString: func(v string) (bool, []string) {
-		choices := []string{"off", "colour", "arrows", "both"}
-
-		if found := slices.Contains(choices, v); !found {
-			return false, choices
-		}
-
-		return true, nil
+		return validatorContains(v, "off", "colour", "arrows", "both")
 	},
 	OptionsWindowPaneBorderLinesString: func(v string) (bool, []string) {
-		choices := []string{"single", "double", "heavy", "simple", "number"}
-
-		if found := slices.Contains(choices, v); !found {
-			return false, choices
-		}
-
-		return true, nil
+		return validatorContains(v, "single", "double", "heavy", "simple", "number")
 	},
 	OptionsWindowPaneBorderStatusString: func(v string) (bool, []string) {
-		choices := []string{"off", "top", "bottom"}
-
-		if found := slices.Contains(choices, v); !found {
-			return false, choices
-		}
-
-		return true, nil
+		return validatorContains(v, "off", "top", "bottom")
 	},
 	OptionsWindowPopupBorderLinesString: func(v string) (bool, []string) {
-		choices := []string{"single", "rounded", "double", "heavy", "simple", "padded", "none"}
-
-		if found := slices.Contains(choices, v); !found {
-			return false, choices
-		}
-
-		return true, nil
+		return validatorContains(v, "single", "rounded", "double", "heavy", "simple", "padded", "none")
 	},
 	OptionsWindowWindowSizeString: func(v string) (bool, []string) {
-		choices := []string{"largest", "smallest", "manual", "latest"}
-
-		if found := slices.Contains(choices, v); !found {
-			return false, choices
-		}
-
-		return true, nil
+		return validatorContains(v, "largest", "smallest", "manual", "latest")
 	},
-	OptionsWindowWrapSearchString: func(v string) (bool, []string) {
-		choices := []string{"on", "off"}
-
-		if found := slices.Contains(choices, v); !found {
-			return false, choices
-		}
-
-		return true, nil
-	},
-	OptionsWindowWindowStatusSeparatorString: func(v string) (bool, []string) { return true, nil },
 
 	// FORMAT options are supported, but not yet validated properly:
-	OptionsWindowWindowStatusFormatString:        func(v string) (bool, []string) { return true, nil },
-	OptionsWindowWindowStatusCurrentFormatString: func(v string) (bool, []string) { return true, nil },
-	OptionsWindowPaneBorderFormatString:          func(v string) (bool, []string) { return true, nil },
-	OptionsWindowAutomaticRenameFormatString:     func(v string) (bool, []string) { return true, nil },
+	OptionsWindowWindowStatusFormatString:        validatorDefault,
+	OptionsWindowWindowStatusCurrentFormatString: validatorDefault,
+	OptionsWindowPaneBorderFormatString:          validatorDefault,
+	OptionsWindowAutomaticRenameFormatString:     validatorDefault,
 
 	// STYLE options are supported, but not yet validated properly:
-	OptionsWindowWindowStatusLastStyleString:     func(v string) (bool, []string) { return true, nil },
-	OptionsWindowWindowStatusStyleString:         func(v string) (bool, []string) { return true, nil },
-	OptionsWindowWindowStatusCurrentStyleString:  func(v string) (bool, []string) { return true, nil },
-	OptionsWindowWindowStatusActivityStyleString: func(v string) (bool, []string) { return true, nil },
-	OptionsWindowWindowStatusBellStyleString:     func(v string) (bool, []string) { return true, nil },
-	OptionsWindowPaneActiveBorderStyleString:     func(v string) (bool, []string) { return true, nil },
-	OptionsWindowModeStyleString:                 func(v string) (bool, []string) { return true, nil },
-	OptionsWindowCopyModeCurrentMatchStyleString: func(v string) (bool, []string) { return true, nil },
-	OptionsWindowCopyModeMatchStyleString:        func(v string) (bool, []string) { return true, nil },
-	OptionsWindowCopyModeMarkStyleString:         func(v string) (bool, []string) { return true, nil },
-	OptionsWindowPaneBorderStyleString:           func(v string) (bool, []string) { return true, nil },
-	OptionsWindowPopupStyleString:                func(v string) (bool, []string) { return true, nil },
-	OptionsWindowPopupBorderStyleString:          func(v string) (bool, []string) { return true, nil },
+	OptionsWindowWindowStatusLastStyleString:     validatorDefault,
+	OptionsWindowWindowStatusStyleString:         validatorDefault,
+	OptionsWindowWindowStatusCurrentStyleString:  validatorDefault,
+	OptionsWindowWindowStatusActivityStyleString: validatorDefault,
+	OptionsWindowWindowStatusBellStyleString:     validatorDefault,
+	OptionsWindowPaneActiveBorderStyleString:     validatorDefault,
+	OptionsWindowModeStyleString:                 validatorDefault,
+	OptionsWindowCopyModeCurrentMatchStyleString: validatorDefault,
+	OptionsWindowCopyModeMatchStyleString:        validatorDefault,
+	OptionsWindowCopyModeMarkStyleString:         validatorDefault,
+	OptionsWindowPaneBorderStyleString:           validatorDefault,
+	OptionsWindowPopupStyleString:                validatorDefault,
+	OptionsWindowPopupBorderStyleString:          validatorDefault,
 }

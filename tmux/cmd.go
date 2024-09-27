@@ -1,6 +1,7 @@
 package tmux
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -43,7 +44,8 @@ func (c Command) String() string {
 	return strings.Join(c.args, " ")
 }
 
-// Exec executes the command and returns an error if one occurred.
+// Exec executes the command and returns an error if one occurred. It will pipe
+// any output to os.Stdin, os.Stdout and os.Stderr.
 func (c Command) Exec() error {
 	c.cmd.Stdin = os.Stdin
 	c.cmd.Stdout = os.Stdout
@@ -54,6 +56,16 @@ func (c Command) Exec() error {
 	}
 
 	return nil
+}
+
+// ExecWithStatus executes the command and attempts to return its exit status.
+func (c Command) ExecWithStatus() int {
+	err := c.cmd.Run()
+	if err != nil && !errors.Is(err, CommandError{}) {
+		return 1
+	}
+
+	return returnExitStatusFromError(err)
 }
 
 // ExecWithOutput executes the command and returns the output as a string.

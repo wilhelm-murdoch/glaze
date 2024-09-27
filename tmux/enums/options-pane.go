@@ -1,7 +1,5 @@
 package enums
 
-import "slices"
-
 type OptionsPane int
 
 const (
@@ -27,7 +25,6 @@ const (
 	OptionsPaneAllowSetTitleString      = "allow-set-title"
 	OptionsPaneAlternateScreenString    = "alternate-screen"
 	OptionsPaneCursorColourString       = "cursor-colour"
-	OptionsPanePaneColoursString        = "pane-colours"
 	OptionsPaneCursorStyleString        = "cursor-style"
 	OptionsPaneRemainOnExitString       = "remain-on-exit"
 	OptionsPaneRemainOnExitFormatString = "remain-on-exit-format"
@@ -44,7 +41,6 @@ var OptionsPaneList = []string{
 	OptionsPaneAllowSetTitleString,
 	OptionsPaneAlternateScreenString,
 	OptionsPaneCursorColourString,
-	OptionsPanePaneColoursString,
 	OptionsPaneCursorStyleString,
 	OptionsPaneRemainOnExitString,
 	OptionsPaneRemainOnExitFormatString,
@@ -67,8 +63,6 @@ func (o OptionsPane) String() string {
 		return OptionsPaneAlternateScreenString
 	case OptionsPaneCursorColour:
 		return OptionsPaneCursorColourString
-	case OptionsPanePaneColours:
-		return OptionsPanePaneColoursString
 	case OptionsPaneCursorStyle:
 		return OptionsPaneCursorStyleString
 	case OptionsPaneRemainOnExit:
@@ -100,8 +94,6 @@ func OptionsPaneFromString(s string) OptionsPane {
 		return OptionsPaneAlternateScreen
 	case OptionsPaneCursorColourString:
 		return OptionsPaneCursorColour
-	case OptionsPanePaneColoursString:
-		return OptionsPanePaneColours
 	case OptionsPaneCursorStyleString:
 		return OptionsPaneCursorStyle
 	case OptionsPaneRemainOnExitString:
@@ -121,22 +113,24 @@ func OptionsPaneFromString(s string) OptionsPane {
 	return OptionsPaneUnknown
 }
 
-var OptionsPaneValidators = map[string]func(v string) (bool, []string){
-	OptionsPaneAllowPassthroughString: func(v string) (bool, []string) {
-		return slices.Contains([]string{"on", "off", "all"}, v), nil
+var OptionsPaneValidators = map[string]ValidatorFunc{
+	OptionsPaneAllowRenameString:        validatorToggle,
+	OptionsPaneAllowSetTitleString:      validatorToggle,
+	OptionsPaneAlternateScreenString:    validatorToggle,
+	OptionsPaneCursorColourString:       validatorColour,
+	OptionsPaneRemainOnExitFormatString: validatorDefault,
+	OptionsPaneScrollOnClearString:      validatorToggle,
+	OptionsPaneSynchronizePanesString:   validatorToggle,
+
+	OptionsPaneRemainOnExitString: func(v string) (bool, []string) {
+		return validatorContains(v, "on", "off", "failed")
 	},
-	OptionsPaneAllowRenameString:        func(v string) (bool, []string) { return true, nil },
-	OptionsPaneAllowSetTitleString:      func(v string) (bool, []string) { return true, nil },
-	OptionsPaneAlternateScreenString:    func(v string) (bool, []string) { return true, nil },
-	OptionsPaneCursorColourString:       func(v string) (bool, []string) { return true, nil },
-	OptionsPanePaneColoursString:        func(v string) (bool, []string) { return true, nil },
-	OptionsPaneRemainOnExitString:       func(v string) (bool, []string) { return true, nil },
-	OptionsPaneRemainOnExitFormatString: func(v string) (bool, []string) { return true, nil },
-	OptionsPaneScrollOnClearString:      func(v string) (bool, []string) { return true, nil },
-	OptionsPaneSynchronizePanesString:   func(v string) (bool, []string) { return true, nil },
+	OptionsPaneAllowPassthroughString: func(v string) (bool, []string) {
+		return validatorContains(v, "on", "off", "all")
+	},
 
 	// STYLE options are supported, but not yet validated properly:
-	OptionsPaneWindowActiveStyleString: func(v string) (bool, []string) { return true, nil },
-	OptionsPaneWindowStyleString:       func(v string) (bool, []string) { return true, nil },
-	OptionsPaneCursorStyleString:       func(v string) (bool, []string) { return true, nil },
+	OptionsPaneWindowActiveStyleString: validatorDefault,
+	OptionsPaneWindowStyleString:       validatorDefault,
+	OptionsPaneCursorStyleString:       validatorDefault,
 }

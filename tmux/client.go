@@ -258,11 +258,9 @@ func (c Client) KillSessionByName(sessionName string) error {
 func (c Client) FindSessionByName(sessionName string) (*Session, error) {
 	sessions, _ := c.Sessions()
 
-	found := sessions.Find(func(i int, s *Session) bool {
+	if found := sessions.Find(func(i int, s *Session) bool {
 		return s.Name == sessionName
-	})
-
-	if found != nil {
+	}); found != nil {
 		return found, nil
 	}
 
@@ -271,9 +269,11 @@ func (c Client) FindSessionByName(sessionName string) (*Session, error) {
 
 // SessionExists returns true if a session with the given name exists.
 func (c Client) SessionExists(sessionName string) bool {
-	sessions, _ := c.Sessions()
+	cmd, _ := NewCommand(c, "has-session", "-t", sessionName)
 
-	return sessions.Find(func(i int, s *Session) bool {
-		return s.Name == sessionName
-	}) != nil
+	if exitStatus := cmd.ExecWithStatus(); exitStatus != 0 {
+		return false
+	}
+
+	return true
 }
