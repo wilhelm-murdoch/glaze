@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/wilhelm-murdoch/glaze/tmux/enums"
+	"github.com/wilhelm-murdoch/go-collection"
 )
 
 // Window represents a tmux window.
@@ -86,13 +87,16 @@ func (w *Window) Split(parentId, name, startingDirectory string) (Pane, error) {
 	}, nil
 }
 
-func (w Window) SetOption(option string, value string) error {
-	cmd, err := NewCommand(w.Session.Client, "set", "-w", "-t", w.Target(), option, value)
-	if err != nil {
-		return err
-	}
+func (w Window) SetOption(option, value string) error {
+	return setOption[enums.OptionsWindow](w.Session.Client, "set", "-w", "-t", w.Target(), option, value)
+}
 
-	return cmd.Exec()
+func (w Window) GetOption(option enums.OptionsWindow) (Option[enums.OptionsWindow], error) {
+	return getOption[enums.OptionsWindow](w.Session.Client, "show", "-w", "-t", w.Target(), fmt.Sprint(option))
+}
+
+func (w Window) ShowOptions() (collection.Collection[Option[enums.OptionsWindow]], error) {
+	return showOptions[enums.OptionsWindow](w.Session.Client, "show", "-w", "-t", w.Target())
 }
 
 func (w Window) Kill() error {

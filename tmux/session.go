@@ -1,10 +1,12 @@
 package tmux
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
 	"github.com/wilhelm-murdoch/glaze/tmux/enums"
+	"github.com/wilhelm-murdoch/go-collection"
 )
 
 // Session represents a tmux session.
@@ -74,13 +76,16 @@ func (s *Session) NewWindow(windowName string) (*Window, error) {
 	}, nil
 }
 
-func (s *Session) SetOption(option string, value string) error {
-	cmd, err := NewCommand(s.Client, "set", option, value)
-	if err != nil {
-		return err
-	}
+func (s *Session) SetOption(option, value string) error {
+	return setOption[enums.OptionsSession](s.Client, "set", "-t", s.Target(), option, value)
+}
 
-	return cmd.Exec()
+func (s *Session) GetOption(option enums.OptionsSession) (Option[enums.OptionsSession], error) {
+	return getOption[enums.OptionsSession](s.Client, "show", "-t", s.Target(), fmt.Sprint(option))
+}
+
+func (s *Session) ShowOptions() (collection.Collection[Option[enums.OptionsSession]], error) {
+	return showOptions[enums.OptionsSession](s.Client, "show", "-t", s.Target())
 }
 
 // Kill closes the current session.

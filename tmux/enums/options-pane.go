@@ -3,7 +3,7 @@ package enums
 type OptionsPane int
 
 const (
-	OptionsPaneAllowPassthrough = iota + 1
+	OptionsPaneAllowPassthrough OptionsPane = iota + 1
 	OptionsPaneAllowRename
 	OptionsPaneAllowSetTitle
 	OptionsPaneAlternateScreen
@@ -82,7 +82,11 @@ func (o OptionsPane) String() string {
 	return OptionsPaneUnknownString
 }
 
-func OptionsPaneFromString(s string) OptionsPane {
+func (o OptionsPane) IsKnown(s string) bool {
+	return o.FromString(s) != OptionsPaneUnknown
+}
+
+func (o OptionsPane) FromString(s string) OptionsPane {
 	switch s {
 	case OptionsPaneAllowPassthroughString:
 		return OptionsPaneAllowPassthrough
@@ -111,6 +115,14 @@ func OptionsPaneFromString(s string) OptionsPane {
 	}
 
 	return OptionsPaneUnknown
+}
+
+func (o OptionsPane) GetValidator(name string) (ValidatorFunc, bool) {
+	if out, ok := OptionsPaneValidators[name]; ok {
+		return out, true
+	}
+
+	return nil, false
 }
 
 var OptionsPaneValidators = map[string]ValidatorFunc{

@@ -3,7 +3,7 @@ package enums
 type OptionsWindow int
 
 const (
-	OptionsWindowAggressiveResize = iota + 1
+	OptionsWindowAggressiveResize OptionsWindow = iota + 1
 	OptionsWindowAutomaticRename
 	OptionsWindowAutomaticRenameFormat
 	OptionsWindowClockModeColour
@@ -211,7 +211,11 @@ func (o OptionsWindow) String() string {
 	return OptionsWindowUnknownString
 }
 
-func OptionsWindowFromString(s string) OptionsWindow {
+func (o OptionsWindow) IsKnown(s string) bool {
+	return o.FromString(s) != OptionsWindowUnknown
+}
+
+func (o OptionsWindow) FromString(s string) OptionsWindow {
 	switch s {
 	case OptionsWindowAggressiveResizeString:
 		return OptionsWindowAggressiveResize
@@ -292,6 +296,14 @@ func OptionsWindowFromString(s string) OptionsWindow {
 	}
 
 	return OptionsWindowUnknown
+}
+
+func (o OptionsWindow) GetValidator(name string) (ValidatorFunc, bool) {
+	if out, ok := OptionsWindowValidators[name]; ok {
+		return out, true
+	}
+
+	return nil, false
 }
 
 var OptionsWindowValidators = map[string]ValidatorFunc{

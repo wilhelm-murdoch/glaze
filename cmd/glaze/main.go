@@ -30,6 +30,9 @@ var (
 )
 
 func main() {
+	log.SetTimeFormat(time.Kitchen)
+	log.SetLevel(log.DebugLevel)
+
 	cli.VersionPrinter = func(c *cli.Context) {
 		fmt.Printf("Version: %s, Stage: %s, Commit: %s, Date: %s\n", Version, Stage, Commit, Date)
 	}

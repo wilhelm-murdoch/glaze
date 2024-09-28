@@ -11,14 +11,54 @@ import (
 	"github.com/zclconf/go-cty/cty"
 )
 
+func validateOptions[OT enums.OptionTyper[OT]](value cty.Value) hcl.Diagnostics {
+	var out hcl.Diagnostics
+
+	if !value.IsNull() {
+		for option, value := range value.AsValueMap() {
+			var optionType OT
+
+			if !optionType.IsKnown(option) {
+				out = out.Append(&hcl.Diagnostic{
+					Severity: hcl.DiagError,
+					Summary:  "Invalid session option specified",
+					Detail:   fmt.Sprintf(`The session option of "%s" does not exist.`, option),
+				})
+			}
+
+			validator, ok := optionType.GetValidator(option)
+			if !ok {
+				out = out.Append(&hcl.Diagnostic{
+					Severity: hcl.DiagError,
+					Summary:  "Invalid validator specified",
+					Detail:   fmt.Sprintf(`The session option "%s" does not have a defined validator.`, option),
+				})
+
+				continue
+			}
+
+			ok, choices := validator(value.AsString())
+			if !ok {
+				if len(choices) > 0 {
+					out = out.Extend(ContainsDiagnostic(fmt.Sprintf(`session option "%s"`, option), value, choices))
+					continue
+				}
+
+				out = out.Append(&hcl.Diagnostic{
+					Severity: hcl.DiagError,
+					Summary:  "Invalid session option value specified",
+					Detail:   fmt.Sprintf(`The value "%s" for session option "%s" is not valid.`, value.AsString(), option),
+				})
+			}
+		}
+	}
+
+	return out
+}
+
 var (
 	envsSpec = &hcldec.AttrSpec{
 		Name: "env",
-		Type: cty.Map(cty.String),
-	}
-
-	optionsSpec = &hcldec.AttrSpec{
-		Name: "options",
 		Type: cty.Map(cty.String),
 	}
 
@@ -43,46 +83,7 @@ var (
 					Type: cty.Map(cty.String),
 				},
 				Func: func(value cty.Value) hcl.Diagnostics {
-					var out hcl.Diagnostics
-
-					if !value.IsNull() {
-						for option, value := range value.AsValueMap() {
-							if known := enums.OptionsSessionFromString(option); known == enums.OptionsSessionUnknown {
-								out = out.Append(&hcl.Diagnostic{
-									Severity: hcl.DiagError,
-									Summary:  "Invalid session option specified",
-									Detail:   fmt.Sprintf(`The session option of "%s" does not exist.`, option),
-								})
-							}
-
-							validator, ok := enums.OptionsSessionValidators[option]
-							if !ok {
-								out = out.Append(&hcl.Diagnostic{
-									Severity: hcl.DiagError,
-									Summary:  "Invalid validator specified",
-									Detail:   fmt.Sprintf(`The session option "%s" does not have a defined validator.`, option),
-								})
-
-								continue
-							}
-
-							ok, choices := validator(value.AsString())
-							if !ok {
-								if len(choices) > 0 {
-									out = out.Extend(ContainsDiagnostic(fmt.Sprintf(`session option "%s"`, option), value, choices))
-									continue
-								}
-
-								out = out.Append(&hcl.Diagnostic{
-									Severity: hcl.DiagError,
-									Summary:  "Invalid session option value specified",
-									Detail:   fmt.Sprintf(`The value "%s" for session option "%s" is not valid.`, value.AsString(), option),
-								})
-							}
-						}
-					}
-
-					return out
+					return validateOptions[enums.OptionsSession](value)
 				},
 			},
 			"hooks": hooksSpec,
@@ -110,46 +111,7 @@ var (
 							Type: cty.Map(cty.String),
 						},
 						Func: func(value cty.Value) hcl.Diagnostics {
-							var out hcl.Diagnostics
-
-							if !value.IsNull() {
-								for option, value := range value.AsValueMap() {
-									if known := enums.OptionsWindowFromString(option); known == enums.OptionsWindowUnknown {
-										out = out.Append(&hcl.Diagnostic{
-											Severity: hcl.DiagError,
-											Summary:  "Invalid window option specified",
-											Detail:   fmt.Sprintf(`The window option of "%s" does not exist.`, option),
-										})
-									}
-
-									validator, ok := enums.OptionsWindowValidators[option]
-									if !ok {
-										out = out.Append(&hcl.Diagnostic{
-											Severity: hcl.DiagError,
-											Summary:  "Invalid validator specified",
-											Detail:   fmt.Sprintf(`The window option "%s" does not have a defined validator.`, option),
-										})
-
-										continue
-									}
-
-									ok, choices := validator(value.AsString())
-									if !ok {
-										if len(choices) > 0 {
-											out = out.Extend(ContainsDiagnostic(fmt.Sprintf(`window option "%s"`, option), value, choices))
-											continue
-										}
-
-										out = out.Append(&hcl.Diagnostic{
-											Severity: hcl.DiagError,
-											Summary:  "Invalid window option value specified",
-											Detail:   fmt.Sprintf(`The value "%s" for window option "%s" is not valid.`, value.AsString(), option),
-										})
-									}
-								}
-							}
-
-							return out
+							return validateOptions[enums.OptionsWindow](value)
 						},
 					},
 					"hooks": hooksSpec,
@@ -191,46 +153,7 @@ var (
 										Type: cty.Map(cty.String),
 									},
 									Func: func(value cty.Value) hcl.Diagnostics {
-										var out hcl.Diagnostics
-
-										if !value.IsNull() {
-											for option, value := range value.AsValueMap() {
-												if known := enums.OptionsPaneFromString(option); known == enums.OptionsPaneUnknown {
-													out = out.Append(&hcl.Diagnostic{
-														Severity: hcl.DiagError,
-														Summary:  "Invalid pane option specified",
-														Detail:   fmt.Sprintf(`The pane option of "%s" does not exist.`, option),
-													})
-												}
-
-												validator, ok := enums.OptionsPaneValidators[option]
-												if !ok {
-													out = out.Append(&hcl.Diagnostic{
-														Severity: hcl.DiagError,
-														Summary:  "Invalid validator specified",
-														Detail:   fmt.Sprintf(`The pane option "%s" does not have a defined validator.`, option),
-													})
-
-													continue
-												}
-
-												ok, choices := validator(value.AsString())
-												if !ok {
-													if len(choices) > 0 {
-														out = out.Extend(ContainsDiagnostic(fmt.Sprintf(`pane option "%s"`, option), value, choices))
-														continue
-													}
-
-													out = out.Append(&hcl.Diagnostic{
-														Severity: hcl.DiagError,
-														Summary:  "Invalid pane option value specified",
-														Detail:   fmt.Sprintf(`The value "%s" for pane option "%s" is not valid.`, value.AsString(), option),
-													})
-												}
-											}
-										}
-
-										return out
+										return validateOptions[enums.OptionsPane](value)
 									},
 								},
 								"hooks": hooksSpec,

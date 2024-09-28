@@ -3,7 +3,7 @@ package enums
 type OptionsSession int
 
 const (
-	OptionsSessionActivityAction = iota + 1
+	OptionsSessionActivityAction OptionsSession = iota + 1
 	OptionsSessionAssumePasteTime
 	OptionsSessionBaseIndex
 	OptionsSessionBellAction
@@ -257,7 +257,11 @@ func (o OptionsSession) String() string {
 	return OptionsSessionUnknownString
 }
 
-func OptionsSessionFromString(s string) OptionsSession {
+func (o OptionsSession) IsKnown(s string) bool {
+	return o.FromString(s) != OptionsSessionUnknown
+}
+
+func (o OptionsSession) FromString(s string) OptionsSession {
 	switch s {
 	case OptionsSessionActivityActionString:
 		return OptionsSessionActivityAction
@@ -358,6 +362,14 @@ func OptionsSessionFromString(s string) OptionsSession {
 	}
 
 	return OptionsSessionUnknown
+}
+
+func (o OptionsSession) GetValidator(name string) (ValidatorFunc, bool) {
+	if out, ok := OptionsSessionValidators[name]; ok {
+		return out, true
+	}
+
+	return nil, false
 }
 
 var OptionsSessionValidators = map[string]ValidatorFunc{
