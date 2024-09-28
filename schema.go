@@ -114,20 +114,20 @@ var (
 
 							if !value.IsNull() {
 								for option, value := range value.AsValueMap() {
-									if known := enums.OptionsPaneFromString(option); known == enums.OptionsPaneUnknown {
+									if known := enums.OptionsWindowFromString(option); known == enums.OptionsWindowUnknown {
 										out = out.Append(&hcl.Diagnostic{
 											Severity: hcl.DiagError,
-											Summary:  "Invalid Pane option specified",
-											Detail:   fmt.Sprintf(`The Pane option of "%s" does not exist.`, option),
+											Summary:  "Invalid window option specified",
+											Detail:   fmt.Sprintf(`The window option of "%s" does not exist.`, option),
 										})
 									}
 
-									validator, ok := enums.OptionsPaneValidators[option]
+									validator, ok := enums.OptionsWindowValidators[option]
 									if !ok {
 										out = out.Append(&hcl.Diagnostic{
 											Severity: hcl.DiagError,
 											Summary:  "Invalid validator specified",
-											Detail:   fmt.Sprintf(`The Pane option "%s" does not have a defined validator.`, option),
+											Detail:   fmt.Sprintf(`The window option "%s" does not have a defined validator.`, option),
 										})
 
 										continue
@@ -136,14 +136,14 @@ var (
 									ok, choices := validator(value.AsString())
 									if !ok {
 										if len(choices) > 0 {
-											out = out.Extend(ContainsDiagnostic(fmt.Sprintf(`Pane option "%s"`, option), value, choices))
+											out = out.Extend(ContainsDiagnostic(fmt.Sprintf(`window option "%s"`, option), value, choices))
 											continue
 										}
 
 										out = out.Append(&hcl.Diagnostic{
 											Severity: hcl.DiagError,
-											Summary:  "Invalid Pane option value specified",
-											Detail:   fmt.Sprintf(`The value "%s" for Pane option "%s" is not valid.`, value.AsString(), option),
+											Summary:  "Invalid window option value specified",
+											Detail:   fmt.Sprintf(`The value "%s" for window option "%s" is not valid.`, value.AsString(), option),
 										})
 									}
 								}

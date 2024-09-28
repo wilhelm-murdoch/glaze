@@ -309,28 +309,13 @@ var OptionsWindowValidators = map[string]ValidatorFunc{
 	OptionsWindowPaneBaseIndexString:         validatorIsNumber,
 	OptionsWindowWrapSearchString:            validatorToggle,
 	OptionsWindowWindowStatusSeparatorString: validatorDefault,
-
-	OptionsWindowClockModeStyleString: func(v string) (bool, []string) {
-		return validatorContains(v, "12", "24")
-	},
-	OptionsWindowModeKeysString: func(v string) (bool, []string) {
-		return validatorContains(v, "vi", "emacs")
-	},
-	OptionsWindowPaneBorderIndicatorsString: func(v string) (bool, []string) {
-		return validatorContains(v, "off", "colour", "arrows", "both")
-	},
-	OptionsWindowPaneBorderLinesString: func(v string) (bool, []string) {
-		return validatorContains(v, "single", "double", "heavy", "simple", "number")
-	},
-	OptionsWindowPaneBorderStatusString: func(v string) (bool, []string) {
-		return validatorContains(v, "off", "top", "bottom")
-	},
-	OptionsWindowPopupBorderLinesString: func(v string) (bool, []string) {
-		return validatorContains(v, "single", "rounded", "double", "heavy", "simple", "padded", "none")
-	},
-	OptionsWindowWindowSizeString: func(v string) (bool, []string) {
-		return validatorContains(v, "largest", "smallest", "manual", "latest")
-	},
+	OptionsWindowClockModeStyleString:        validatorContains("12", "24"),
+	OptionsWindowModeKeysString:              validatorContains("vi", "emacs"),
+	OptionsWindowPaneBorderIndicatorsString:  validatorContains("off", "colour", "arrows", "both"),
+	OptionsWindowPaneBorderLinesString:       validatorContains("single", "double", "heavy", "simple", "number"),
+	OptionsWindowPaneBorderStatusString:      validatorContains("off", "top", "bottom"),
+	OptionsWindowPopupBorderLinesString:      validatorContains("single", "rounded", "double", "heavy", "simple", "padded", "none"),
+	OptionsWindowWindowSizeString:            validatorContains("largest", "smallest", "manual", "latest"),
 
 	// FORMAT options are supported, but not yet validated properly:
 	OptionsWindowWindowStatusFormatString:        validatorDefault,

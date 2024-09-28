@@ -121,13 +121,8 @@ var OptionsPaneValidators = map[string]ValidatorFunc{
 	OptionsPaneRemainOnExitFormatString: validatorDefault,
 	OptionsPaneScrollOnClearString:      validatorToggle,
 	OptionsPaneSynchronizePanesString:   validatorToggle,
-
-	OptionsPaneRemainOnExitString: func(v string) (bool, []string) {
-		return validatorContains(v, "on", "off", "failed")
-	},
-	OptionsPaneAllowPassthroughString: func(v string) (bool, []string) {
-		return validatorContains(v, "on", "off", "all")
-	},
+	OptionsPaneRemainOnExitString:       validatorContains("on", "off", "failed"),
+	OptionsPaneAllowPassthroughString:   validatorContains("on", "off", "all"),
 
 	// STYLE options are supported, but not yet validated properly:
 	OptionsPaneWindowActiveStyleString: validatorDefault,

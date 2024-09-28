@@ -16,6 +16,7 @@ type Pane struct {
 	Size              string
 	Envs              map[string]string
 	Hooks             map[string]string
+	Options           map[string]string
 	Commands          []string
 	Focus             bool
 }
@@ -55,6 +56,13 @@ func (p *Pane) Decode(value cty.Value) hcl.Diagnostics {
 		p.Hooks = make(map[string]string)
 		for name, value := range value.GetAttr("hooks").AsValueMap() {
 			p.Hooks[name] = value.AsString()
+		}
+	}
+
+	if !value.GetAttr("options").IsNull() {
+		p.Options = make(map[string]string)
+		for name, value := range value.GetAttr("options").AsValueMap() {
+			p.Options[name] = value.AsString()
 		}
 	}
 

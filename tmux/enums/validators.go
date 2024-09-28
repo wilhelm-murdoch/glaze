@@ -11,6 +11,8 @@ import (
 type ValidatorFunc func(v string) (bool, []string)
 
 var (
+	validatorDefault = func(v string) (bool, []string) { return true, nil }
+
 	validatorDimension = func(v string) (bool, []string) {
 		if strings.HasSuffix(v, "%") {
 			percentage, err := fmt.Sscanf(strings.TrimPrefix(v, "%"), "%d", new(int))
@@ -62,10 +64,8 @@ var (
 		return false, nil
 	}
 
-	validatorDefault = func(v string) (bool, []string) { return true, nil }
-
 	validatorToggle = func(v string) (bool, []string) {
-		return validatorContains(v, "on", "off")
+		return validatorContains(v, "on", "off")(v)
 	}
 
 	validatorIsNumber = func(v string) (bool, []string) {
@@ -89,7 +89,16 @@ var (
 		return true, nil
 	}
 
-	validatorContains = func(v string, o ...string) (bool, []string) {
-		return slices.Contains(o, v), o
+	validatorContains = func(options ...string) func(v string) (bool, []string) {
+		return func(v string) (bool, []string) {
+			return slices.Contains(options, v), options
+		}
+	}
+
+	validatorRegex = func(pattern string) func(v string) (bool, []string) {
+		return func(v string) (bool, []string) {
+			r := regexp.MustCompile(pattern)
+			return len(r.FindStringSubmatch(v)) != 0, nil
+		}
 	}
 )

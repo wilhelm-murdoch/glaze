@@ -361,10 +361,14 @@ func OptionsSessionFromString(s string) OptionsSession {
 }
 
 var OptionsSessionValidators = map[string]ValidatorFunc{
+	OptionsSessionBaseIndexString:                validatorIsNumber,
+	OptionsSessionDefaultCommandString:           validatorDefault,
+	OptionsSessionDefaultShellString:             validatorDefault,
 	OptionsSessionDisplayPanesActiveColourString: validatorColour,
 	OptionsSessionDisplayPanesColourString:       validatorColour,
 	OptionsSessionDisplayPanesTimeString:         validatorIsNumber,
 	OptionsSessionDisplayTimeString:              validatorIsNumber,
+	OptionsSessionAssumePasteTimeString:          validatorIsNumber,
 	OptionsSessionHistoryLimitString:             validatorIsNumber,
 	OptionsSessionKeyTableString:                 validatorDefault,
 	OptionsSessionLockAfterTimeString:            validatorIsNumber,
@@ -383,37 +387,19 @@ var OptionsSessionValidators = map[string]ValidatorFunc{
 	OptionsSessionVisualActivityString:           validatorToggle,
 	OptionsSessionVisualBellString:               validatorToggle,
 	OptionsSessionWordSeparatorsString:           validatorDefault,
-
-	OptionsSessionMenuBorderLinesString: func(v string) (bool, []string) {
-		return validatorContains(v, "single", "rounded", "double", "heavy", "simple", "padded", "none")
-	},
-	OptionsSessionActivityActionString: func(v string) (bool, []string) {
-		return validatorContains(v, "any", "none", "current", "other")
-	},
-	OptionsSessionDetachOnDestroyString: func(v string) (bool, []string) {
-		return validatorContains(v, "off", "on", "no-detatched", "previous", "next")
-	},
-	OptionsSessionMessageLineString: func(v string) (bool, []string) {
-		return validatorContains(v, "0", "1", "2", "3", "4")
-	},
-	OptionsSessionSilenceActionString: func(v string) (bool, []string) {
-		return validatorContains(v, "any", "none", "current", "other")
-	},
-	OptionsSessionStatusString: func(v string) (bool, []string) {
-		return validatorContains(v, "off", "on", "2", "3", "4", "5")
-	},
-	OptionsSessionStatusJustifyString: func(v string) (bool, []string) {
-		return validatorContains(v, "left", "centre", "right", "absolute-centre")
-	},
-	OptionsSessionStatusKeysString: func(v string) (bool, []string) {
-		return validatorContains(v, "vi", "emacs")
-	},
-	OptionsSessionStatusPositionString: func(v string) (bool, []string) {
-		return validatorContains(v, "top", "bottom")
-	},
-	OptionsSessionVisualSilenceString: func(v string) (bool, []string) {
-		return validatorContains(v, "on", "off", "both")
-	},
+	OptionsSessionDefaultSizeString:              validatorRegex(`^(\d+)x(\d+)$`),
+	OptionsSessionBellActionString:               validatorContains("any", "none", "currant", "other"),
+	OptionsSessionDestroyUnattachedString:        validatorContains("off", "on", "keep-last", "keep-group"),
+	OptionsSessionMenuBorderLinesString:          validatorContains("single", "rounded", "double", "heavy", "simple", "padded", "none"),
+	OptionsSessionActivityActionString:           validatorContains("any", "none", "current", "other"),
+	OptionsSessionDetachOnDestroyString:          validatorContains("off", "on", "no-detached", "previous", "next"),
+	OptionsSessionMessageLineString:              validatorContains("0", "1", "2", "3", "4"),
+	OptionsSessionSilenceActionString:            validatorContains("any", "none", "current", "other"),
+	OptionsSessionStatusString:                   validatorContains("off", "on", "2", "3", "4", "5"),
+	OptionsSessionStatusJustifyString:            validatorContains("left", "centre", "right", "absolute-centre"),
+	OptionsSessionStatusKeysString:               validatorContains("vi", "emacs"),
+	OptionsSessionStatusPositionString:           validatorContains("top", "bottom"),
+	OptionsSessionVisualSilenceString:            validatorContains("on", "off", "both"),
 
 	// STYLE options are supported, but not yet validated properly:
 	OptionsSessionMessageCommandStyleString: validatorDefault,

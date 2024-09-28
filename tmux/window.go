@@ -22,7 +22,7 @@ type Window struct {
 // Target returns the target window by its composite id of session name
 // and window id.
 func (w Window) Target() string {
-	return fmt.Sprintf(`%s:@%d`, w.Session.Name, w.Id)
+	return fmt.Sprintf(`%s:%d`, w.Session.Name, w.Index)
 }
 
 // Split splits the current window into two panes.
@@ -54,7 +54,7 @@ func (w *Window) Split(parentId, name, startingDirectory string) (Pane, error) {
 		return pane, err
 	}
 
-	parts := strings.SplitN(output, ";", 4)
+	parts := strings.SplitN(output, ";", len(format))
 
 	id, err := strconv.Atoi(strings.ReplaceAll(parts[0], "%", ""))
 	if err != nil {
@@ -76,7 +76,7 @@ func (w *Window) Split(parentId, name, startingDirectory string) (Pane, error) {
 	}
 
 	return Pane{
-		Id:                id,
+		Id:                PaneId(id),
 		Index:             index,
 		Name:              name,
 		StartingDirectory: startingDirectory,
@@ -86,8 +86,13 @@ func (w *Window) Split(parentId, name, startingDirectory string) (Pane, error) {
 	}, nil
 }
 
-func (w Window) Reindex() error {
-	return nil
+func (w Window) SetOption(option string, value string) error {
+	cmd, err := NewCommand(w.Session.Client, "set", "-w", "-t", w.Target(), option, value)
+	if err != nil {
+		return err
+	}
+
+	return cmd.Exec()
 }
 
 func (w Window) Kill() error {

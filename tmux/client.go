@@ -183,7 +183,7 @@ func (c Client) Panes(window *Window) (collection.Collection[*Pane], error) {
 	}
 
 	for _, pane := range strings.Split(output, "\n") {
-		parts := strings.SplitN(pane, ";", 5)
+		parts := strings.SplitN(pane, ";", len(format))
 
 		id, err := strconv.Atoi(strings.ReplaceAll(parts[0], "%", ""))
 		if err != nil {
@@ -196,7 +196,7 @@ func (c Client) Panes(window *Window) (collection.Collection[*Pane], error) {
 		}
 
 		panes.Push(&Pane{
-			Id:                id,
+			Id:                PaneId(id),
 			Index:             index,
 			Name:              parts[2],
 			StartingDirectory: parts[4],

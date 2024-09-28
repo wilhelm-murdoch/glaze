@@ -1,6 +1,8 @@
 package tmux
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // Pane represents a tmux pane.
 type Pane struct {
@@ -10,12 +12,12 @@ type Pane struct {
 	IsActive          bool
 	IsFirst           bool
 	Index             int
-	Id                int
+	Id                PaneId
 }
 
 // Target returns the target pane by its composite id of session name, window id, and pane id.
 func (p Pane) Target() string {
-	return fmt.Sprintf(`%s:@%d.%%%d`, p.Window.Session.Name, p.Window.Id, p.Id)
+	return fmt.Sprintf(`%s:%d.%d`, p.Window.Session.Name, p.Window.Index, p.Index)
 }
 
 // SendKeys sends the given keystrokes to the current pane.
@@ -31,6 +33,15 @@ func (p Pane) SendKeys(keys string) error {
 // SetEnv sets the given environment variable to the given value in the current pane.
 func (p Pane) SetEnv(key string, value string) error {
 	cmd, err := NewCommand(p.Window.Session.Client, "setenv", "-t", p.Name, key, value)
+	if err != nil {
+		return err
+	}
+
+	return cmd.Exec()
+}
+
+func (p Pane) SetOption(option string, value string) error {
+	cmd, err := NewCommand(p.Window.Session.Client, "set", "-p", "-t", fmt.Sprint(p.Id), option, value)
 	if err != nil {
 		return err
 	}

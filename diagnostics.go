@@ -14,8 +14,8 @@ import (
 )
 
 type DiagnosticsManager struct {
-	hcl.Diagnostics
-	hcl.DiagnosticWriter
+	Diagnostics      hcl.Diagnostics
+	DiagnosticWriter hcl.DiagnosticWriter
 }
 
 func (dm *DiagnosticsManager) Write() error {
@@ -29,6 +29,14 @@ func (dm *DiagnosticsManager) Write() error {
 func (dm *DiagnosticsManager) Extend(diags hcl.Diagnostics) hcl.Diagnostics {
 	dm.Diagnostics = dm.Diagnostics.Extend(diags)
 	return dm.Diagnostics
+}
+
+func (dm *DiagnosticsManager) Append(diag *hcl.Diagnostic) hcl.Diagnostics {
+	return dm.Diagnostics.Append(diag)
+}
+
+func (dm *DiagnosticsManager) HasErrors() bool {
+	return dm.Diagnostics.HasErrors()
 }
 
 func NewDiagnosticsManager(filePath string) *DiagnosticsManager {

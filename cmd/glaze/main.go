@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"strings"
 	"time"
 
+	"github.com/charmbracelet/log"
 	"github.com/urfave/cli/v2"
 	"github.com/wilhelm-murdoch/glaze"
 	"github.com/wilhelm-murdoch/glaze/cmd/glaze/actions"

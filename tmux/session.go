@@ -1,7 +1,6 @@
 package tmux
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -36,7 +35,7 @@ func (s *Session) NewWindow(windowName string) (*Window, error) {
 	args := []string{
 		"neww",
 		"-d",
-		"-t", fmt.Sprintf("%s:", s.Name),
+		"-t", s.Name,
 		"-n", windowName,
 		"-F", strings.Join(format, ";"),
 		"-P",
@@ -52,7 +51,7 @@ func (s *Session) NewWindow(windowName string) (*Window, error) {
 		return window, err
 	}
 
-	parts := strings.SplitN(output, ";", 5)
+	parts := strings.SplitN(output, ";", len(format))
 
 	id, err := strconv.Atoi(strings.ReplaceAll(parts[0], "@", ""))
 	if err != nil {
@@ -73,6 +72,15 @@ func (s *Session) NewWindow(windowName string) (*Window, error) {
 		IsFirst:  index == 0,
 		Session:  s,
 	}, nil
+}
+
+func (s *Session) SetOption(option string, value string) error {
+	cmd, err := NewCommand(s.Client, "set", option, value)
+	if err != nil {
+		return err
+	}
+
+	return cmd.Exec()
 }
 
 // Kill closes the current session.
