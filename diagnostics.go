@@ -85,6 +85,23 @@ func DirectoryDiagnostic(field string, value cty.Value) hcl.Diagnostics {
 	return out
 }
 
+func FileDiagnostic(field string, value cty.Value) hcl.Diagnostics {
+	var out hcl.Diagnostics
+
+	if !value.IsNull() {
+		fileInfo, err := os.Stat(tmux.ExpandPath(value.AsString()))
+		if err != nil || errors.Is(err, fs.ErrNotExist) || fileInfo.IsDir() {
+			return hcl.Diagnostics{{
+				Severity: hcl.DiagError,
+				Summary:  fmt.Sprintf(`Invalid %s specified`, field),
+				Detail:   fmt.Sprintf(`The %s of "%s" does not exist, cannot be accessed or is a directory.`, field, value.AsString()),
+			}}
+		}
+	}
+
+	return out
+}
+
 func WrongAttributeDiagnostic(field, have, want string) hcl.Diagnostic {
 	return hcl.Diagnostic{
 		Severity: hcl.DiagError,

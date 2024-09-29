@@ -1,100 +1,27 @@
 session {
   name = "TestSession"
 
-  options = {
-    activity-action             = "any"
-    assume-paste-time           = "1000"
-    base-index                  = "0"
-    bell-action                 = "any"
-    default-command             = ""
-    default-shell               = "/bin/zsh"
-    default-size                = "80x80"
-    destroy-unattached          = "off"
-    detach-on-destroy           = "no-detached"
-    display-panes-active-colour = "black"
-    display-panes-colour        = "white"
-    display-panes-time          = "1000"
-    display-time                = "1000"
-    history-limit               = "1000"
-    key-table                   = ""
-    lock-after-time             = "500"
-    lock-command                = ""
-    menu-border-lines           = "single"
-    message-line                = "1"
-    mouse                       = "on"
-    prefix                      = "3"
-    prefix2                     = "3"
-    renumber-windows            = "on"
-    repeat-time                 = "500"
-    set-titles                  = "on"
-    silence-action              = "any"
-    status                      = "5"
-    status-interval             = "15"
-    status-justify              = "left"
-    status-keys                 = "vi"
-    status-left                 = ""
-    status-left-length          = "10"
-    status-left-style           = ""
-    status-position             = "bottom"
-    status-right                = ""
-    status-right-length         = "10"
-    status-style                = ""
-    visual-activity             = "on"
-    visual-bell                 = "on"
-    visual-silence              = "on"
-    word-separators             = ""
-  }
-
   // popup {
 
   // }
 
-  // menu {
+  menu {
+    name = "test"
+    bind = "C-s"
+    
+    // script = "" // path to script
 
-  // }
+    items = {
+      one = "foo",
+      two = "bar"
+    }
+  }
 
   window {
     layout = "tiled"
 
-    options = {
-      aggressive-resize             = ""
-      automatic-rename              = ""
-      clock-mode-colour             = "black"
-      fill-character                = "d"
-      main-pane-height              = "50"
-      main-pane-width               = "50"
-      mode-keys                     = "vi"
-      mode-style                    = ""
-      monitor-activity              = ""
-      monitor-bell                  = ""
-      monitor-silence               = "1"
-      other-pane-height             = "50"
-      other-pane-width              = "50"
-      pane-base-index               = "0"
-      pane-border-indicators        = "off"
-      pane-border-lines             = "single"
-      pane-border-status            = "bottom"
-      popup-style                   = ""
-      popup-border-lines            = "single"
-      window-status-last-style      = ""
-      window-status-separator       = ""
-      window-size                   = "largest"
-      wrap-search                   = ""
-    }
-
     pane {
       name = "option-test"
-      options = {
-        allow-passthrough     = "off"
-        allow-rename          = "off"
-        allow-set-title       = "on"
-        alternate-screen      = "on"
-        cursor-colour         = "black"
-        remain-on-exit        = "on"
-        remain-on-exit-format = "BOO!"
-        scroll-on-clear       = "on"
-        synchronize-panes     = "off"
-      }
     }
 
     pane {}

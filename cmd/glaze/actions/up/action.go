@@ -73,7 +73,7 @@ func Run(ctx *cli.Context) error {
 	}
 
 	for option, value := range profile.Options {
-		log.Info("... setting option", "session", session.Name, option, value)
+		log.Info("setting option", "session", session.Name, option, value)
 		if err := session.SetOption(option, value); err != nil {
 			return fmt.Errorf("could not set option `%s` with value `%s` for session `%s`: %s", option, value, session.Name, err)
 		}
@@ -81,14 +81,14 @@ func Run(ctx *cli.Context) error {
 
 	// Iterate through the windows and panes defined within the specified profile and create them within the tmux session.
 	for _, wm := range profile.Windows.Items() {
-		log.Info("... creating new window", "window", wm.Name)
+		log.Info("creating new window", "window", wm.Name)
 		wc, err := session.NewWindow(wm.Name)
 		if err != nil {
 			return fmt.Errorf("could not create new window `%s`: %s", wm.Name, err)
 		}
 
 		for option, value := range wm.Options {
-			log.Info("... setting option", "window", wm.Name, option, value)
+			log.Info("setting option", "window", wm.Name, option, value)
 			if err := wc.SetOption(option, value); err != nil {
 				return fmt.Errorf("could not set option `%s` with value `%s` for window `%s`: %s", option, value, session.Name, err)
 			}
@@ -108,7 +108,7 @@ func Run(ctx *cli.Context) error {
 		}
 
 		for _, pm := range wm.Panes.Items() {
-			log.Info("... ... adding pane", "pane", pm.Name, "from", defaultPane.Target())
+			log.Info("adding pane", "pane", pm.Name, "from", defaultPane.Target())
 			pc, err := wc.Split(defaultPane.Target(), pm.Name, pm.StartingDirectory)
 			if err != nil {
 				return fmt.Errorf("could not split pane `%d` for window `%s`: %s", defaultPane.Index, wc.Name, err)
@@ -118,7 +118,7 @@ func Run(ctx *cli.Context) error {
 			// current the profile. Add a small delay between each command
 			// to ensure they are executed in order.
 			for _, cmd := range pm.Commands {
-				log.Info("... ... sending command", "pane", pc.Name, "cmd", cmd)
+				log.Info("sending command", "pane", pc.Name, "cmd", cmd)
 				time.Sleep(time.Millisecond * time.Duration(100))
 				if err := pc.SendKeys(cmd); err != nil {
 					return fmt.Errorf("could not execute command `%s` for pane `%s` in window `%s`: %s", cmd, pc.Name, wc.Name, err)
@@ -126,14 +126,14 @@ func Run(ctx *cli.Context) error {
 			}
 
 			for option, value := range pm.Options {
-				log.Info("... ... setting option", "pane", pc.Name, option, value)
+				log.Info("setting option", "pane", pc.Name, option, value)
 				if err := pc.SetOption(option, value); err != nil {
 					return fmt.Errorf("could not set option `%s` with value `%s` for pane `%s` in window `%s`: %s", option, value, pc.Name, wc.Name, err)
 				}
 			}
 
 			if pm.Focus {
-				log.Info("... ... setting focus", "pane", pc.Name)
+				log.Info("setting focus", "pane", pc.Name)
 				pc.Select()
 			}
 		}
@@ -143,7 +143,7 @@ func Run(ctx *cli.Context) error {
 		}
 
 		if wm.Focus {
-			log.Info("... setting focus", "window", wc.Name)
+			log.Info("setting focus", "window", wc.Name)
 			wc.Select()
 		}
 
