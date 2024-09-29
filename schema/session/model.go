@@ -1,9 +1,10 @@
-package models
+package session
 
 import (
 	"os"
 
 	"github.com/hashicorp/hcl/v2"
+	"github.com/wilhelm-murdoch/glaze/schema/window"
 	"github.com/wilhelm-murdoch/go-collection"
 	"github.com/zclconf/go-cty/cty"
 )
@@ -11,11 +12,11 @@ import (
 const DefaultGlazeSesssionName = "default"
 
 type Session struct {
-	Name              string
-	StartingDirectory string
-	Options           map[string]string
-	Envs              map[string]string
-	Windows           collection.Collection[*Window]
+	Name              Name
+	StartingDirectory Directory
+	Options           Options
+	Envs              Envs
+	Windows           collection.Collection[*window.Window]
 }
 
 func (s *Session) Decode(value cty.Value) hcl.Diagnostics {
@@ -23,28 +24,28 @@ func (s *Session) Decode(value cty.Value) hcl.Diagnostics {
 
 	s.Name = DefaultGlazeSesssionName
 	if !value.GetAttr("name").IsNull() {
-		s.Name = value.GetAttr("name").AsString()
+		s.Name = Name(value.GetAttr("name").AsString())
 	}
 
 	if !value.GetAttr("starting_directory").IsNull() {
-		s.StartingDirectory = value.GetAttr("starting_directory").AsString()
+		s.StartingDirectory = Directory(value.GetAttr("starting_directory").AsString())
 	} else {
 		if pwd, err := os.Getwd(); err == nil {
-			s.StartingDirectory = pwd
+			s.StartingDirectory = Directory(pwd)
 		}
 	}
 
 	if !value.GetAttr("envs").IsNull() {
-		s.Envs = make(map[string]string)
+		s.Envs = make(Envs)
 		for name, value := range value.GetAttr("envs").AsValueMap() {
-			s.Envs[name] = value.AsString()
+			s.Envs[Name(name)] = Value(value.AsString())
 		}
 	}
 
 	if !value.GetAttr("options").IsNull() {
-		s.Options = make(map[string]string)
+		s.Options = make(Options)
 		for name, value := range value.GetAttr("options").AsValueMap() {
-			s.Options[name] = value.AsString()
+			s.Options[Name(name)] = Value(value.AsString())
 		}
 	}
 
@@ -55,7 +56,7 @@ func (s *Session) Decode(value cty.Value) hcl.Diagnostics {
 			for it.Next() {
 				_, value := it.Element()
 
-				window := new(Window)
+				window := new(window.Window)
 
 				if diags = window.Decode(value); diags.HasErrors() {
 					diags = diags.Extend(diags)

@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/wilhelm-murdoch/glaze/schema/pane"
+	"github.com/wilhelm-murdoch/glaze/schema/window"
 	"github.com/wilhelm-murdoch/glaze/tmux/enums"
 	"github.com/wilhelm-murdoch/go-collection"
 )
@@ -27,7 +29,7 @@ func (w Window) Target() string {
 }
 
 // Split splits the current window into two panes.
-func (w *Window) Split(parentId, name, startingDirectory string) (Pane, error) {
+func (w *Window) Split(parentId string, name pane.Name, startingDirectory pane.Directory) (Pane, error) {
 	var pane Pane
 
 	format := []string{
@@ -41,7 +43,7 @@ func (w *Window) Split(parentId, name, startingDirectory string) (Pane, error) {
 		"splitw",
 		"-Pd",
 		"-t", parentId,
-		"-c", startingDirectory,
+		"-c", fmt.Sprint(startingDirectory),
 		"-F", strings.Join(format, ";"),
 	}
 
@@ -67,7 +69,7 @@ func (w *Window) Split(parentId, name, startingDirectory string) (Pane, error) {
 		return pane, err
 	}
 
-	cmd, err = NewCommand(w.Session.Client, "selectp", "-T", name, "-t", parts[0])
+	cmd, err = NewCommand(w.Session.Client, "selectp", "-T", fmt.Sprint(name), "-t", parts[0])
 	if err != nil {
 		return pane, err
 	}
@@ -79,16 +81,16 @@ func (w *Window) Split(parentId, name, startingDirectory string) (Pane, error) {
 	return Pane{
 		Id:                PaneId(id),
 		Index:             index,
-		Name:              name,
-		StartingDirectory: startingDirectory,
+		Name:              fmt.Sprint(name),
+		StartingDirectory: fmt.Sprint(startingDirectory),
 		IsActive:          parts[3] == "1",
 		IsFirst:           index == 0,
 		Window:            w,
 	}, nil
 }
 
-func (w Window) SetOption(option, value string) error {
-	return setOption[enums.OptionsWindow](w.Session.Client, "set", "-w", "-t", w.Target(), option, value)
+func (w Window) SetOption(option window.Name, value window.Value) error {
+	return setOption[enums.OptionsWindow](w.Session.Client, "set", "-w", "-t", w.Target(), fmt.Sprint(option), fmt.Sprint(value))
 }
 
 func (w Window) GetOption(option enums.OptionsWindow) (Option[enums.OptionsWindow], error) {

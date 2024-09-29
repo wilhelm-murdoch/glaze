@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/wilhelm-murdoch/glaze/schema/session"
+	"github.com/wilhelm-murdoch/glaze/schema/window"
 	"github.com/wilhelm-murdoch/glaze/tmux/enums"
 	"github.com/wilhelm-murdoch/go-collection"
 )
@@ -23,7 +25,7 @@ func (s *Session) Target() string {
 }
 
 // NewWindow creates a new window in the current session and returns it.
-func (s *Session) NewWindow(windowName string) (*Window, error) {
+func (s *Session) NewWindow(windowName window.Name) (*Window, error) {
 	var window *Window
 
 	format := []string{
@@ -38,7 +40,7 @@ func (s *Session) NewWindow(windowName string) (*Window, error) {
 		"neww",
 		"-d",
 		"-t", s.Name,
-		"-n", windowName,
+		"-n", fmt.Sprint(windowName),
 		"-F", strings.Join(format, ";"),
 		"-P",
 	}
@@ -76,8 +78,8 @@ func (s *Session) NewWindow(windowName string) (*Window, error) {
 	}, nil
 }
 
-func (s *Session) SetOption(option, value string) error {
-	return setOption[enums.OptionsSession](s.Client, "set", "-t", s.Target(), option, value)
+func (s *Session) SetOption(option session.Name, value session.Value) error {
+	return setOption[enums.OptionsSession](s.Client, "set", "-t", s.Target(), fmt.Sprint(option), fmt.Sprint(value))
 }
 
 func (s *Session) GetOption(option enums.OptionsSession) (Option[enums.OptionsSession], error) {

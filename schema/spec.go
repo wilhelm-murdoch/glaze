@@ -1,4 +1,4 @@
-package glaze
+package schema
 
 import (
 	"fmt"
@@ -7,6 +7,7 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hcldec"
+	"github.com/wilhelm-murdoch/glaze"
 	"github.com/wilhelm-murdoch/glaze/tmux/enums"
 	"github.com/zclconf/go-cty/cty"
 )
@@ -40,7 +41,7 @@ func validateOptions[OT enums.OptionTyper[OT]](value cty.Value) hcl.Diagnostics 
 			ok, choices := validator(value.AsString())
 			if !ok {
 				if len(choices) > 0 {
-					out = out.Extend(ContainsDiagnostic(fmt.Sprintf(`session option "%s"`, option), value, choices))
+					out = out.Extend(glaze.ContainsDiagnostic(fmt.Sprintf(`session option "%s"`, option), value, choices))
 					continue
 				}
 
@@ -93,7 +94,7 @@ var (
 					Type: cty.String,
 				},
 				Func: func(value cty.Value) hcl.Diagnostics {
-					return DirectoryDiagnostic("starting directory", value)
+					return glaze.DirectoryDiagnostic("starting directory", value)
 				},
 			},
 			"windows": &hcldec.BlockListSpec{
@@ -125,7 +126,7 @@ var (
 							Type: cty.String,
 						},
 						Func: func(value cty.Value) hcl.Diagnostics {
-							return DirectoryDiagnostic("starting directory", value)
+							return glaze.DirectoryDiagnostic("starting directory", value)
 						},
 					},
 					"layout": &hcldec.ValidateSpec{
@@ -134,7 +135,7 @@ var (
 							Type: cty.String,
 						},
 						Func: func(value cty.Value) hcl.Diagnostics {
-							return ContainsDiagnostic("layout", value, enums.LayoutList)
+							return glaze.ContainsDiagnostic("layout", value, enums.LayoutList)
 						},
 					},
 					"panes": &hcldec.BlockListSpec{
@@ -198,7 +199,7 @@ var (
 										Type: cty.String,
 									},
 									Func: func(value cty.Value) hcl.Diagnostics {
-										return DirectoryDiagnostic("starting directory", value)
+										return glaze.DirectoryDiagnostic("starting directory", value)
 									},
 								},
 								"commands": &hcldec.AttrSpec{

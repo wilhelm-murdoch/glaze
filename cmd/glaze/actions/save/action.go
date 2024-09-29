@@ -1,4 +1,4 @@
-package actions
+package save
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"github.com/wilhelm-murdoch/glaze"
 )
 
-func Save(ctx *cli.Context) error {
+func Run(ctx *cli.Context) error {
 	profilePath, err := glaze.ResolveProfilePath(ctx.Args().First())
 	if err != nil {
 		return err

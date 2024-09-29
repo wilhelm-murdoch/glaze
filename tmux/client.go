@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/wilhelm-murdoch/glaze/schema/session"
 	"github.com/wilhelm-murdoch/glaze/tmux/enums"
 	"github.com/wilhelm-murdoch/go-collection"
 )
@@ -210,10 +211,10 @@ func (c Client) Panes(window *Window) (collection.Collection[*Pane], error) {
 }
 
 // NewSession creates a new session with the given name and starting directory.
-func (c Client) NewSession(sessionName, startingDirectory string) (*Session, error) {
+func (c Client) NewSession(sessionName session.Name, startingDirectory session.Directory) (*Session, error) {
 	var session *Session
 
-	cmd, err := NewCommand(c, "new", "-d", "-s", sessionName, "-c", startingDirectory)
+	cmd, err := NewCommand(c, "new", "-d", "-s", fmt.Sprint(sessionName), "-c", fmt.Sprint(startingDirectory))
 	if err != nil {
 		return session, err
 	}
@@ -228,16 +229,16 @@ func (c Client) NewSession(sessionName, startingDirectory string) (*Session, err
 	}
 
 	return sessions.Find(func(i int, s *Session) bool {
-		return s.Name == sessionName
+		return s.Name == fmt.Sprint(sessionName)
 	}), nil
 }
 
 // NewSessionIfNotExists creates a new session with the given name and starting
 // directory if it does not already exist.
-func (c Client) NewSessionIfNotExists(sessionName, startingDirectory string) (*Session, error) {
+func (c Client) NewSessionIfNotExists(sessionName session.Name, startingDirectory session.Directory) (*Session, error) {
 	sessions, _ := c.Sessions()
 	exists := sessions.Find(func(i int, s *Session) bool {
-		return s.Name == sessionName
+		return s.Name == fmt.Sprint(sessionName)
 	})
 
 	if exists == nil {
@@ -248,18 +249,18 @@ func (c Client) NewSessionIfNotExists(sessionName, startingDirectory string) (*S
 }
 
 // KillSession kills the given session.
-func (c Client) KillSessionByName(sessionName string) error {
-	cmd, _ := NewCommand(c, "kill-session", "-t", sessionName)
+func (c Client) KillSessionByName(sessionName session.Name) error {
+	cmd, _ := NewCommand(c, "kill-session", "-t", fmt.Sprint(sessionName))
 
 	return cmd.Exec()
 }
 
 // FindSessionByName returns the session with the given name if it exists.
-func (c Client) FindSessionByName(sessionName string) (*Session, error) {
+func (c Client) FindSessionByName(sessionName session.Name) (*Session, error) {
 	sessions, _ := c.Sessions()
 
 	if found := sessions.Find(func(i int, s *Session) bool {
-		return s.Name == sessionName
+		return s.Name == fmt.Sprint(sessionName)
 	}); found != nil {
 		return found, nil
 	}
@@ -268,8 +269,8 @@ func (c Client) FindSessionByName(sessionName string) (*Session, error) {
 }
 
 // SessionExists returns true if a session with the given name exists.
-func (c Client) SessionExists(sessionName string) bool {
-	cmd, _ := NewCommand(c, "has-session", "-t", sessionName)
+func (c Client) SessionExists(sessionName session.Name) bool {
+	cmd, _ := NewCommand(c, "has-session", "-t", fmt.Sprint(sessionName))
 
 	if exitStatus := cmd.ExecWithStatus(); exitStatus != 0 {
 		return false

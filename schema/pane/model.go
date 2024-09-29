@@ -1,4 +1,4 @@
-package models
+package pane
 
 import (
 	"os"
@@ -11,14 +11,14 @@ import (
 const DefaultGlazePaneName = "default"
 
 type Pane struct {
-	Name              string
-	StartingDirectory string
-	Size              string
-	Envs              map[string]string
-	Hooks             map[string]string
-	Options           map[string]string
-	Commands          []string
-	Focus             bool
+	Name              Name
+	StartingDirectory Directory
+	Size              Size
+	Envs              Envs
+	Hooks             Hooks
+	Options           Options
+	Commands          []Command
+	Focus             Focus
 }
 
 func (p *Pane) Decode(value cty.Value) hcl.Diagnostics {
@@ -26,7 +26,7 @@ func (p *Pane) Decode(value cty.Value) hcl.Diagnostics {
 
 	p.Name = DefaultGlazePaneName
 	if !value.GetAttr("name").IsNull() {
-		p.Name = value.GetAttr("name").AsString()
+		p.Name = Name(value.GetAttr("name").AsString())
 	}
 
 	if !value.GetAttr("focus").IsNull() {
@@ -34,35 +34,35 @@ func (p *Pane) Decode(value cty.Value) hcl.Diagnostics {
 	}
 
 	if !value.GetAttr("starting_directory").IsNull() {
-		p.StartingDirectory = value.GetAttr("starting_directory").AsString()
+		p.StartingDirectory = Directory(value.GetAttr("starting_directory").AsString())
 	} else {
 		if pwd, err := os.Getwd(); err == nil {
-			p.StartingDirectory = pwd
+			p.StartingDirectory = Directory(pwd)
 		}
 	}
 
 	if !value.GetAttr("size").IsNull() {
-		p.Size = value.GetAttr("size").AsString()
+		p.Size = Size(value.GetAttr("size").AsString())
 	}
 
 	if !value.GetAttr("envs").IsNull() {
-		p.Envs = make(map[string]string)
+		p.Envs = make(Envs)
 		for name, value := range value.GetAttr("envs").AsValueMap() {
-			p.Envs[name] = value.AsString()
+			p.Envs[Name(name)] = Value(value.AsString())
 		}
 	}
 
 	if !value.GetAttr("hooks").IsNull() {
-		p.Hooks = make(map[string]string)
+		p.Hooks = make(Hooks)
 		for name, value := range value.GetAttr("hooks").AsValueMap() {
-			p.Hooks[name] = value.AsString()
+			p.Hooks[Name(name)] = Value(value.AsString())
 		}
 	}
 
 	if !value.GetAttr("options").IsNull() {
-		p.Options = make(map[string]string)
+		p.Options = make(Options)
 		for name, value := range value.GetAttr("options").AsValueMap() {
-			p.Options[name] = value.AsString()
+			p.Options[Name(name)] = Value(value.AsString())
 		}
 	}
 
@@ -72,7 +72,7 @@ func (p *Pane) Decode(value cty.Value) hcl.Diagnostics {
 			for cit.Next() {
 				_, c := cit.Element()
 				if c.Type().FriendlyName() == "string" {
-					p.Commands = append(p.Commands, c.AsString())
+					p.Commands = append(p.Commands, Command(c.AsString()))
 				}
 			}
 		}

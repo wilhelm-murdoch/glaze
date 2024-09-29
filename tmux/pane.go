@@ -3,6 +3,7 @@ package tmux
 import (
 	"fmt"
 
+	"github.com/wilhelm-murdoch/glaze/schema/pane"
 	"github.com/wilhelm-murdoch/glaze/tmux/enums"
 	"github.com/wilhelm-murdoch/go-collection"
 )
@@ -24,8 +25,8 @@ func (p Pane) Target() string {
 }
 
 // SendKeys sends the given keystrokes to the current pane.
-func (p Pane) SendKeys(keys string) error {
-	cmd, err := NewCommand(p.Window.Session.Client, "send", "-t", p.Target(), keys, "Enter")
+func (p Pane) SendKeys(keys pane.Command) error {
+	cmd, err := NewCommand(p.Window.Session.Client, "send", "-t", p.Target(), fmt.Sprint(keys), "Enter")
 	if err != nil {
 		return err
 	}
@@ -34,8 +35,8 @@ func (p Pane) SendKeys(keys string) error {
 }
 
 // SetEnv sets the given environment variable to the given value in the current pane.
-func (p Pane) SetEnv(key string, value string) error {
-	cmd, err := NewCommand(p.Window.Session.Client, "setenv", "-t", p.Name, key, value)
+func (p Pane) SetEnv(key pane.Name, value pane.Value) error {
+	cmd, err := NewCommand(p.Window.Session.Client, "setenv", "-t", p.Name, fmt.Sprint(key), fmt.Sprint(value))
 	if err != nil {
 		return err
 	}
@@ -43,8 +44,8 @@ func (p Pane) SetEnv(key string, value string) error {
 	return cmd.Exec()
 }
 
-func (p Pane) SetOption(option, value string) error {
-	return setOption[enums.OptionsPane](p.Window.Session.Client, "set", "-p", "-t", p.Target(), option, value)
+func (p Pane) SetOption(option pane.Name, value pane.Value) error {
+	return setOption[enums.OptionsPane](p.Window.Session.Client, "set", "-p", "-t", p.Target(), fmt.Sprint(option), fmt.Sprint(value))
 }
 
 func (p Pane) GetOption(option enums.OptionsPane) (Option[enums.OptionsPane], error) {

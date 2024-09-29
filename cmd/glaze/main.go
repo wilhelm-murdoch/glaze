@@ -10,7 +10,9 @@ import (
 	"github.com/charmbracelet/log"
 	"github.com/urfave/cli/v2"
 	"github.com/wilhelm-murdoch/glaze"
-	"github.com/wilhelm-murdoch/glaze/cmd/glaze/actions"
+	"github.com/wilhelm-murdoch/glaze/cmd/glaze/actions/format"
+	"github.com/wilhelm-murdoch/glaze/cmd/glaze/actions/save"
+	"github.com/wilhelm-murdoch/glaze/cmd/glaze/actions/up"
 )
 
 const defaultErrCode = 1
@@ -130,9 +132,9 @@ func main() {
 					},
 				},
 			},
-			Action: actions.Up,
+			Action: up.Run,
 		}, {
-			Name:  "fmt",
+			Name:  "format",
 			Usage: "rewrites the target glaze profile file to a canonical format",
 			Flags: []cli.Flag{
 				&cli.BoolFlag{
@@ -140,11 +142,11 @@ func main() {
 					Usage: "writes the formatted glaze output to your terminal",
 				},
 			},
-			Action: actions.Fmt,
+			Action: format.Run,
 		}, {
 			Name:   "save",
 			Usage:  "running this within a tmux session will save its current state to the specified glaze profile",
-			Action: actions.Save,
+			Action: save.Run,
 		}},
 	}
 

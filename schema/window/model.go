@@ -1,9 +1,10 @@
-package models
+package window
 
 import (
 	"os"
 
 	"github.com/hashicorp/hcl/v2"
+	"github.com/wilhelm-murdoch/glaze/schema/pane"
 	"github.com/wilhelm-murdoch/glaze/tmux/enums"
 	"github.com/wilhelm-murdoch/go-collection"
 	"github.com/zclconf/go-cty/cty"
@@ -13,13 +14,13 @@ import (
 const DefaultGlazeWindowName = "default"
 
 type Window struct {
-	Name              string
-	StartingDirectory string
-	Envs              map[string]string
-	Options           map[string]string
-	Panes             collection.Collection[*Pane]
+	Name              Name
+	StartingDirectory Directory
+	Envs              Envs
+	Options           Options
+	Panes             collection.Collection[*pane.Pane]
 	Layout            enums.Layout
-	Focus             bool
+	Focus             Focus
 }
 
 func (w *Window) Decode(value cty.Value) hcl.Diagnostics {
@@ -27,7 +28,7 @@ func (w *Window) Decode(value cty.Value) hcl.Diagnostics {
 
 	w.Name = "default"
 	if !value.GetAttr("name").IsNull() {
-		w.Name = value.GetAttr("name").AsString()
+		w.Name = Name(value.GetAttr("name").AsString())
 	}
 
 	if !value.GetAttr("layout").IsNull() {
@@ -41,24 +42,24 @@ func (w *Window) Decode(value cty.Value) hcl.Diagnostics {
 	}
 
 	if !value.GetAttr("starting_directory").IsNull() {
-		w.StartingDirectory = value.GetAttr("starting_directory").AsString()
+		w.StartingDirectory = Directory(value.GetAttr("starting_directory").AsString())
 	} else {
 		if pwd, err := os.Getwd(); err == nil {
-			w.StartingDirectory = pwd
+			w.StartingDirectory = Directory(pwd)
 		}
 	}
 
 	if !value.GetAttr("envs").IsNull() {
-		w.Envs = make(map[string]string)
+		w.Envs = make(Envs)
 		for name, value := range value.GetAttr("envs").AsValueMap() {
-			w.Envs[name] = value.AsString()
+			w.Envs[Name(name)] = Value(value.AsString())
 		}
 	}
 
 	if !value.GetAttr("options").IsNull() {
-		w.Options = make(map[string]string)
+		w.Options = make(Options)
 		for name, value := range value.GetAttr("options").AsValueMap() {
-			w.Options[name] = value.AsString()
+			w.Options[Name(name)] = Value(value.AsString())
 		}
 	}
 
@@ -69,7 +70,7 @@ func (w *Window) Decode(value cty.Value) hcl.Diagnostics {
 			for it.Next() {
 				_, value := it.Element()
 
-				pane := new(Pane)
+				pane := new(pane.Pane)
 
 				if diags = pane.Decode(value); diags.HasErrors() {
 					diags = diags.Extend(diags)

@@ -1,4 +1,4 @@
-package actions
+package up
 
 import (
 	"fmt"
@@ -7,10 +7,11 @@ import (
 	"github.com/charmbracelet/log"
 	"github.com/urfave/cli/v2"
 	"github.com/wilhelm-murdoch/glaze"
+	"github.com/wilhelm-murdoch/glaze/schema"
 	"github.com/wilhelm-murdoch/glaze/tmux"
 )
 
-func Up(ctx *cli.Context) error {
+func Run(ctx *cli.Context) error {
 	profilePath, err := glaze.ResolveProfilePath(ctx.Args().First())
 	if err != nil {
 		return err
@@ -32,7 +33,7 @@ func Up(ctx *cli.Context) error {
 		return fmt.Errorf("could not parse specified variables: %s", err)
 	}
 
-	profile, decodeDiags := parser.Decode(glaze.PrimaryGlazeSpec, glaze.BuildEvalContext(variables))
+	profile, decodeDiags := parser.Decode(schema.PrimaryGlazeSpec, glaze.BuildEvalContext(variables))
 	if decodeDiags.HasErrors() {
 		diagsManager.Extend(decodeDiags)
 		return diagsManager.Write()
