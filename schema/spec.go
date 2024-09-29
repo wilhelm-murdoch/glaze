@@ -32,37 +32,56 @@ var (
 				Type: cty.String,
 			},
 			"envs": envsSpec,
-			"menu": &hcldec.ValidateSpec{
-				Wrapped: &hcldec.ObjectSpec{
-					"name": &hcldec.AttrSpec{
-						Name: "name",
-						Type: cty.String,
-					},
-					"bind": &hcldec.AttrSpec{
-						Name: "bind",
-						Type: cty.String,
-					},
-					"shell-script": &hcldec.ValidateSpec{
-						Wrapped: &hcldec.AttrSpec{
-							Name: "shell-script",
+			"menus": &hcldec.BlockListSpec{
+				TypeName: "menu",
+				Nested: &hcldec.ValidateSpec{
+					Wrapped: &hcldec.ObjectSpec{
+						"name": &hcldec.AttrSpec{
+							Name: "name",
 							Type: cty.String,
 						},
-						Func: func(value cty.Value) hcl.Diagnostics {
-							return nil
+						"bind": &hcldec.AttrSpec{
+							Name: "bind",
+							Type: cty.String,
+						},
+						"shell-script": &hcldec.ValidateSpec{
+							Wrapped: &hcldec.AttrSpec{
+								Name: "shell-script",
+								Type: cty.String,
+							},
+							Func: func(value cty.Value) hcl.Diagnostics {
+								return glaze.FileDiagnostic("shell-script", value)
+							},
+						},
+						"items": &hcldec.BlockListSpec{
+							TypeName: "item",
+							MinItems: 1,
+							Nested: &hcldec.ObjectSpec{
+								"name": &hcldec.AttrSpec{
+									Name:     "name",
+									Type:     cty.String,
+									Required: true,
+								},
+								"disabled": &hcldec.AttrSpec{
+									Name: "disabled",
+									Type: cty.Bool,
+								},
+								"bind": &hcldec.AttrSpec{
+									Name:     "bind",
+									Type:     cty.String,
+									Required: true,
+								},
+								"command": &hcldec.AttrSpec{
+									Name:     "command",
+									Type:     cty.String,
+									Required: true,
+								},
+							},
 						},
 					},
-					"items": &hcldec.ValidateSpec{
-						Wrapped: &hcldec.AttrSpec{
-							Name: "items",
-							Type: cty.Map(cty.String),
-						},
-						Func: func(value cty.Value) hcl.Diagnostics {
-							return nil
-						},
+					Func: func(value cty.Value) hcl.Diagnostics {
+						return nil
 					},
-				},
-				Func: func(value cty.Value) hcl.Diagnostics {
-					return nil
 				},
 			},
 			"options": &hcldec.ValidateSpec{

@@ -1,19 +1,26 @@
 session {
   name = "TestSession"
-
-  // popup {
-
-  // }
-
+  
   menu {
     name = "test"
     bind = "C-s"
-    
-    // script = "" // path to script
 
-    items = {
-      one = "foo",
-      two = "bar"
+    item {
+      name    = "one"
+      bind    = "o"
+      command = "echo hi"
+    }
+
+    item {
+      name    = "two"
+      bind    = "t"
+      command = "echo hi"
+    }
+
+    item {
+      name    = "three"
+      bind    = "t"
+      command = "echo hi"
     }
   }
 

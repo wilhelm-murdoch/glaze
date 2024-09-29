@@ -79,6 +79,13 @@ func Run(ctx *cli.Context) error {
 		}
 	}
 
+	for _, mm := range profile.Menus.Items() {
+		log.Info("setting menu", "session", session.Name, "name", mm.Name)
+		if err := session.SetMenu(mm); err != nil {
+			return fmt.Errorf("could not set menu `%s` for session `%s`: %s", mm.Name, session.Name, err)
+		}
+	}
+
 	// Iterate through the windows and panes defined within the specified profile and create them within the tmux session.
 	for _, wm := range profile.Windows.Items() {
 		log.Info("creating new window", "window", wm.Name)

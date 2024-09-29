@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/hashicorp/hcl/v2"
+	"github.com/wilhelm-murdoch/glaze/schema/menu"
 	"github.com/wilhelm-murdoch/glaze/schema/window"
 	"github.com/wilhelm-murdoch/go-collection"
 	"github.com/zclconf/go-cty/cty"
@@ -17,6 +18,7 @@ type Session struct {
 	Options           Options
 	Envs              Envs
 	Windows           collection.Collection[*window.Window]
+	Menus             collection.Collection[*menu.Menu]
 }
 
 func (s *Session) Decode(value cty.Value) hcl.Diagnostics {
@@ -49,6 +51,24 @@ func (s *Session) Decode(value cty.Value) hcl.Diagnostics {
 		}
 	}
 
+	if !value.GetAttr("menus").IsNull() {
+		if value.GetAttr("menus").CanIterateElements() {
+			it := value.GetAttr("menus").ElementIterator()
+
+			for it.Next() {
+				_, value := it.Element()
+
+				menu := new(menu.Menu)
+				if diags = menu.Decode(value); diags.HasErrors() {
+					diags = diags.Extend(diags)
+					continue
+				}
+
+				s.Menus.Push(menu)
+			}
+		}
+	}
+
 	if !value.GetAttr("windows").IsNull() {
 		if value.GetAttr("windows").CanIterateElements() {
 			it := value.GetAttr("windows").ElementIterator()
@@ -57,7 +77,6 @@ func (s *Session) Decode(value cty.Value) hcl.Diagnostics {
 				_, value := it.Element()
 
 				window := new(window.Window)
-
 				if diags = window.Decode(value); diags.HasErrors() {
 					diags = diags.Extend(diags)
 					continue

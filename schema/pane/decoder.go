@@ -10,17 +10,6 @@ import (
 
 const DefaultGlazePaneName = "default"
 
-type Pane struct {
-	Name              Name
-	StartingDirectory Directory
-	Size              Size
-	Envs              Envs
-	Hooks             Hooks
-	Options           Options
-	Commands          []Command
-	Focus             Focus
-}
-
 func (p *Pane) Decode(value cty.Value) hcl.Diagnostics {
 	var diags hcl.Diagnostics
 

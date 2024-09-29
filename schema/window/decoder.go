@@ -6,22 +6,11 @@ import (
 	"github.com/hashicorp/hcl/v2"
 	"github.com/wilhelm-murdoch/glaze/schema/pane"
 	"github.com/wilhelm-murdoch/glaze/tmux/enums"
-	"github.com/wilhelm-murdoch/go-collection"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
 )
 
 const DefaultGlazeWindowName = "default"
-
-type Window struct {
-	Name              Name
-	StartingDirectory Directory
-	Envs              Envs
-	Options           Options
-	Panes             collection.Collection[*pane.Pane]
-	Layout            enums.Layout
-	Focus             Focus
-}
 
 func (w *Window) Decode(value cty.Value) hcl.Diagnostics {
 	var diags hcl.Diagnostics

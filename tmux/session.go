@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/wilhelm-murdoch/glaze/schema/menu"
 	"github.com/wilhelm-murdoch/glaze/schema/session"
 	"github.com/wilhelm-murdoch/glaze/schema/window"
 	"github.com/wilhelm-murdoch/glaze/tmux/enums"
@@ -76,6 +77,15 @@ func (s *Session) NewWindow(windowName window.Name) (*Window, error) {
 		IsFirst:  index == 0,
 		Session:  s,
 	}, nil
+}
+
+func (s *Session) SetMenu(menu *menu.Menu) error {
+	cmd, err := NewCommand(s.Client, menu.CommandArgs()...)
+	if err != nil {
+		return err
+	}
+
+	return cmd.Exec()
 }
 
 func (s *Session) SetOption(option session.Name, value session.Value) error {
