@@ -68,13 +68,18 @@ func (s *Session) NewWindow(windowName window.Name) (*Window, error) {
 		return window, err
 	}
 
+	baseIndex, err := s.GetOption(enums.OptionsSessionBaseIndex)
+	if err != nil {
+		return window, err
+	}
+
 	return &Window{
 		Id:       id,
 		Index:    index,
 		Name:     parts[2],
 		Layout:   enums.LayoutFromString(parts[3]),
 		IsActive: parts[4] == "1",
-		IsFirst:  index == 0,
+		IsFirst:  parts[1] == baseIndex.Value,
 		Session:  s,
 	}, nil
 }
@@ -93,11 +98,11 @@ func (s *Session) SetOption(option session.Name, value session.Value) error {
 }
 
 func (s *Session) GetOption(option enums.OptionsSession) (Option[enums.OptionsSession], error) {
-	return getOption[enums.OptionsSession](s.Client, "show", "-t", s.Target(), fmt.Sprint(option))
+	return getOption[enums.OptionsSession](s.Client, "show", "-g", "-t", s.Target(), fmt.Sprint(option))
 }
 
 func (s *Session) ShowOptions() (collection.Collection[Option[enums.OptionsSession]], error) {
-	return showOptions[enums.OptionsSession](s.Client, "show", "-t", s.Target())
+	return showOptions[enums.OptionsSession](s.Client, "show", "-g", "-t", s.Target())
 }
 
 // Kill closes the current session.

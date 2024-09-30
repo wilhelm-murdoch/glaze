@@ -78,27 +78,32 @@ func (w *Window) Split(parentId string, name pane.Name, startingDirectory pane.D
 		return pane, err
 	}
 
+	baseIndex, err := w.GetOption(enums.OptionsWindowPaneBaseIndex)
+	if err != nil {
+		return pane, err
+	}
+
 	return Pane{
 		Id:                PaneId(id),
 		Index:             index,
 		Name:              fmt.Sprint(name),
 		StartingDirectory: fmt.Sprint(startingDirectory),
 		IsActive:          parts[3] == "1",
-		IsFirst:           index == 0,
+		IsFirst:           parts[1] == baseIndex.Value,
 		Window:            w,
 	}, nil
 }
 
 func (w Window) SetOption(option window.Name, value window.Value) error {
-	return setOption[enums.OptionsWindow](w.Session.Client, "set", "-w", "-t", w.Target(), fmt.Sprint(option), fmt.Sprint(value))
+	return setOption[enums.OptionsWindow](w.Session.Client, "set", "-gw", "-t", w.Target(), fmt.Sprint(option), fmt.Sprint(value))
 }
 
 func (w Window) GetOption(option enums.OptionsWindow) (Option[enums.OptionsWindow], error) {
-	return getOption[enums.OptionsWindow](w.Session.Client, "show", "-w", "-t", w.Target(), fmt.Sprint(option))
+	return getOption[enums.OptionsWindow](w.Session.Client, "show", "-gw", "-t", w.Target(), fmt.Sprint(option))
 }
 
 func (w Window) ShowOptions() (collection.Collection[Option[enums.OptionsWindow]], error) {
-	return showOptions[enums.OptionsWindow](w.Session.Client, "show", "-w", "-t", w.Target())
+	return showOptions[enums.OptionsWindow](w.Session.Client, "show", "-gw", "-t", w.Target())
 }
 
 func (w Window) Kill() error {
