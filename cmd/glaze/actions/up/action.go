@@ -122,7 +122,7 @@ func Run(ctx *cli.Context) error {
 			}
 
 			// Run any defined commands in order as defined within the
-			// current the profile. Add a small delay between each command
+			// current profile. Add a small delay between each command
 			// to ensure they are executed in order.
 			for _, cmd := range pm.Commands {
 				log.Info("sending command", "pane", pc.Name, "cmd", cmd)

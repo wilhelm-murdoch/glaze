@@ -37,8 +37,9 @@ var (
 				Nested: &hcldec.ValidateSpec{
 					Wrapped: &hcldec.ObjectSpec{
 						"name": &hcldec.AttrSpec{
-							Name: "name",
-							Type: cty.String,
+							Name:     "name",
+							Type:     cty.String,
+							Required: true,
 						},
 						"bind": &hcldec.AttrSpec{
 							Name: "bind",
