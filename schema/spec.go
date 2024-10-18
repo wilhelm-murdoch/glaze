@@ -32,67 +32,9 @@ var (
 				Type: cty.String,
 			},
 			"envs": envsSpec,
-			"menus": &hcldec.BlockListSpec{
-				TypeName: "menu",
-				Nested: &hcldec.ValidateSpec{
-					Wrapped: &hcldec.ObjectSpec{
-						"name": &hcldec.AttrSpec{
-							Name:     "name",
-							Type:     cty.String,
-							Required: true,
-						},
-						"bind": &hcldec.AttrSpec{
-							Name: "bind",
-							Type: cty.String,
-						},
-						"shell-script": &hcldec.ValidateSpec{
-							Wrapped: &hcldec.AttrSpec{
-								Name: "shell-script",
-								Type: cty.String,
-							},
-							Func: func(value cty.Value) hcl.Diagnostics {
-								return glaze.FileDiagnostic("shell-script", value)
-							},
-						},
-						"items": &hcldec.BlockListSpec{
-							TypeName: "item",
-							MinItems: 1,
-							Nested: &hcldec.ObjectSpec{
-								"name": &hcldec.AttrSpec{
-									Name:     "name",
-									Type:     cty.String,
-									Required: true,
-								},
-								"disabled": &hcldec.AttrSpec{
-									Name: "disabled",
-									Type: cty.Bool,
-								},
-								"bind": &hcldec.AttrSpec{
-									Name:     "bind",
-									Type:     cty.String,
-									Required: true,
-								},
-								"command": &hcldec.AttrSpec{
-									Name:     "command",
-									Type:     cty.String,
-									Required: true,
-								},
-							},
-						},
-					},
-					Func: func(value cty.Value) hcl.Diagnostics {
-						return nil
-					},
-				},
-			},
-			"options": &hcldec.ValidateSpec{
-				Wrapped: &hcldec.AttrSpec{
-					Name: "options",
-					Type: cty.Map(cty.String),
-				},
-				Func: func(value cty.Value) hcl.Diagnostics {
-					return validateOptions[enums.OptionsSession](value)
-				},
+			"commands": &hcldec.AttrSpec{
+				Name: "commands",
+				Type: cty.List(cty.String),
 			},
 			"hooks": hooksSpec,
 			"starting_directory": &hcldec.ValidateSpec{
@@ -112,16 +54,7 @@ var (
 						Name: "name",
 						Type: cty.String,
 					},
-					"envs": envsSpec,
-					"options": &hcldec.ValidateSpec{
-						Wrapped: &hcldec.AttrSpec{
-							Name: "options",
-							Type: cty.Map(cty.String),
-						},
-						Func: func(value cty.Value) hcl.Diagnostics {
-							return validateOptions[enums.OptionsWindow](value)
-						},
-					},
+					"envs":  envsSpec,
 					"hooks": hooksSpec,
 					"focus": &hcldec.AttrSpec{
 						Name: "focus",
@@ -154,16 +87,7 @@ var (
 									Name: "name",
 									Type: cty.String,
 								},
-								"envs": envsSpec,
-								"options": &hcldec.ValidateSpec{
-									Wrapped: &hcldec.AttrSpec{
-										Name: "options",
-										Type: cty.Map(cty.String),
-									},
-									Func: func(value cty.Value) hcl.Diagnostics {
-										return validateOptions[enums.OptionsPane](value)
-									},
-								},
+								"envs":  envsSpec,
 								"hooks": hooksSpec,
 								"focus": &hcldec.AttrSpec{
 									Name: "focus",

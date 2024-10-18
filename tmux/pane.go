@@ -4,8 +4,6 @@ import (
 	"fmt"
 
 	"github.com/wilhelm-murdoch/glaze/schema/pane"
-	"github.com/wilhelm-murdoch/glaze/tmux/enums"
-	"github.com/wilhelm-murdoch/go-collection"
 )
 
 // Pane represents a tmux pane.
@@ -42,18 +40,6 @@ func (p Pane) SetEnv(key pane.Name, value pane.Value) error {
 	}
 
 	return cmd.Exec()
-}
-
-func (p Pane) SetOption(option pane.Name, value pane.Value) error {
-	return setOption[enums.OptionsPane](p.Window.Session.Client, "set", "-p", "-t", p.Target(), fmt.Sprint(option), fmt.Sprint(value))
-}
-
-func (p Pane) GetOption(option enums.OptionsPane) (Option[enums.OptionsPane], error) {
-	return getOption[enums.OptionsPane](p.Window.Session.Client, "show", "-p", "-t", p.Target(), fmt.Sprint(option))
-}
-
-func (p Pane) ShowOptions() (collection.Collection[Option[enums.OptionsPane]], error) {
-	return showOptions[enums.OptionsPane](p.Window.Session.Client, "show", "-p", "-t", p.Target())
 }
 
 func (p Pane) Select() error {

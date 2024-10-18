@@ -128,10 +128,10 @@ func (c Client) Windows(session *Session) (collection.Collection[*Window], error
 		return windows, err
 	}
 
-	baseIndex, err := getOption[enums.OptionsSession](c, "show", "-g", "-t", session.Target(), enums.OptionsSessionBaseIndexString)
-	if err != nil {
-		return windows, err
-	}
+	// baseIndex, err := getOption[enums.OptionsSession](c, "show", "-g", "-t", session.Target(), enums.OptionsSessionBaseIndexString)
+	// if err != nil {
+	// 	return windows, err
+	// }
 
 	for _, window := range strings.Split(output, "\n") {
 		parts := strings.SplitN(window, ";", 5)
@@ -152,8 +152,9 @@ func (c Client) Windows(session *Session) (collection.Collection[*Window], error
 			Name:     parts[2],
 			Layout:   enums.LayoutFromString(parts[3]),
 			IsActive: parts[4] == "1",
-			IsFirst:  parts[1] == baseIndex.Value,
-			Session:  session,
+			IsFirst:  parts[1] == "1",
+			// IsFirst:  parts[1] == baseIndex.Value,
+			Session: session,
 		})
 	}
 
@@ -188,10 +189,10 @@ func (c Client) Panes(window *Window) (collection.Collection[*Pane], error) {
 		return panes, err
 	}
 
-	baseIndex, err := getOption[enums.OptionsWindow](c, "show", "-gw", "-t", window.Target(), enums.OptionsWindowPaneBaseIndexString)
-	if err != nil {
-		return panes, err
-	}
+	// baseIndex, err := getOption[enums.OptionsWindow](c, "show", "-gw", "-t", window.Target(), enums.OptionsWindowPaneBaseIndexString)
+	// if err != nil {
+	// 	return panes, err
+	// }
 
 	for _, pane := range strings.Split(output, "\n") {
 		parts := strings.SplitN(pane, ";", len(format))
@@ -212,8 +213,9 @@ func (c Client) Panes(window *Window) (collection.Collection[*Pane], error) {
 			Name:              parts[2],
 			StartingDirectory: parts[4],
 			IsActive:          parts[3] == "1",
-			IsFirst:           parts[1] == baseIndex.Value,
-			Window:            window,
+			IsFirst:           parts[1] == "1",
+			// IsFirst:           parts[1] == baseIndex.Value,
+			Window: window,
 		})
 	}
 
