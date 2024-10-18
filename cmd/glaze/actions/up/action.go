@@ -72,6 +72,10 @@ func Run(ctx *cli.Context) error {
 		return fmt.Errorf("could not create new session `%s`: %s", session.Name, err)
 	}
 
+	for _, cmd := range profile.Commands {
+		fmt.Println("--")
+		fmt.Println(cmd)
+	}
 	// Iterate through the windows and panes defined within the specified profile and create them within the tmux session.
 	for _, wm := range profile.Windows.Items() {
 		log.Info("creating new window", "window", wm.Name)

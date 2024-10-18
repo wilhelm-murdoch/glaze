@@ -14,9 +14,9 @@ const DefaultGlazeSesssionName = "default"
 type Session struct {
 	Name              Name
 	StartingDirectory Directory
-	Options           Options
 	Envs              Envs
 	Windows           collection.Collection[*window.Window]
+	Commands          Commands
 }
 
 func (s *Session) Decode(value cty.Value) hcl.Diagnostics {
@@ -39,6 +39,13 @@ func (s *Session) Decode(value cty.Value) hcl.Diagnostics {
 		s.Envs = make(Envs)
 		for name, value := range value.GetAttr("envs").AsValueMap() {
 			s.Envs[Name(name)] = Value(value.AsString())
+		}
+	}
+
+	if !value.GetAttr("commands").IsNull() {
+		s.Commands = make(Commands, len(value.GetAttr("commands").AsValueSlice()))
+		for _, command := range value.GetAttr("commands").AsValueSlice() {
+			s.Commands = append(s.Commands, command.AsString())
 		}
 	}
 

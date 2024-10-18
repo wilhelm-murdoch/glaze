@@ -1,19 +1,15 @@
 session {
   name = "${path.base}"
 
-  // tmux set -g status-right "#[align=absolute-centre]#[fg=#f8f9f2]#W#[fg=#51cd97]#{?client_prefix,#[fg=#d0689d],#[fg=#51cd97]}.#[align=right]#{?window_bigger,[#{window_offset_x}#,#{window_offset_y}] ,}#[fg=#404040,underscore]#S#[none] "
-  // tmux set -g status-style "bg=#1f1f1f,fg=#f8f8f2"
-  // tmux set -g window-status-current-format "#{?client_prefix,#[fg=#d0689d],#[fg=#51cd97]}"
-  // tmux set -g window-status-format "#[fg=#404040]"
-  // tmux set -g status-left ' '
-
-  //   bind {
-  //     description = "presents a session switching menu"
-  //     keys = "C-s"
-  //     command = <<-EOT
-  // tmux list-sessions -F '#S' | awk 'BEGIN {ORS=" "} {print $1, NR, "\"switch-client -t", $1 "\""}' | xargs tmux display-menu -T "Switch Session"
-  // EOT
-  //   }
+  commands = [
+    "set -g status-right \"#[align=absolute-centre]#[fg=#f8f9f2]#W#[fg=#51cd97]#{?client_prefix,#[fg=#d0689d],#[fg=#51cd97]}.#[align=right]#{?window_bigger,[#{window_offset_x}#,#{window_offset_y}] ,}#[fg=#404040,underscore]#S#[none] \"",
+    "set -g status-style \"bg=#1f1f1f,fg=#f8f8f2\"",
+    "set -g window-status-current-format \"#{?client_prefix,#[fg=#d0689d],#[fg=#51cd97]}\"",
+    "set -g window-status-format \"#[fg=#404040]\"",
+    "set -g status-left ' '",
+    "set-window-option -g pane-border-style \"fg=#404040\"",
+    "set-window-option -g pane-active-border-style \"fg=#51cd97\""
+  ]
 
   window {
     name   = "🥺"
