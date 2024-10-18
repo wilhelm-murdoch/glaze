@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclparse"
-	"github.com/wilhelm-murdoch/glaze/tmux"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -57,7 +57,7 @@ func NewDiagnosticsManager(filePath string) *DiagnosticsManager {
 func ContainsDiagnostic(field string, value cty.Value, list []string) hcl.Diagnostics {
 	var out hcl.Diagnostics
 
-	if !value.IsNull() && !tmux.Contains(list, value.AsString()) {
+	if !value.IsNull() && !slices.Contains(list, value.AsString()) {
 		return hcl.Diagnostics{{
 			Severity: hcl.DiagError,
 			Summary:  fmt.Sprintf(`Invalid %s specified`, field),
@@ -72,7 +72,7 @@ func DirectoryDiagnostic(field string, value cty.Value) hcl.Diagnostics {
 	var out hcl.Diagnostics
 
 	if !value.IsNull() {
-		fileInfo, err := os.Stat(tmux.ExpandPath(value.AsString()))
+		fileInfo, err := os.Stat(ExpandPath(value.AsString()))
 		if err != nil || errors.Is(err, fs.ErrNotExist) || !fileInfo.IsDir() {
 			return hcl.Diagnostics{{
 				Severity: hcl.DiagError,
@@ -89,7 +89,7 @@ func FileDiagnostic(field string, value cty.Value) hcl.Diagnostics {
 	var out hcl.Diagnostics
 
 	if !value.IsNull() {
-		fileInfo, err := os.Stat(tmux.ExpandPath(value.AsString()))
+		fileInfo, err := os.Stat(ExpandPath(value.AsString()))
 		if err != nil || errors.Is(err, fs.ErrNotExist) || fileInfo.IsDir() {
 			return hcl.Diagnostics{{
 				Severity: hcl.DiagError,

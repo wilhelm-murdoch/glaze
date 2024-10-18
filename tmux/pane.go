@@ -6,6 +6,12 @@ import (
 	"github.com/wilhelm-murdoch/glaze/schema/pane"
 )
 
+type PaneId int
+
+func (id PaneId) String() string {
+	return fmt.Sprintf("%%%d", int(id))
+}
+
 // Pane represents a tmux pane.
 type Pane struct {
 	Window            *Window

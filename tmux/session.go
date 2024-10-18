@@ -10,6 +10,12 @@ import (
 	"github.com/wilhelm-murdoch/glaze/tmux/enums"
 )
 
+type SessionId int
+
+func (id SessionId) String() string {
+	return fmt.Sprintf("$%d", int(id))
+}
+
 // Session represents a tmux session.
 type Session struct {
 	Client            Client

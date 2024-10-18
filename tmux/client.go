@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/wilhelm-murdoch/glaze"
 	"github.com/wilhelm-murdoch/glaze/schema/session"
 	"github.com/wilhelm-murdoch/glaze/tmux/enums"
 	"github.com/wilhelm-murdoch/go-collection"
@@ -33,7 +34,7 @@ func NewClient(socketPath, socketName string, debug bool) Client {
 func (c *Client) Attach(session *Session) error {
 	var args []string
 
-	if !IsInsideTmux() {
+	if !glaze.IsInsideTmux() {
 		args = append(args, "attach", "-t", session.Target())
 	} else {
 		args = append(args, "switchc", "-t", session.Target())

@@ -10,6 +10,12 @@ import (
 	"github.com/wilhelm-murdoch/glaze/tmux/enums"
 )
 
+type WindowId int
+
+func (id WindowId) String() string {
+	return fmt.Sprintf("@%d", int(id))
+}
+
 // Window represents a tmux window.
 type Window struct {
 	Session  *Session
