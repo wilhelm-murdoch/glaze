@@ -1,6 +1,7 @@
 package tmux
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -189,10 +190,27 @@ func (c Client) Panes(window *Window) (collection.Collection[*Pane], error) {
 		return panes, err
 	}
 
-	// baseIndex, err := getOption[enums.OptionsWindow](c, "show", "-gw", "-t", window.Target(), enums.OptionsWindowPaneBaseIndexString)
-	// if err != nil {
-	// 	return panes, err
-	// }
+	args = []string{
+		"show",
+		"-gw",
+		"-t", window.Target(),
+		"pane-base-index",
+	}
+
+	baseIndexCmd, err := NewCommand(c, args...)
+	if err != nil {
+		return panes, err
+	}
+
+	baseIndexCmdOutput, err := baseIndexCmd.ExecWithOutput()
+	if err != nil {
+		return panes, err
+	}
+
+	baseIndexCmdParts := strings.SplitN(baseIndexCmdOutput, " ", -1)
+	if len(baseIndexCmdParts) != 2 {
+		return panes, errors.New("could not determine global base index")
+	}
 
 	for _, pane := range strings.Split(output, "\n") {
 		parts := strings.SplitN(pane, ";", len(format))
@@ -213,9 +231,8 @@ func (c Client) Panes(window *Window) (collection.Collection[*Pane], error) {
 			Name:              parts[2],
 			StartingDirectory: parts[4],
 			IsActive:          parts[3] == "1",
-			IsFirst:           parts[1] == "1",
-			// IsFirst:           parts[1] == baseIndex.Value,
-			Window: window,
+			IsFirst:           parts[1] == baseIndexCmdParts[1],
+			Window:            window,
 		})
 	}
 

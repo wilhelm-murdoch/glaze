@@ -1,6 +1,7 @@
 package tmux
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -65,10 +66,27 @@ func (s *Session) NewWindow(windowName window.Name) (*Window, error) {
 		return window, err
 	}
 
-	// baseIndex, err := s.GetOption(enums.OptionsSessionBaseIndex)
-	// if err != nil {
-	// 	return window, err
-	// }
+	args = []string{
+		"show",
+		"-g",
+		"-t", s.Target(),
+		"base-index",
+	}
+
+	baseIndexCmd, err := NewCommand(s.Client, args...)
+	if err != nil {
+		return window, err
+	}
+
+	baseIndexCmdOutput, err := baseIndexCmd.ExecWithOutput()
+	if err != nil {
+		return window, err
+	}
+
+	baseIndexCmdParts := strings.SplitN(baseIndexCmdOutput, " ", -1)
+	if len(baseIndexCmdParts) != 2 {
+		return window, errors.New("could not determine window base index")
+	}
 
 	return &Window{
 		Id:       id,
@@ -76,9 +94,8 @@ func (s *Session) NewWindow(windowName window.Name) (*Window, error) {
 		Name:     parts[2],
 		Layout:   enums.LayoutFromString(parts[3]),
 		IsActive: parts[4] == "1",
-		IsFirst:  parts[1] == "1",
-		// IsFirst:  parts[1] == baseIndex.Value,
-		Session: s,
+		IsFirst:  parts[1] == baseIndexCmdParts[1],
+		Session:  s,
 	}, nil
 }
 

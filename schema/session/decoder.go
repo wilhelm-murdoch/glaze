@@ -42,13 +42,6 @@ func (s *Session) Decode(value cty.Value) hcl.Diagnostics {
 		}
 	}
 
-	if !value.GetAttr("options").IsNull() {
-		s.Options = make(Options)
-		for name, value := range value.GetAttr("options").AsValueMap() {
-			s.Options[Name(name)] = Value(value.AsString())
-		}
-	}
-
 	if !value.GetAttr("windows").IsNull() {
 		if value.GetAttr("windows").CanIterateElements() {
 			it := value.GetAttr("windows").ElementIterator()

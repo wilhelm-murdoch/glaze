@@ -48,13 +48,6 @@ func (p *Pane) Decode(value cty.Value) hcl.Diagnostics {
 		}
 	}
 
-	if !value.GetAttr("options").IsNull() {
-		p.Options = make(Options)
-		for name, value := range value.GetAttr("options").AsValueMap() {
-			p.Options[Name(name)] = Value(value.AsString())
-		}
-	}
-
 	if !value.GetAttr("commands").IsNull() {
 		if value.GetAttr("commands").CanIterateElements() {
 			cit := value.GetAttr("commands").ElementIterator()

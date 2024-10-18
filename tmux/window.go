@@ -1,6 +1,7 @@
 package tmux
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -76,10 +77,27 @@ func (w *Window) Split(parentId string, name pane.Name, startingDirectory pane.D
 		return pane, err
 	}
 
-	// baseIndex, err := w.GetOption(enums.OptionsWindowPaneBaseIndex)
-	// if err != nil {
-	// 	return pane, err
-	// }
+	args = []string{
+		"show",
+		"-gw",
+		"-t", w.Target(),
+		"pane-base-index",
+	}
+
+	baseIndexCmd, err := NewCommand(w.Session.Client, args...)
+	if err != nil {
+		return pane, err
+	}
+
+	baseIndexCmdOutput, err := baseIndexCmd.ExecWithOutput()
+	if err != nil {
+		return pane, err
+	}
+
+	baseIndexCmdParts := strings.SplitN(baseIndexCmdOutput, " ", -1)
+	if len(baseIndexCmdParts) != 2 {
+		return pane, errors.New("could not determine pane base index")
+	}
 
 	return Pane{
 		Id:                PaneId(id),
@@ -87,9 +105,8 @@ func (w *Window) Split(parentId string, name pane.Name, startingDirectory pane.D
 		Name:              fmt.Sprint(name),
 		StartingDirectory: fmt.Sprint(startingDirectory),
 		IsActive:          parts[3] == "1",
-		// IsFirst:           parts[1] == baseIndex.Value,
-		IsFirst: parts[1] == "1",
-		Window:  w,
+		IsFirst:           parts[1] == baseIndexCmdParts[1],
+		Window:            w,
 	}, nil
 }
 
