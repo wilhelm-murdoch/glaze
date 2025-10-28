@@ -1,17 +1,20 @@
 package window
 
 import (
-	"github.com/wilhelm-murdoch/glaze/schema/pane"
-	"github.com/wilhelm-murdoch/glaze/tmux/enums"
 	"github.com/wilhelm-murdoch/go-collection"
+
+	"github.com/wilhelm-murdoch/glaze/internal/schema/pane"
+	"github.com/wilhelm-murdoch/glaze/internal/tmux/enums"
 )
 
-type Name string
-type Value string
-type Directory string
-type Envs map[Name]Value
-type Options map[Name]Value
-type Focus bool
+type (
+	Name      string
+	Value     string
+	Directory string
+	Envs      map[Name]Value
+	Options   map[Name]Value
+	Focus     bool
+)
 
 type Window struct {
 	Name              Name

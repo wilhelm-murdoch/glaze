@@ -7,16 +7,18 @@ import (
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclwrite"
 	"github.com/urfave/cli/v2"
-	"github.com/wilhelm-murdoch/glaze"
+
+	"github.com/wilhelm-murdoch/glaze/internal/diagnostics"
+	"github.com/wilhelm-murdoch/glaze/internal/parser"
 )
 
 func Run(ctx *cli.Context) error {
-	profilePath, err := glaze.ResolveProfilePath(ctx.Args().First())
+	profilePath, err := parser.ResolveProfilePath(ctx.Args().First())
 	if err != nil {
 		return err
 	}
 
-	diagsManager := glaze.NewDiagnosticsManager(profilePath)
+	diagsManager := diagnostics.NewDiagnosticsManager(profilePath)
 	if diagsManager.HasErrors() {
 		return diagsManager.Write()
 	}
@@ -25,7 +27,7 @@ func Run(ctx *cli.Context) error {
 		return diagsManager.Write()
 	}
 
-	parser, parserDiags := glaze.NewParser(profilePath)
+	parser, parserDiags := parser.NewParser(profilePath)
 	if parserDiags.HasErrors() {
 		diagsManager.Extend(parserDiags)
 		return diagsManager.Write()
@@ -38,7 +40,7 @@ func Run(ctx *cli.Context) error {
 		return nil
 	}
 
-	if err := os.WriteFile(profilePath, []byte(formatted), 0644); err != nil {
+	if err := os.WriteFile(profilePath, []byte(formatted), 0o644); err != nil {
 		diagsManager.Append(&hcl.Diagnostic{
 			Severity: hcl.DiagError,
 			Summary:  "Failed to write file",

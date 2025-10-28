@@ -1,10 +1,9 @@
 module github.com/wilhelm-murdoch/glaze
 
-go 1.22.0
-
-toolchain go1.22.2
+go 1.25.0
 
 require (
+	github.com/charmbracelet/log v0.4.0
 	github.com/hashicorp/hcl/v2 v2.19.1
 	github.com/kr/pretty v0.1.0
 	github.com/urfave/cli/v2 v2.27.1
@@ -17,7 +16,6 @@ require (
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/charmbracelet/lipgloss v0.10.0 // indirect
-	github.com/charmbracelet/log v0.4.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect

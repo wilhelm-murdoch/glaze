@@ -4,10 +4,11 @@ import (
 	"os"
 
 	"github.com/hashicorp/hcl/v2"
-	"github.com/wilhelm-murdoch/glaze/schema/pane"
-	"github.com/wilhelm-murdoch/glaze/tmux/enums"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
+
+	"github.com/wilhelm-murdoch/glaze/internal/schema/pane"
+	"github.com/wilhelm-murdoch/glaze/internal/tmux/enums"
 )
 
 const DefaultGlazeWindowName = "default"

@@ -1,4 +1,4 @@
-package glaze
+package parser
 
 import (
 	"fmt"
@@ -9,10 +9,12 @@ import (
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hcldec"
 	"github.com/hashicorp/hcl/v2/hclparse"
-	"github.com/wilhelm-murdoch/glaze/schema/session"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/function"
 	"github.com/zclconf/go-cty/cty/function/stdlib"
+
+	"github.com/wilhelm-murdoch/glaze/internal/schema/session"
+	"github.com/wilhelm-murdoch/glaze/pkg/files"
 )
 
 type Parser struct {
@@ -34,7 +36,10 @@ func NewParser(path string) (*Parser, hcl.Diagnostics) {
 	}, nil
 }
 
-func (p *Parser) Decode(spec hcldec.Spec, ctx *hcl.EvalContext) (*session.Session, hcl.Diagnostics) {
+func (p *Parser) Decode(
+	spec hcldec.Spec,
+	ctx *hcl.EvalContext,
+) (*session.Session, hcl.Diagnostics) {
 	var diags hcl.Diagnostics
 
 	decoded, diags := hcldec.Decode(p.File.Body, spec, ctx)
@@ -67,13 +72,16 @@ func ResolveProfilePath(profilePath string) (string, error) {
 
 		profilePath = filepath.Join(cwd, ".glaze")
 
-		if !FileExists(profilePath) && os.Getenv("GLAZE_PATH") != "" {
+		if !files.FileExists(profilePath) && os.Getenv("GLAZE_PATH") != "" {
 			profilePath = filepath.Join(os.Getenv("GLAZE_PATH"), ".glaze")
 		}
 	}
 
-	if !FileExists(profilePath) {
-		return profilePath, fmt.Errorf("profile `%s` not found on the specified path, the current directory, or the GLAZE_PATH environment variable", profilePath)
+	if !files.FileExists(profilePath) {
+		return profilePath, fmt.Errorf(
+			"profile `%s` not found on the specified path, the current directory, or the GLAZE_PATH environment variable",
+			profilePath,
+		)
 	}
 
 	return profilePath, nil

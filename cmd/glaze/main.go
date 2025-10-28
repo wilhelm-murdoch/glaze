@@ -9,10 +9,11 @@ import (
 
 	"github.com/charmbracelet/log"
 	"github.com/urfave/cli/v2"
-	"github.com/wilhelm-murdoch/glaze"
+
 	"github.com/wilhelm-murdoch/glaze/cmd/glaze/actions/format"
 	"github.com/wilhelm-murdoch/glaze/cmd/glaze/actions/save"
 	"github.com/wilhelm-murdoch/glaze/cmd/glaze/actions/up"
+	"github.com/wilhelm-murdoch/glaze/pkg/files"
 )
 
 const defaultErrCode = 1
@@ -86,11 +87,17 @@ func main() {
 					Usage: "optional path to the tmux socket",
 					Action: func(ctx *cli.Context, value string) error {
 						if ctx.String("socket-name") != "" && value != "" {
-							return cli.Exit("cannot specify both --socket-name and --socket-path flags", defaultErrCode)
+							return cli.Exit(
+								"cannot specify both --socket-name and --socket-path flags",
+								defaultErrCode,
+							)
 						}
 
-						if value != "" && !glaze.FileExists(value) {
-							return cli.Exit(fmt.Sprintf("specified --socket-path of %s does not exist", value), defaultErrCode)
+						if value != "" && !files.FileExists(value) {
+							return cli.Exit(
+								fmt.Sprintf("specified --socket-path of %s does not exist", value),
+								defaultErrCode,
+							)
 						}
 
 						return nil
@@ -102,7 +109,10 @@ func main() {
 					Usage: "optional name for the tmux socket",
 					Action: func(ctx *cli.Context, value string) error {
 						if ctx.String("socket-path") != "" && value != "" {
-							return cli.Exit("cannot specify both --socket-name and --socket-path flags", defaultErrCode)
+							return cli.Exit(
+								"cannot specify both --socket-name and --socket-path flags",
+								defaultErrCode,
+							)
 						}
 
 						return nil
@@ -115,7 +125,11 @@ func main() {
 						for _, variable := range value {
 							if !strings.Contains(variable, "=") {
 								return cli.Exit(
-									fmt.Sprintf("the --var `%s` does not match the required format of `key=value`", variable), defaultErrCode,
+									fmt.Sprintf(
+										"the --var `%s` does not match the required format of `key=value`",
+										variable,
+									),
+									defaultErrCode,
 								)
 							}
 
@@ -123,7 +137,11 @@ func main() {
 
 							if strings.HasSuffix(parts[0], " ") {
 								return cli.Exit(
-									fmt.Sprintf("the --var name `%s` appears to have trailing spaces and does not match the required format of `key=value`", parts[0]), defaultErrCode,
+									fmt.Sprintf(
+										"the --var name `%s` appears to have trailing spaces and does not match the required format of `key=value`",
+										parts[0],
+									),
+									defaultErrCode,
 								)
 							}
 						}

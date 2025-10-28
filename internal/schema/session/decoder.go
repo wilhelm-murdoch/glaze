@@ -4,9 +4,10 @@ import (
 	"os"
 
 	"github.com/hashicorp/hcl/v2"
-	"github.com/wilhelm-murdoch/glaze/schema/window"
 	"github.com/wilhelm-murdoch/go-collection"
 	"github.com/zclconf/go-cty/cty"
+
+	"github.com/wilhelm-murdoch/glaze/internal/schema/window"
 )
 
 const DefaultGlazeSesssionName = "default"

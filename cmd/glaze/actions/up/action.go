@@ -6,34 +6,39 @@ import (
 
 	"github.com/charmbracelet/log"
 	"github.com/urfave/cli/v2"
-	"github.com/wilhelm-murdoch/glaze"
-	"github.com/wilhelm-murdoch/glaze/schema"
-	"github.com/wilhelm-murdoch/glaze/tmux"
+
+	"github.com/wilhelm-murdoch/glaze/internal/diagnostics"
+	"github.com/wilhelm-murdoch/glaze/internal/parser"
+	"github.com/wilhelm-murdoch/glaze/internal/schema"
+	"github.com/wilhelm-murdoch/glaze/internal/tmux"
 )
 
 func Run(ctx *cli.Context) error {
-	profilePath, err := glaze.ResolveProfilePath(ctx.Args().First())
+	profilePath, err := parser.ResolveProfilePath(ctx.Args().First())
 	if err != nil {
 		return err
 	}
 
-	diagsManager := glaze.NewDiagnosticsManager(profilePath)
+	diagsManager := diagnostics.NewDiagnosticsManager(profilePath)
 	if diagsManager.HasErrors() {
 		return diagsManager.Write()
 	}
 
-	parser, parserDiags := glaze.NewParser(profilePath)
+	glazeParser, parserDiags := parser.NewParser(profilePath)
 	if parserDiags.HasErrors() {
 		diagsManager.Extend(parserDiags)
 		return diagsManager.Write()
 	}
 
-	variables, err := glaze.CollectVariables(ctx.StringSlice("var"))
+	variables, err := parser.CollectVariables(ctx.StringSlice("var"))
 	if err != nil {
 		return fmt.Errorf("could not parse specified variables: %s", err)
 	}
 
-	profile, decodeDiags := parser.Decode(schema.PrimaryGlazeSpec, glaze.BuildEvalContext(variables))
+	profile, decodeDiags := glazeParser.Decode(
+		schema.PrimaryGlazeSpec,
+		parser.BuildEvalContext(variables),
+	)
 	if decodeDiags.HasErrors() {
 		diagsManager.Extend(decodeDiags)
 		return diagsManager.Write()
@@ -101,7 +106,12 @@ func Run(ctx *cli.Context) error {
 			log.Info("adding pane", "pane", pm.Name, "from", defaultPane.Target())
 			pc, err := wc.Split(defaultPane.Target(), pm.Name, pm.StartingDirectory)
 			if err != nil {
-				return fmt.Errorf("could not split pane `%d` for window `%s`: %s", defaultPane.Index, wc.Name, err)
+				return fmt.Errorf(
+					"could not split pane `%d` for window `%s`: %s",
+					defaultPane.Index,
+					wc.Name,
+					err,
+				)
 			}
 
 			// Run any defined commands in order as defined within the
@@ -111,7 +121,13 @@ func Run(ctx *cli.Context) error {
 				log.Info("sending command", "pane", pc.Name, "cmd", cmd)
 				time.Sleep(time.Millisecond * time.Duration(100))
 				if err := pc.SendKeys(cmd); err != nil {
-					return fmt.Errorf("could not execute command `%s` for pane `%s` in window `%s`: %s", cmd, pc.Name, wc.Name, err)
+					return fmt.Errorf(
+						"could not execute command `%s` for pane `%s` in window `%s`: %s",
+						cmd,
+						pc.Name,
+						wc.Name,
+						err,
+					)
 				}
 			}
 
@@ -122,7 +138,12 @@ func Run(ctx *cli.Context) error {
 		}
 
 		if err := wc.SelectLayout(wm.Layout); err != nil {
-			return fmt.Errorf("could not select layout `%s` for window `%s`: %s", wm.Layout, wc.Name, err)
+			return fmt.Errorf(
+				"could not select layout `%s` for window `%s`: %s",
+				wm.Layout,
+				wc.Name,
+				err,
+			)
 		}
 
 		if wm.Focus {

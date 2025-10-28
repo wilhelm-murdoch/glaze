@@ -6,10 +6,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/wilhelm-murdoch/glaze"
-	"github.com/wilhelm-murdoch/glaze/schema/session"
-	"github.com/wilhelm-murdoch/glaze/tmux/enums"
 	"github.com/wilhelm-murdoch/go-collection"
+
+	"github.com/wilhelm-murdoch/glaze/internal/schema/session"
+	"github.com/wilhelm-murdoch/glaze/internal/tmux/enums"
 )
 
 // Client represents a tmux client.
@@ -34,7 +34,7 @@ func NewClient(socketPath, socketName string, debug bool) Client {
 func (c *Client) Attach(session *Session) error {
 	var args []string
 
-	if !glaze.IsInsideTmux() {
+	if !IsInsideTmux() {
 		args = append(args, "attach", "-t", session.Target())
 	} else {
 		args = append(args, "switchc", "-t", session.Target())
@@ -83,7 +83,7 @@ func (c Client) Sessions() (collection.Collection[*Session], error) {
 		return sessions, err
 	}
 
-	for _, line := range strings.Split(output, "\n") {
+	for line := range strings.SplitSeq(output, "\n") {
 		parts := strings.SplitN(line, ";", 3)
 
 		id, err := strconv.Atoi(strings.ReplaceAll(parts[0], "$", ""))
@@ -135,7 +135,7 @@ func (c Client) Windows(session *Session) (collection.Collection[*Window], error
 	// 	return windows, err
 	// }
 
-	for _, window := range strings.Split(output, "\n") {
+	for window := range strings.SplitSeq(output, "\n") {
 		parts := strings.SplitN(window, ";", 5)
 
 		id, err := strconv.Atoi(strings.ReplaceAll(parts[0], "@", ""))
@@ -208,12 +208,12 @@ func (c Client) Panes(window *Window) (collection.Collection[*Pane], error) {
 		return panes, err
 	}
 
-	baseIndexCmdParts := strings.SplitN(baseIndexCmdOutput, " ", -1)
+	baseIndexCmdParts := strings.Split(baseIndexCmdOutput, " ")
 	if len(baseIndexCmdParts) != 2 {
 		return panes, errors.New("could not determine global base index")
 	}
 
-	for _, pane := range strings.Split(output, "\n") {
+	for pane := range strings.SplitSeq(output, "\n") {
 		parts := strings.SplitN(pane, ";", len(format))
 
 		id, err := strconv.Atoi(strings.ReplaceAll(parts[0], "%", ""))
@@ -241,10 +241,21 @@ func (c Client) Panes(window *Window) (collection.Collection[*Pane], error) {
 }
 
 // NewSession creates a new session with the given name and starting directory.
-func (c Client) NewSession(sessionName session.Name, startingDirectory session.Directory) (*Session, error) {
+func (c Client) NewSession(
+	sessionName session.Name,
+	startingDirectory session.Directory,
+) (*Session, error) {
 	var session *Session
 
-	cmd, err := NewCommand(c, "new", "-d", "-s", fmt.Sprint(sessionName), "-c", fmt.Sprint(startingDirectory))
+	cmd, err := NewCommand(
+		c,
+		"new",
+		"-d",
+		"-s",
+		fmt.Sprint(sessionName),
+		"-c",
+		fmt.Sprint(startingDirectory),
+	)
 	if err != nil {
 		return session, err
 	}
@@ -265,7 +276,10 @@ func (c Client) NewSession(sessionName session.Name, startingDirectory session.D
 
 // NewSessionIfNotExists creates a new session with the given name and starting
 // directory if it does not already exist.
-func (c Client) NewSessionIfNotExists(sessionName session.Name, startingDirectory session.Directory) (*Session, error) {
+func (c Client) NewSessionIfNotExists(
+	sessionName session.Name,
+	startingDirectory session.Directory,
+) (*Session, error) {
 	sessions, _ := c.Sessions()
 	exists := sessions.Find(func(i int, s *Session) bool {
 		return s.Name == fmt.Sprint(sessionName)

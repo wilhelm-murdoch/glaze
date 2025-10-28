@@ -6,9 +6,10 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hcldec"
-	"github.com/wilhelm-murdoch/glaze"
-	"github.com/wilhelm-murdoch/glaze/tmux/enums"
 	"github.com/zclconf/go-cty/cty"
+
+	"github.com/wilhelm-murdoch/glaze/internal/diagnostics"
+	"github.com/wilhelm-murdoch/glaze/internal/tmux/enums"
 )
 
 var (
@@ -43,7 +44,7 @@ var (
 					Type: cty.String,
 				},
 				Func: func(value cty.Value) hcl.Diagnostics {
-					return glaze.DirectoryDiagnostic("starting directory", value)
+					return diagnostics.DirectoryDiagnostic("starting directory", value)
 				},
 			},
 			"windows": &hcldec.BlockListSpec{
@@ -66,7 +67,7 @@ var (
 							Type: cty.String,
 						},
 						Func: func(value cty.Value) hcl.Diagnostics {
-							return glaze.DirectoryDiagnostic("starting directory", value)
+							return diagnostics.DirectoryDiagnostic("starting directory", value)
 						},
 					},
 					"layout": &hcldec.ValidateSpec{
@@ -75,7 +76,7 @@ var (
 							Type: cty.String,
 						},
 						Func: func(value cty.Value) hcl.Diagnostics {
-							return glaze.ContainsDiagnostic("layout", value, enums.LayoutList)
+							return diagnostics.ContainsDiagnostic("layout", value, enums.LayoutList)
 						},
 					},
 					"panes": &hcldec.BlockListSpec{
@@ -104,7 +105,8 @@ var (
 										if !value.IsNull() {
 											input := value.AsString()
 
-											matched := regexp.MustCompile(`^(\\d+|\\d+%)$`).MatchString(input)
+											matched := regexp.MustCompile(`^(\\d+|\\d+%)$`).
+												MatchString(input)
 
 											if input[len(input)-1] == '%' {
 												input = input[:len(input)-1]
@@ -130,7 +132,10 @@ var (
 										Type: cty.String,
 									},
 									Func: func(value cty.Value) hcl.Diagnostics {
-										return glaze.DirectoryDiagnostic("starting directory", value)
+										return diagnostics.DirectoryDiagnostic(
+											"starting directory",
+											value,
+										)
 									},
 								},
 								"commands": &hcldec.AttrSpec{

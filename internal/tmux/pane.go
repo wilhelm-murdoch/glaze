@@ -3,7 +3,7 @@ package tmux
 import (
 	"fmt"
 
-	"github.com/wilhelm-murdoch/glaze/schema/pane"
+	"github.com/wilhelm-murdoch/glaze/internal/schema/pane"
 )
 
 type PaneId int
@@ -30,7 +30,14 @@ func (p Pane) Target() string {
 
 // SendKeys sends the given keystrokes to the current pane.
 func (p Pane) SendKeys(keys pane.Command) error {
-	cmd, err := NewCommand(p.Window.Session.Client, "send", "-t", p.Target(), fmt.Sprint(keys), "Enter")
+	cmd, err := NewCommand(
+		p.Window.Session.Client,
+		"send",
+		"-t",
+		p.Target(),
+		fmt.Sprint(keys),
+		"Enter",
+	)
 	if err != nil {
 		return err
 	}
@@ -40,7 +47,14 @@ func (p Pane) SendKeys(keys pane.Command) error {
 
 // SetEnv sets the given environment variable to the given value in the current pane.
 func (p Pane) SetEnv(key pane.Name, value pane.Value) error {
-	cmd, err := NewCommand(p.Window.Session.Client, "setenv", "-t", p.Name, fmt.Sprint(key), fmt.Sprint(value))
+	cmd, err := NewCommand(
+		p.Window.Session.Client,
+		"setenv",
+		"-t",
+		p.Name,
+		fmt.Sprint(key),
+		fmt.Sprint(value),
+	)
 	if err != nil {
 		return err
 	}

@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/wilhelm-murdoch/glaze/schema/pane"
-	"github.com/wilhelm-murdoch/glaze/tmux/enums"
+	"github.com/wilhelm-murdoch/glaze/internal/schema/pane"
+	"github.com/wilhelm-murdoch/glaze/internal/tmux/enums"
 )
 
 type WindowId int
@@ -34,7 +34,11 @@ func (w Window) Target() string {
 }
 
 // Split splits the current window into two panes.
-func (w *Window) Split(parentId string, name pane.Name, startingDirectory pane.Directory) (Pane, error) {
+func (w *Window) Split(
+	parentId string,
+	name pane.Name,
+	startingDirectory pane.Directory,
+) (Pane, error) {
 	var pane Pane
 
 	format := []string{

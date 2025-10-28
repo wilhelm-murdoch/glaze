@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/wilhelm-murdoch/glaze/schema/window"
-	"github.com/wilhelm-murdoch/glaze/tmux/enums"
+	"github.com/wilhelm-murdoch/glaze/internal/schema/window"
+	"github.com/wilhelm-murdoch/glaze/internal/tmux/enums"
 )
 
 type SessionId int
@@ -89,7 +89,7 @@ func (s *Session) NewWindow(windowName window.Name) (*Window, error) {
 		return window, err
 	}
 
-	baseIndexCmdParts := strings.SplitN(baseIndexCmdOutput, " ", -1)
+	baseIndexCmdParts := strings.Split(baseIndexCmdOutput, " ")
 	if len(baseIndexCmdParts) != 2 {
 		return window, errors.New("could not determine window base index")
 	}

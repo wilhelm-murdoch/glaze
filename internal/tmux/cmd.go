@@ -6,8 +6,6 @@ import (
 	"os"
 	"os/exec"
 	"strings"
-
-	"github.com/wilhelm-murdoch/glaze"
 )
 
 // Command represents a command to run within a tmux session.
@@ -18,7 +16,7 @@ type Command struct {
 
 // NewCommand returns a new command with the given arguments.
 func NewCommand(client Client, args ...string) (Command, error) {
-	ok, tmux := glaze.IsInstalled()
+	ok, tmux := IsInstalled()
 	if !ok {
 		return Command{}, fmt.Errorf("tmux is not installed")
 	}
