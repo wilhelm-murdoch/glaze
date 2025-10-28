@@ -156,7 +156,11 @@ func main() {
 				},
 			},
 			Action: func(ctx *cli.Context) error {
-				action := up.NewAction(ctx)
+				action, err := up.NewAction(ctx)
+				if err != nil {
+					return err
+				}
+
 				return action.Run()
 			},
 		}, {

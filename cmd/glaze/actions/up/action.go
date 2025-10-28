@@ -15,44 +15,48 @@ import (
 )
 
 type Action struct {
-	ctx *cli.Context
+	ctx          *cli.Context
+	diagsManager *diagnostics.DiagnosticsManager
+	parser       *parser.Parser
 }
 
-func NewAction(ctx *cli.Context) *Action {
-	return &Action{
-		ctx: ctx,
-	}
-}
-
-func (a *Action) Run() error {
-	profilePath, err := profile.ResolveProfilePath(a.ctx.Args().First())
+func NewAction(ctx *cli.Context) (*Action, error) {
+	profilePath, err := profile.ResolveProfilePath(ctx.Args().First())
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	diagsManager := diagnostics.NewDiagnosticsManager(profilePath)
 	if diagsManager.HasErrors() {
-		return diagsManager.Write()
+		return nil, diagsManager.Write()
 	}
 
-	glazeParser, parserDiags := parser.NewParser(profilePath)
+	parser, parserDiags := parser.NewParser(profilePath)
 	if parserDiags.HasErrors() {
 		diagsManager.Extend(parserDiags)
-		return diagsManager.Write()
+		return nil, diagsManager.Write()
 	}
 
+	return &Action{
+		ctx:          ctx,
+		diagsManager: diagsManager,
+		parser:       parser,
+	}, nil
+}
+
+func (a *Action) Run() error {
 	variables, err := parser.CollectVariables(a.ctx.StringSlice("var"))
 	if err != nil {
 		return fmt.Errorf("could not parse specified variables: %s", err)
 	}
 
-	profile, decodeDiags := glazeParser.Decode(
+	profile, decodeDiags := a.parser.Decode(
 		schema.PrimaryGlazeSpec,
 		parser.BuildEvalContext(variables),
 	)
 	if decodeDiags.HasErrors() {
-		diagsManager.Extend(decodeDiags)
-		return diagsManager.Write()
+		a.diagsManager.Extend(decodeDiags)
+		return a.diagsManager.Write()
 	}
 
 	client := tmux.NewClient(
