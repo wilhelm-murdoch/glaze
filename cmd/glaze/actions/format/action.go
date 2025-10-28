@@ -13,12 +13,22 @@ import (
 	"github.com/wilhelm-murdoch/glaze/internal/profile"
 )
 
+type Action struct {
+	ctx *cli.Context
+}
+
+func NewAction(ctx *cli.Context) *Action {
+	return &Action{
+		ctx: ctx,
+	}
+}
+
 // Run is an action that will reformat the given glaze definition file to match
 // a canonical format and style, ensuring consistency. If a `stdout` flag is not
 // passed through via the cli, this command will attempt to overwrite the given
 // file with reformatted output.
-func Run(ctx *cli.Context) error {
-	profilePath, err := profile.ResolveProfilePath(ctx.Args().First())
+func (a *Action) Run() error {
+	profilePath, err := profile.ResolveProfilePath(a.ctx.Args().First())
 	if err != nil {
 		return err
 	}
@@ -40,7 +50,7 @@ func Run(ctx *cli.Context) error {
 
 	formatted := string(hclwrite.Format(glazeParser.File.Bytes))
 
-	if ctx.Bool("stdout") {
+	if a.ctx.Bool("stdout") {
 		fmt.Print(formatted)
 		return nil
 	}

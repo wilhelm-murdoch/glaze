@@ -163,11 +163,17 @@ func main() {
 					Usage: "writes the formatted glaze output to your terminal",
 				},
 			},
-			Action: format.Run,
+			Action: func(ctx *cli.Context) error {
+				action := format.NewAction(ctx)
+				return action.Run()
+			},
 		}, {
-			Name:   "save",
-			Usage:  "running this within a tmux session will save its current state to the specified glaze profile",
-			Action: save.Run,
+			Name:  "save",
+			Usage: "running this within a tmux session will save its current state to the specified glaze profile",
+			Action: func(ctx *cli.Context) error {
+				action := save.NewAction(ctx)
+				return action.Run()
+			},
 		}},
 	}
 
