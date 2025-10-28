@@ -150,7 +150,10 @@ func main() {
 					},
 				},
 			},
-			Action: up.Run,
+			Action: func(ctx *cli.Context) error {
+				action := up.NewAction(ctx)
+				return action.Run()
+			},
 		}, {
 			Name:  "format",
 			Usage: "rewrites the target glaze profile file to a canonical format",

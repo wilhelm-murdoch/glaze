@@ -13,6 +13,10 @@ import (
 	"github.com/wilhelm-murdoch/glaze/internal/profile"
 )
 
+// Run is an action that will reformat the given glaze definition file to match
+// a canonical format and style, ensuring consistency. If a `stdout` flag is not
+// passed through via the cli, this command will attempt to overwrite the given
+// file with reformatted output.
 func Run(ctx *cli.Context) error {
 	profilePath, err := profile.ResolveProfilePath(ctx.Args().First())
 	if err != nil {
@@ -28,13 +32,13 @@ func Run(ctx *cli.Context) error {
 		return diagsManager.Write()
 	}
 
-	parser, parserDiags := parser.NewParser(profilePath)
+	glazeParser, parserDiags := parser.NewParser(profilePath)
 	if parserDiags.HasErrors() {
 		diagsManager.Extend(parserDiags)
 		return diagsManager.Write()
 	}
 
-	formatted := string(hclwrite.Format(parser.File.Bytes))
+	formatted := string(hclwrite.Format(glazeParser.File.Bytes))
 
 	if ctx.Bool("stdout") {
 		fmt.Print(formatted)

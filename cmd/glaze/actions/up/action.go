@@ -14,8 +14,18 @@ import (
 	"github.com/wilhelm-murdoch/glaze/internal/tmux"
 )
 
-func Run(ctx *cli.Context) error {
-	profilePath, err := profile.ResolveProfilePath(ctx.Args().First())
+type Action struct {
+	ctx *cli.Context
+}
+
+func NewAction(ctx *cli.Context) *Action {
+	return &Action{
+		ctx: ctx,
+	}
+}
+
+func (a *Action) Run() error {
+	profilePath, err := profile.ResolveProfilePath(a.ctx.Args().First())
 	if err != nil {
 		return err
 	}
@@ -31,7 +41,7 @@ func Run(ctx *cli.Context) error {
 		return diagsManager.Write()
 	}
 
-	variables, err := parser.CollectVariables(ctx.StringSlice("var"))
+	variables, err := parser.CollectVariables(a.ctx.StringSlice("var"))
 	if err != nil {
 		return fmt.Errorf("could not parse specified variables: %s", err)
 	}
@@ -46,12 +56,12 @@ func Run(ctx *cli.Context) error {
 	}
 
 	client := tmux.NewClient(
-		ctx.String("socket-name"),
-		ctx.String("socket-path"),
-		ctx.Bool("debug"),
+		a.ctx.String("socket-name"),
+		a.ctx.String("socket-path"),
+		a.ctx.Bool("debug"),
 	)
 
-	if ctx.Bool("clear") {
+	if a.ctx.Bool("clear") {
 		log.Info("clearing previous session", "session", profile.Name)
 		client.KillSessionByName(profile.Name)
 	}
@@ -62,7 +72,7 @@ func Run(ctx *cli.Context) error {
 			return fmt.Errorf("could not find session `%s`: %s", profile.Name, err)
 		}
 
-		if !ctx.Bool("detached") {
+		if !a.ctx.Bool("detached") {
 			log.Info("attaching to existing session", "session", profile.Name)
 			if err := client.Attach(session); err != nil {
 				return fmt.Errorf("could not attach to session `%s`: %s", session.Name, err)
@@ -172,7 +182,7 @@ func Run(ctx *cli.Context) error {
 		defaultWindow.Kill()
 	}
 
-	if !ctx.Bool("detached") {
+	if !a.ctx.Bool("detached") {
 		if err := client.Attach(session); err != nil {
 			return err
 		}

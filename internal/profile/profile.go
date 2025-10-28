@@ -8,6 +8,10 @@ import (
 	"github.com/wilhelm-murdoch/glaze/pkg/files"
 )
 
+// ResolveProfilePath attempts to determine the most reasonable path to a glaze definition file.
+// If a `profilePath` is not given, it assumes we wish to look within the current path in which
+// the glaze cli was executed. Failing that, it attempts to read a path from a `GLAZE_PATH`
+// environment variable.
 func ResolveProfilePath(profilePath string) (string, error) {
 	if profilePath == "" {
 		cwd, err := os.Getwd()

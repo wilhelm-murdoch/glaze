@@ -1,19 +1,14 @@
 package save
 
 import (
-	"fmt"
+	"errors"
 
 	"github.com/urfave/cli/v2"
-	"github.com/wilhelm-murdoch/glaze/internal/profile"
 )
 
+// Run attempts to save the specified tmux session as a canonical glaze definition file.
 func Run(ctx *cli.Context) error {
-	profilePath, err := profile.ResolveProfilePath(ctx.Args().First())
-	if err != nil {
-		return err
-	}
-
-	fmt.Println(profilePath)
-
-	return nil
+	return errors.New(
+		"dynamically saving an existing tmux layout as a glaze definition file is not yet supported",
+	)
 }
