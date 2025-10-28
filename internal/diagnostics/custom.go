@@ -9,57 +9,9 @@ import (
 	"strings"
 
 	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclparse"
-	"github.com/zclconf/go-cty/cty"
-
 	"github.com/wilhelm-murdoch/glaze/pkg/files"
+	"github.com/zclconf/go-cty/cty"
 )
-
-type DiagnosticsManager struct {
-	Diagnostics      hcl.Diagnostics
-	DiagnosticWriter hcl.DiagnosticWriter
-}
-
-func (dm *DiagnosticsManager) Write() error {
-	if err := dm.DiagnosticWriter.WriteDiagnostics(dm.Diagnostics); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (dm *DiagnosticsManager) Extend(diags hcl.Diagnostics) hcl.Diagnostics {
-	dm.Diagnostics = dm.Diagnostics.Extend(diags)
-	return dm.Diagnostics
-}
-
-func (dm *DiagnosticsManager) Append(diag *hcl.Diagnostic) hcl.Diagnostics {
-	return dm.Diagnostics.Append(diag)
-}
-
-func (dm *DiagnosticsManager) HasErrors() bool {
-	return dm.Diagnostics.HasErrors()
-}
-
-func NewDiagnosticsManager(filePath string) *DiagnosticsManager {
-	parser := hclparse.NewParser()
-	file, diags := parser.ParseHCLFile(filePath)
-
-	diagsManager := &DiagnosticsManager{
-		DiagnosticWriter: hcl.NewDiagnosticTextWriter(
-			os.Stdout,
-			map[string]*hcl.File{filePath: file},
-			78,
-			true,
-		),
-	}
-
-	if diags.HasErrors() {
-		diagsManager.Extend(diags)
-	}
-
-	return diagsManager
-}
 
 func ContainsDiagnostic(field string, value cty.Value, list []string) hcl.Diagnostics {
 	var out hcl.Diagnostics

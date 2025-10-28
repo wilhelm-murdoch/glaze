@@ -9,12 +9,13 @@ import (
 
 	"github.com/wilhelm-murdoch/glaze/internal/diagnostics"
 	"github.com/wilhelm-murdoch/glaze/internal/parser"
+	"github.com/wilhelm-murdoch/glaze/internal/profile"
 	"github.com/wilhelm-murdoch/glaze/internal/schema"
 	"github.com/wilhelm-murdoch/glaze/internal/tmux"
 )
 
 func Run(ctx *cli.Context) error {
-	profilePath, err := parser.ResolveProfilePath(ctx.Args().First())
+	profilePath, err := profile.ResolveProfilePath(ctx.Args().First())
 	if err != nil {
 		return err
 	}
