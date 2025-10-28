@@ -49,7 +49,7 @@ func collectFlagVariables(vars []string) map[string]cty.Value {
 	return out
 }
 
-// addDefaultVariables is used to append other useful variables for use within a glaze file.
+// addDefaultVariables is used to append other useful variables for use within a glaze definition file.
 func addDefaultVariables() (map[string]cty.Value, error) {
 	out := make(map[string]cty.Value)
 
@@ -66,6 +66,8 @@ func addDefaultVariables() (map[string]cty.Value, error) {
 	return out, nil
 }
 
+// CollectVariables returns a key value map of all relevant environment variables, user-
+// defined variables picked up from the CLI and some useful default variables.
 func CollectVariables(flaggedVariables []string) (map[string]cty.Value, error) {
 	out := make(map[string]cty.Value)
 
@@ -86,6 +88,9 @@ func CollectVariables(flaggedVariables []string) (map[string]cty.Value, error) {
 	return out, nil
 }
 
+// BuildEvalContext returns an `EvalContext` which is used to pass the key value map of
+// variables sourced from CollectVariables as well as useful string template functions
+// for use within a glaze definition file.
 func BuildEvalContext(variables map[string]cty.Value) *hcl.EvalContext {
 	return &hcl.EvalContext{
 		Variables: variables,
