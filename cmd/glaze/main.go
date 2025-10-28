@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"strings"
 	"time"
 
@@ -13,6 +12,7 @@ import (
 	"github.com/wilhelm-murdoch/glaze/cmd/glaze/actions/format"
 	"github.com/wilhelm-murdoch/glaze/cmd/glaze/actions/save"
 	"github.com/wilhelm-murdoch/glaze/cmd/glaze/actions/up"
+	"github.com/wilhelm-murdoch/glaze/internal/tmux"
 	"github.com/wilhelm-murdoch/glaze/pkg/files"
 )
 
@@ -36,7 +36,7 @@ func main() {
 	log.SetTimeFormat(time.Kitchen)
 	log.SetLevel(log.DebugLevel)
 
-	cli.VersionPrinter = func(c *cli.Context) {
+	cli.VersionPrinter = func(ctx *cli.Context) {
 		fmt.Printf("Version: %s, Stage: %s, Commit: %s, Date: %s\n", Version, Stage, Commit, Date)
 	}
 
@@ -50,7 +50,7 @@ func main() {
 
 	app := &cli.App{
 		Name:     "glaze",
-		Usage:    "easily manage tmux windows and panes",
+		Usage:    "easily manage tmux sessions, windows and panes",
 		Version:  Version,
 		Compiled: time.Now(),
 		Authors: []*cli.Author{{
@@ -59,8 +59,13 @@ func main() {
 		}},
 		Copyright: fmt.Sprintf(`(c) %d Wilhelm Codes ( https://wilhelm.codes )`, currentYear),
 		Before: func(ctx *cli.Context) error {
-			if _, err := exec.LookPath("tmux"); err != nil {
-				return err
+			ok, path := tmux.IsInstalled()
+
+			if !ok {
+				return fmt.Errorf(
+					"could not find a valid tmux installation on path: %s",
+					path,
+				)
 			}
 
 			return nil
