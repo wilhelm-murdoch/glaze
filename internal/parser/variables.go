@@ -2,6 +2,7 @@ package parser
 
 import (
 	"fmt"
+	"maps"
 	"os"
 	"path/filepath"
 	"strings"
@@ -14,51 +15,75 @@ import (
 
 const glazeEnvPrefix = "GLAZE_ENV_"
 
+// collectEnvVariables parses environment variables that start with the `glazeEnvPrefix` prefix.
+func collectEnvVariables(envs []string, prefix string) map[string]cty.Value {
+	out := make(map[string]cty.Value)
+
+	for _, env := range envs {
+		if !strings.HasPrefix(env, prefix) {
+			continue
+		}
+
+		trimmed := strings.TrimPrefix(env, prefix)
+
+		if !strings.Contains(trimmed, "=") {
+			continue
+		}
+
+		parts := strings.SplitN(trimmed, "=", 2)
+		out[parts[0]] = cty.StringVal(parts[1])
+	}
+
+	return out
+}
+
+// collectFlagVariables parses variables passed via command line with multiple `--var` flags.
+func collectFlagVariables(vars []string) map[string]cty.Value {
+	out := make(map[string]cty.Value)
+
+	for _, flag := range vars {
+		parts := strings.SplitN(flag, "=", 2)
+		out[strings.TrimSpace(parts[0])] = cty.StringVal(parts[1])
+	}
+
+	return out
+}
+
+// addDefaultVariables is used to append other useful variables for use within a glaze file.
+func addDefaultVariables() (map[string]cty.Value, error) {
+	out := make(map[string]cty.Value)
+
+	pwd, err := os.Getwd()
+	if err != nil {
+		return nil, fmt.Errorf("could not read current working directory: %w", err)
+	}
+
+	out["path"] = cty.ObjectVal(map[string]cty.Value{
+		"base": cty.StringVal(filepath.Base(pwd)),
+		"pwd":  cty.StringVal(pwd),
+	})
+
+	return out, nil
+}
+
 func CollectVariables(flaggedVariables []string) (map[string]cty.Value, error) {
-	variables := make(map[string]cty.Value)
+	out := make(map[string]cty.Value)
 
 	// We import environmental variables first:
-	{
-		for _, env := range os.Environ() {
-			if !strings.HasPrefix(env, glazeEnvPrefix) {
-				continue
-			}
-
-			env = strings.TrimPrefix(env, glazeEnvPrefix)
-
-			if !strings.Contains(env, "=") {
-				continue
-			}
-
-			parts := strings.SplitN(env, "=", 2)
-
-			variables[parts[0]] = cty.StringVal(parts[1])
-		}
-	}
+	envs := collectEnvVariables(os.Environ(), glazeEnvPrefix)
+	maps.Copy(out, envs)
 
 	// Next, import all variables passed by the --var flag:
-	{
-		for _, flag := range flaggedVariables {
-			parts := strings.SplitN(flag, "=", 2)
-
-			variables[strings.TrimSpace(parts[0])] = cty.StringVal(parts[1])
-		}
-	}
+	vars := collectFlagVariables(flaggedVariables)
+	maps.Copy(out, vars)
 
 	// Finally, we add some default variables that might be useful:
-	{
-		cwd, err := os.Getwd()
-		if err != nil {
-			return variables, fmt.Errorf("could not read current working directory: %s", err)
-		}
-
-		variables["path"] = cty.ObjectVal(map[string]cty.Value{
-			"base": cty.StringVal(filepath.Base(cwd)),
-			"cwd":  cty.StringVal(cwd),
-		})
+	out, err := addDefaultVariables()
+	if err != nil {
+		return nil, err
 	}
 
-	return variables, nil
+	return out, nil
 }
 
 func BuildEvalContext(variables map[string]cty.Value) *hcl.EvalContext {
