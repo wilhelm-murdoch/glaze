@@ -59,16 +59,16 @@ func (a *Action) Run() error {
 	}
 
 	// Iterate through the windows and panes defined within the specified profile and create them within the tmux session.
-	for _, wm := range profile.Windows.Items() {
-		log.Info("creating new window", "window", wm.Name)
-		wc, err := session.NewWindow(wm.Name)
+	for _, ws := range profile.Windows.Items() {
+		log.Info("creating new window", "window", ws.Name)
+		wtmx, err := session.NewWindow(ws.Name)
 		if err != nil {
-			return fmt.Errorf("could not create new window `%s`: %s", wm.Name, err)
+			return fmt.Errorf("could not create new window `%s`: %s", ws.Name, err)
 		}
 
-		panes, err := a.client.Panes(wc)
+		panes, err := a.client.Panes(wtmx)
 		if err != nil {
-			return fmt.Errorf("could not read panes for window `%s`: %s", wc.Name, err)
+			return fmt.Errorf("could not read panes for window `%s`: %s", wtmx.Name, err)
 		}
 
 		defaultPane := panes.Find(func(i int, item *tmux.Pane) bool {
@@ -76,20 +76,20 @@ func (a *Action) Run() error {
 		})
 
 		if defaultPane == nil {
-			return fmt.Errorf("could not locate default pane for window `%s`", wc.Name)
+			return fmt.Errorf("could not locate default pane for window `%s`", wtmx.Name)
 		}
 
 		// Panes are originally parsed and created in the reverse order of how they are
 		// defined within the glaze definition file. So, we'll just reverse them here to
 		// set them back to the user-defined order.
-		for _, pm := range wm.Panes.Reverse().Items() {
-			log.Info("adding pane", "pane", pm.Name, "from", defaultPane.Target())
-			pc, err := wc.Split(defaultPane.Target(), pm.Name, pm.StartingDirectory)
+		for _, ps := range ws.Panes.Reverse().Items() {
+			log.Info("adding pane", "pane", ps.Name, "from", defaultPane.Target())
+			ptmx, err := wtmx.Split(defaultPane.Target(), ps.Name, ps.StartingDirectory)
 			if err != nil {
 				return fmt.Errorf(
 					"could not split pane `%d` for window `%s`: %s",
 					defaultPane.Index,
-					wc.Name,
+					wtmx.Name,
 					err,
 				)
 			}
@@ -97,41 +97,41 @@ func (a *Action) Run() error {
 			// Run any defined commands in order as defined within the
 			// current profile. Add a small delay between each command
 			// to ensure they are executed in order.
-			for _, cmd := range pm.Commands {
-				log.Info("sending command", "pane", pc.Name, "cmd", cmd)
+			for _, cmd := range ps.Commands {
+				log.Info("sending command", "pane", ptmx.Name, "cmd", cmd)
 				time.Sleep(time.Millisecond * time.Duration(100))
-				if err := pc.SendKeys(cmd); err != nil {
+				if err := ptmx.SendKeys(cmd); err != nil {
 					return fmt.Errorf(
 						"could not execute command `%s` for pane `%s` in window `%s`: %s",
 						cmd,
-						pc.Name,
-						wc.Name,
+						ptmx.Name,
+						wtmx.Name,
 						err,
 					)
 				}
 			}
 
-			if pm.Focus {
-				log.Info("setting focus", "pane", pc.Name)
-				pc.Select()
+			if ps.Focus {
+				log.Info("setting focus", "pane", ptmx.Name)
+				ptmx.Select()
 			}
 		}
 
 		// Remove the default pane directly from the session.
 		defaultPane.Kill()
 
-		if err := wc.SelectLayout(wm.Layout); err != nil {
+		if err := wtmx.SelectLayout(ws.Layout); err != nil {
 			return fmt.Errorf(
 				"could not select layout `%s` for window `%s`: %s",
-				wm.Layout,
-				wc.Name,
+				ws.Layout,
+				wtmx.Name,
 				err,
 			)
 		}
 
-		if wm.Focus {
-			log.Info("setting focus", "window", wc.Name)
-			wc.Select()
+		if ws.Focus {
+			log.Info("setting focus", "window", wtmx.Name)
+			wtmx.Select()
 		}
 
 	}

@@ -20,8 +20,6 @@ session {
       commands = [
         "echo 1"
       ]
-
-      width = 80%
     }
 
     pane {
@@ -55,6 +53,7 @@ session {
 
     pane {
       focus = true
+      starting_directory = "~/Downloads"
 
       commands = [
         "lazygit"
