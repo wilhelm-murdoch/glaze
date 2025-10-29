@@ -7,36 +7,22 @@ import (
 	"github.com/charmbracelet/log"
 	"github.com/urfave/cli/v2"
 
-	"github.com/wilhelm-murdoch/glaze/internal/diagnostics"
+	"github.com/wilhelm-murdoch/glaze/cmd/glaze/actions"
 	"github.com/wilhelm-murdoch/glaze/internal/parser"
-	"github.com/wilhelm-murdoch/glaze/internal/profile"
 	"github.com/wilhelm-murdoch/glaze/internal/schema"
 	"github.com/wilhelm-murdoch/glaze/internal/schema/session"
 	"github.com/wilhelm-murdoch/glaze/internal/tmux"
 )
 
 type Action struct {
-	ctx          *cli.Context
-	diagsManager *diagnostics.DiagnosticsManager
-	parser       *parser.Parser
-	client       *tmux.Client
+	actions.BaseAction
+	client *tmux.Client
 }
 
 func NewAction(ctx *cli.Context) (*Action, error) {
-	profilePath, err := profile.ResolveProfilePath(ctx.Args().First())
+	base, err := actions.NewBaseAction(ctx)
 	if err != nil {
 		return nil, err
-	}
-
-	diagsManager := diagnostics.NewDiagnosticsManager(profilePath)
-	if diagsManager.HasErrors() {
-		return nil, diagsManager.Write()
-	}
-
-	parser, parserDiags := parser.NewParser(profilePath)
-	if parserDiags.HasErrors() {
-		diagsManager.Extend(parserDiags)
-		return nil, diagsManager.Write()
 	}
 
 	client := tmux.NewClient(
@@ -46,27 +32,25 @@ func NewAction(ctx *cli.Context) (*Action, error) {
 	)
 
 	return &Action{
-		ctx:          ctx,
-		diagsManager: diagsManager,
-		parser:       parser,
-		client:       &client,
+		BaseAction: *base,
+		client:     &client,
 	}, nil
 }
 
 func (a *Action) Run() error {
-	variables, err := parser.CollectVariables(a.ctx.StringSlice("var"))
+	variables, err := parser.CollectVariables(a.Context.StringSlice("var"))
 	if err != nil {
 		return fmt.Errorf("could not parse specified variables: %s", err)
 	}
 
-	profile, decodeDiags := a.parser.Decode(
+	profile, decodeDiags := a.Parser.Decode(
 		schema.PrimaryGlazeSpec,
 		parser.BuildEvalContext(variables),
 	)
 
 	if decodeDiags.HasErrors() {
-		a.diagsManager.Extend(decodeDiags)
-		return a.diagsManager.Write()
+		a.DiagnosticsManager.Extend(decodeDiags)
+		return a.DiagnosticsManager.Write()
 	}
 
 	session, err := a.resolveSession(profile)
@@ -164,7 +148,7 @@ func (a *Action) Run() error {
 		defaultWindow.Kill()
 	}
 
-	if !a.ctx.Bool("detached") {
+	if !a.Context.Bool("detached") {
 		if err := a.client.Attach(session); err != nil {
 			return err
 		}
@@ -178,7 +162,7 @@ func (a *Action) resolveWindows() {}
 func (a *Action) resolvePanes() {}
 
 func (a *Action) resolveSession(profile *session.Session) (*tmux.Session, error) {
-	if a.ctx.Bool("clear") {
+	if a.Context.Bool("clear") {
 		log.Info("clearing previous session", "session", profile.Name)
 		a.client.KillSessionByName(profile.Name)
 	}
@@ -189,7 +173,7 @@ func (a *Action) resolveSession(profile *session.Session) (*tmux.Session, error)
 			return nil, fmt.Errorf("could not find session `%s`: %s", profile.Name, err)
 		}
 
-		if !a.ctx.Bool("detached") {
+		if !a.Context.Bool("detached") {
 			log.Info("attaching to existing session", "session", profile.Name)
 			if err := a.client.Attach(session); err != nil {
 				return nil, fmt.Errorf("could not attach to session `%s`: %s", session.Name, err)
