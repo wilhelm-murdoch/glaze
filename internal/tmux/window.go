@@ -104,7 +104,7 @@ func (w *Window) Split(
 		return pane, err
 	}
 
-	baseIndexCmdParts := strings.SplitN(baseIndexCmdOutput, " ", -1)
+	baseIndexCmdParts := strings.Split(baseIndexCmdOutput, " ")
 	if len(baseIndexCmdParts) != 2 {
 		return pane, errors.New("could not determine pane base index")
 	}

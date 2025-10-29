@@ -79,7 +79,10 @@ func (a *Action) Run() error {
 			return fmt.Errorf("could not locate default pane for window `%s`", wc.Name)
 		}
 
-		for _, pm := range wm.Panes.Items() {
+		// Panes are originally parsed and created in the reverse order of how they are
+		// defined within the glaze definition file. So, we'll just reverse them here to
+		// set them back to the user-defined order.
+		for _, pm := range wm.Panes.Reverse().Items() {
 			log.Info("adding pane", "pane", pm.Name, "from", defaultPane.Target())
 			pc, err := wc.Split(defaultPane.Target(), pm.Name, pm.StartingDirectory)
 			if err != nil {
@@ -114,6 +117,9 @@ func (a *Action) Run() error {
 			}
 		}
 
+		// Remove the default pane directly from the session.
+		defaultPane.Kill()
+
 		if err := wc.SelectLayout(wm.Layout); err != nil {
 			return fmt.Errorf(
 				"could not select layout `%s` for window `%s`: %s",
@@ -128,8 +134,6 @@ func (a *Action) Run() error {
 			wc.Select()
 		}
 
-		// Remove the default pane directly from the session.
-		defaultPane.Kill()
 	}
 
 	if err := a.removeDefaultWindow(session); err != nil {

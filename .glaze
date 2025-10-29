@@ -18,22 +18,47 @@ session {
 
     pane {
       commands = [
-        "nvim"
+        "echo 1"
+      ]
+
+      width = 80
+    }
+
+    pane {
+      commands = [
+        "echo 2"
       ]
     }
 
     pane {
       commands = [
-        "nvim"
+        "echo 3"
+      ]
+    }
+
+    pane {
+      commands = [
+        "echo 4"
       ]
     }
   }
 
   window {
     name  = "terminal"
-    focus = true
+    layout = "even-vertical"
 
     pane {
+      commands = [
+        "btop"
+      ]
+    }
+
+    pane {
+      focus = true
+
+      commands = [
+        "lazygit"
+      ]
     }
   }
 }
