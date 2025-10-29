@@ -132,20 +132,8 @@ func (a *Action) Run() error {
 		defaultPane.Kill()
 	}
 
-	// Tmux creates a default window with a default pane for every
-	// session. Remove the defaults so only windows and panes defined
-	// within the profile are left.
-	windows, err := a.client.Windows(session)
-	if err != nil {
-		return fmt.Errorf("could not read windows for session `%s`: %s", session.Name, err)
-	}
-
-	defaultWindow := windows.Find(func(i int, window *tmux.Window) bool {
-		return window.IsFirst
-	})
-
-	if defaultWindow != nil {
-		defaultWindow.Kill()
+	if err := a.removeDefaultWindow(session); err != nil {
+		return err
 	}
 
 	if !a.Context.Bool("detached") {
@@ -157,9 +145,33 @@ func (a *Action) Run() error {
 	return nil
 }
 
-func (a *Action) resolveWindows() {}
+func (a *Action) generateWindows() {}
 
-func (a *Action) resolvePanes() {}
+// Tmux creates a default window with a default pane for every
+// session. Remove the defaults so only windows and panes defined
+// within the profile are left.
+func (a *Action) removeDefaultWindow(session *tmux.Session) error {
+	windows, err := a.client.Windows(session)
+	if err != nil {
+		return fmt.Errorf("could not read windows for session `%s`: %s", session.Name, err)
+	}
+
+	defaultWindow := windows.Find(func(i int, window *tmux.Window) bool {
+		return window.IsFirst
+	})
+
+	if defaultWindow != nil {
+		if err := defaultWindow.Kill(); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (a *Action) generatePanes() {}
+
+func (a *Action) removeDefaultPane() {}
 
 func (a *Action) resolveSession(profile *session.Session) (*tmux.Session, error) {
 	if a.Context.Bool("clear") {
