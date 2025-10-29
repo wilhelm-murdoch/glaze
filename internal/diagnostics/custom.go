@@ -9,8 +9,9 @@ import (
 	"strings"
 
 	"github.com/hashicorp/hcl/v2"
-	"github.com/wilhelm-murdoch/glaze/pkg/files"
 	"github.com/zclconf/go-cty/cty"
+
+	"github.com/wilhelm-murdoch/glaze/pkg/files"
 )
 
 func ContainsDiagnostic(field string, value cty.Value, list []string) hcl.Diagnostics {
@@ -21,7 +22,7 @@ func ContainsDiagnostic(field string, value cty.Value, list []string) hcl.Diagno
 			Severity: hcl.DiagError,
 			Summary:  fmt.Sprintf(`Invalid %s specified`, field),
 			Detail: fmt.Sprintf(
-				`The %s value of \"%s\" is not supported among: %s.`,
+				`The %s value of "%s" is not supported among: %s.`,
 				field,
 				value.AsString(),
 				strings.Join(list, ", "),
@@ -42,7 +43,7 @@ func DirectoryDiagnostic(field string, value cty.Value) hcl.Diagnostics {
 				Severity: hcl.DiagError,
 				Summary:  fmt.Sprintf(`Invalid %s specified`, field),
 				Detail: fmt.Sprintf(
-					`The %s of \"%s\" does not exist or is not a directory.`,
+					`The %s of "%s" does not exist or is not a directory.`,
 					field,
 					value.AsString(),
 				),
@@ -63,7 +64,7 @@ func FileDiagnostic(field string, value cty.Value) hcl.Diagnostics {
 				Severity: hcl.DiagError,
 				Summary:  fmt.Sprintf(`Invalid %s specified`, field),
 				Detail: fmt.Sprintf(
-					`The %s of \"%s\" does not exist, cannot be accessed or is a directory.`,
+					`The %s of "%s" does not exist, cannot be accessed or is a directory.`,
 					field,
 					value.AsString(),
 				),
@@ -78,6 +79,6 @@ func WrongAttributeDiagnostic(field, have, want string) hcl.Diagnostic {
 	return hcl.Diagnostic{
 		Severity: hcl.DiagError,
 		Summary:  fmt.Sprintf(`Invalid %s specified`, field),
-		Detail:   fmt.Sprintf(`The %s value \"%s\" should be \"%s\".`, field, have, want),
+		Detail:   fmt.Sprintf(`The %s value "%s" should be "%s".`, field, have, want),
 	}
 }

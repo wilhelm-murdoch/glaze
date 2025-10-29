@@ -12,25 +12,28 @@ session {
   ]
 
   window {
-    name   = "🥺"
+    focus  = true
+    name   = "editor"
     layout = "tiled"
 
     pane {
-      name = "option-test"
+      commands = [
+        "nvim"
+      ]
     }
 
-    pane {}
-    pane {}
-    pane {}
+    pane {
+      commands = [
+        "nvim"
+      ]
+    }
   }
 
   window {
+    name  = "terminal"
     focus = true
 
-    pane {}
     pane {
-      focus = true
     }
-    pane {}
   }
 }

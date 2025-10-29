@@ -171,16 +171,28 @@ func main() {
 					Name:  "stdout",
 					Usage: "writes the formatted glaze output to your terminal",
 				},
+				&cli.BoolFlag{
+					Name:  "validate",
+					Usage: "validates the given glaze definition file and returns any diagnostics",
+				},
 			},
 			Action: func(ctx *cli.Context) error {
-				action := format.NewAction(ctx)
+				action, err := format.NewAction(ctx)
+				if err != nil {
+					return err
+				}
+
 				return action.Run()
 			},
 		}, {
 			Name:  "save",
 			Usage: "running this within a tmux session will save its current state to the specified glaze profile",
 			Action: func(ctx *cli.Context) error {
-				action := save.NewAction(ctx)
+				action, err := save.NewAction(ctx)
+				if err != nil {
+					return err
+				}
+
 				return action.Run()
 			},
 		}},

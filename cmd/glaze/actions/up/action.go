@@ -11,6 +11,7 @@ import (
 	"github.com/wilhelm-murdoch/glaze/internal/parser"
 	"github.com/wilhelm-murdoch/glaze/internal/profile"
 	"github.com/wilhelm-murdoch/glaze/internal/schema"
+	"github.com/wilhelm-murdoch/glaze/internal/schema/session"
 	"github.com/wilhelm-murdoch/glaze/internal/tmux"
 )
 
@@ -18,6 +19,7 @@ type Action struct {
 	ctx          *cli.Context
 	diagsManager *diagnostics.DiagnosticsManager
 	parser       *parser.Parser
+	client       *tmux.Client
 }
 
 func NewAction(ctx *cli.Context) (*Action, error) {
@@ -37,10 +39,17 @@ func NewAction(ctx *cli.Context) (*Action, error) {
 		return nil, diagsManager.Write()
 	}
 
+	client := tmux.NewClient(
+		ctx.String("socket-name"),
+		ctx.String("socket-path"),
+		ctx.Bool("debug"),
+	)
+
 	return &Action{
 		ctx:          ctx,
 		diagsManager: diagsManager,
 		parser:       parser,
+		client:       &client,
 	}, nil
 }
 
@@ -54,48 +63,17 @@ func (a *Action) Run() error {
 		schema.PrimaryGlazeSpec,
 		parser.BuildEvalContext(variables),
 	)
+
 	if decodeDiags.HasErrors() {
 		a.diagsManager.Extend(decodeDiags)
 		return a.diagsManager.Write()
 	}
 
-	client := tmux.NewClient(
-		a.ctx.String("socket-name"),
-		a.ctx.String("socket-path"),
-		a.ctx.Bool("debug"),
-	)
-
-	if a.ctx.Bool("clear") {
-		log.Info("clearing previous session", "session", profile.Name)
-		client.KillSessionByName(profile.Name)
-	}
-
-	if client.SessionExists(profile.Name) {
-		session, err := client.FindSessionByName(profile.Name)
-		if err != nil {
-			return fmt.Errorf("could not find session `%s`: %s", profile.Name, err)
-		}
-
-		if !a.ctx.Bool("detached") {
-			log.Info("attaching to existing session", "session", profile.Name)
-			if err := client.Attach(session); err != nil {
-				return fmt.Errorf("could not attach to session `%s`: %s", session.Name, err)
-			}
-		}
-
-		return nil
-	}
-
-	log.Info("creating new session", "session", profile.Name)
-	session, err := client.NewSession(profile.Name, profile.StartingDirectory)
+	session, err := a.resolveSession(profile)
 	if err != nil {
-		return fmt.Errorf("could not create new session `%s`: %s", session.Name, err)
+		return err
 	}
 
-	for _, cmd := range profile.Commands {
-		fmt.Println("--")
-		fmt.Println(cmd)
-	}
 	// Iterate through the windows and panes defined within the specified profile and create them within the tmux session.
 	for _, wm := range profile.Windows.Items() {
 		log.Info("creating new window", "window", wm.Name)
@@ -104,7 +82,7 @@ func (a *Action) Run() error {
 			return fmt.Errorf("could not create new window `%s`: %s", wm.Name, err)
 		}
 
-		panes, err := client.Panes(wc)
+		panes, err := a.client.Panes(wc)
 		if err != nil {
 			return fmt.Errorf("could not read panes for window `%s`: %s", wc.Name, err)
 		}
@@ -173,7 +151,7 @@ func (a *Action) Run() error {
 	// Tmux creates a default window with a default pane for every
 	// session. Remove the defaults so only windows and panes defined
 	// within the profile are left.
-	windows, err := client.Windows(session)
+	windows, err := a.client.Windows(session)
 	if err != nil {
 		return fmt.Errorf("could not read windows for session `%s`: %s", session.Name, err)
 	}
@@ -187,10 +165,45 @@ func (a *Action) Run() error {
 	}
 
 	if !a.ctx.Bool("detached") {
-		if err := client.Attach(session); err != nil {
+		if err := a.client.Attach(session); err != nil {
 			return err
 		}
 	}
 
 	return nil
+}
+
+func (a *Action) resolveWindows() {}
+
+func (a *Action) resolvePanes() {}
+
+func (a *Action) resolveSession(profile *session.Session) (*tmux.Session, error) {
+	if a.ctx.Bool("clear") {
+		log.Info("clearing previous session", "session", profile.Name)
+		a.client.KillSessionByName(profile.Name)
+	}
+
+	if a.client.SessionExists(profile.Name) {
+		session, err := a.client.FindSessionByName(profile.Name)
+		if err != nil {
+			return nil, fmt.Errorf("could not find session `%s`: %s", profile.Name, err)
+		}
+
+		if !a.ctx.Bool("detached") {
+			log.Info("attaching to existing session", "session", profile.Name)
+			if err := a.client.Attach(session); err != nil {
+				return nil, fmt.Errorf("could not attach to session `%s`: %s", session.Name, err)
+			}
+		}
+
+		return nil, nil
+	}
+
+	log.Info("creating new session", "session", profile.Name)
+	session, err := a.client.NewSession(profile.Name, profile.StartingDirectory)
+	if err != nil {
+		return nil, fmt.Errorf("could not create new session `%s`: %s", session.Name, err)
+	}
+
+	return session, nil
 }
