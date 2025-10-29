@@ -29,9 +29,7 @@ func NewAction(ctx *cli.Context) (*Action, error) {
 }
 
 // Run is an action that will reformat the given glaze definition file to match
-// a canonical format and style, ensuring consistency. If a `stdout` flag is not
-// passed through via the cli, this command will attempt to overwrite the given
-// file with reformatted output.
+// a canonical format and style, ensuring consistency.
 func (a *Action) Run() error {
 	formatted := string(hclwrite.Format(a.Parser.File.Bytes))
 

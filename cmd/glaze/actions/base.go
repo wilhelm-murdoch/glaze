@@ -24,13 +24,14 @@ func NewBaseAction(ctx *cli.Context) (*BaseAction, error) {
 
 	diagsManager := diagnostics.NewDiagnosticsManager(profilePath)
 	if diagsManager.HasErrors() {
-		return nil, diagsManager.Write()
+		diagsManager.Write()
+		return nil, ge.ErrorInvalidGlazeDefinition
 	}
 
 	parser, parserDiags := parser.NewParser(profilePath)
 	if parserDiags.HasErrors() {
-		diagsManager.Extend(parserDiags)
-		return nil, diagsManager.Write()
+		diagsManager.Write()
+		return nil, ge.ErrorInvalidGlazeDefinition
 	}
 
 	return &BaseAction{

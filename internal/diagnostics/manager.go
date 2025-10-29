@@ -13,11 +13,7 @@ type DiagnosticsManager struct {
 }
 
 func (dm *DiagnosticsManager) Write() error {
-	if err := dm.DiagnosticWriter.WriteDiagnostics(dm.Diagnostics); err != nil {
-		return err
-	}
-
-	return nil
+	return dm.DiagnosticWriter.WriteDiagnostics(dm.Diagnostics)
 }
 
 func (dm *DiagnosticsManager) Extend(diags hcl.Diagnostics) hcl.Diagnostics {
