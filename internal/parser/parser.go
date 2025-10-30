@@ -5,7 +5,7 @@ import (
 	"github.com/hashicorp/hcl/v2/hcldec"
 	"github.com/hashicorp/hcl/v2/hclparse"
 
-	"github.com/wilhelm-murdoch/glaze/internal/schema/session"
+	"github.com/wilhelm-murdoch/glazier/internal/schema/session"
 )
 
 type Parser struct {

@@ -7,8 +7,8 @@ import (
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
 
-	"github.com/wilhelm-murdoch/glaze/internal/schema/pane"
-	"github.com/wilhelm-murdoch/glaze/internal/tmux/enums"
+	"github.com/wilhelm-murdoch/glazier/internal/schema/pane"
+	"github.com/wilhelm-murdoch/glazier/internal/tmux/enums"
 )
 
 const DefaultGlazeWindowName = "default"

@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/wilhelm-murdoch/glaze/internal/schema/pane"
-	"github.com/wilhelm-murdoch/glaze/internal/tmux/enums"
+	"github.com/wilhelm-murdoch/glazier/internal/schema/pane"
+	"github.com/wilhelm-murdoch/glazier/internal/tmux/enums"
 )
 
 type WindowId int

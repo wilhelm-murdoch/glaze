@@ -8,8 +8,8 @@ import (
 
 	"github.com/wilhelm-murdoch/go-collection"
 
-	"github.com/wilhelm-murdoch/glaze/internal/schema/session"
-	"github.com/wilhelm-murdoch/glaze/internal/tmux/enums"
+	"github.com/wilhelm-murdoch/glazier/internal/schema/session"
+	"github.com/wilhelm-murdoch/glazier/internal/tmux/enums"
 )
 
 // Client represents a tmux client.

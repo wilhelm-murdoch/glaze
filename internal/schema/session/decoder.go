@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/wilhelm-murdoch/glaze/internal/schema/window"
+	"github.com/wilhelm-murdoch/glazier/internal/schema/window"
 )
 
 const DefaultGlazeSesssionName = "default"

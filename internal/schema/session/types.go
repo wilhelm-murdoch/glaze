@@ -3,7 +3,7 @@ package session
 import (
 	"github.com/wilhelm-murdoch/go-collection"
 
-	"github.com/wilhelm-murdoch/glaze/internal/schema/window"
+	"github.com/wilhelm-murdoch/glazier/internal/schema/window"
 )
 
 type (

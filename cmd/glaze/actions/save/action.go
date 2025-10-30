@@ -3,7 +3,7 @@ package save
 import (
 	"github.com/urfave/cli/v2"
 
-	"github.com/wilhelm-murdoch/glaze/cmd/glaze/actions"
+	"github.com/wilhelm-murdoch/glazier/cmd/glaze/actions"
 )
 
 type Action struct {

@@ -8,9 +8,9 @@ import (
 	"github.com/hashicorp/hcl/v2/hclwrite"
 	"github.com/urfave/cli/v2"
 
-	"github.com/wilhelm-murdoch/glaze/cmd/glaze/actions"
-	"github.com/wilhelm-murdoch/glaze/internal/parser"
-	"github.com/wilhelm-murdoch/glaze/internal/schema"
+	"github.com/wilhelm-murdoch/glazier/cmd/glaze/actions"
+	"github.com/wilhelm-murdoch/glazier/internal/parser"
+	"github.com/wilhelm-murdoch/glazier/internal/schema"
 )
 
 type Action struct {

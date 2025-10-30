@@ -3,7 +3,7 @@ package tmux
 import (
 	"fmt"
 
-	"github.com/wilhelm-murdoch/glaze/internal/schema/pane"
+	"github.com/wilhelm-murdoch/glazier/internal/schema/pane"
 )
 
 type PaneId int

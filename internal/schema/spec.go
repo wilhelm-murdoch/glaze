@@ -8,8 +8,8 @@ import (
 	"github.com/hashicorp/hcl/v2/hcldec"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/wilhelm-murdoch/glaze/internal/diagnostics"
-	"github.com/wilhelm-murdoch/glaze/internal/tmux/enums"
+	"github.com/wilhelm-murdoch/glazier/internal/diagnostics"
+	"github.com/wilhelm-murdoch/glazier/internal/tmux/enums"
 )
 
 var (

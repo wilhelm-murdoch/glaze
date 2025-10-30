@@ -20,6 +20,8 @@ session {
       commands = [
         "echo 1"
       ]
+
+      size = "50"
     }
 
     pane {

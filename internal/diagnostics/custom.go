@@ -11,7 +11,7 @@ import (
 	"github.com/hashicorp/hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 
-	"github.com/wilhelm-murdoch/glaze/pkg/files"
+	"github.com/wilhelm-murdoch/glazier/pkg/files"
 )
 
 // ContainsDiagnostic is responsible for checking if a value is present in a given list and returning a diagnostic if not.

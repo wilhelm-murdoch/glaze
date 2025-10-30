@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/wilhelm-murdoch/glaze/pkg/files"
+	"github.com/wilhelm-murdoch/glazier/pkg/files"
 )
 
 // ResolveProfilePath attempts to determine the most reasonable path to a glaze definition file.

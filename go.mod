@@ -1,4 +1,4 @@
-module github.com/wilhelm-murdoch/glaze
+module github.com/wilhelm-murdoch/glazier
 
 go 1.25.0
 

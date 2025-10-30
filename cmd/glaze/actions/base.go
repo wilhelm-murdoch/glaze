@@ -3,10 +3,10 @@ package actions
 import (
 	"github.com/urfave/cli/v2"
 
-	"github.com/wilhelm-murdoch/glaze/internal/diagnostics"
-	ge "github.com/wilhelm-murdoch/glaze/internal/errors" // ge = "Glaze Errors"
-	"github.com/wilhelm-murdoch/glaze/internal/parser"
-	"github.com/wilhelm-murdoch/glaze/internal/profile"
+	"github.com/wilhelm-murdoch/glazier/internal/diagnostics"
+	ge "github.com/wilhelm-murdoch/glazier/internal/errors" // ge = "Glaze Errors"
+	"github.com/wilhelm-murdoch/glazier/internal/parser"
+	"github.com/wilhelm-murdoch/glazier/internal/profile"
 )
 
 type BaseAction struct {

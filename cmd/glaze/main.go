@@ -9,11 +9,11 @@ import (
 	"github.com/charmbracelet/log"
 	"github.com/urfave/cli/v2"
 
-	"github.com/wilhelm-murdoch/glaze/cmd/glaze/actions/format"
-	"github.com/wilhelm-murdoch/glaze/cmd/glaze/actions/save"
-	"github.com/wilhelm-murdoch/glaze/cmd/glaze/actions/up"
-	"github.com/wilhelm-murdoch/glaze/internal/tmux"
-	"github.com/wilhelm-murdoch/glaze/pkg/files"
+	"github.com/wilhelm-murdoch/glazier/cmd/glaze/actions/format"
+	"github.com/wilhelm-murdoch/glazier/cmd/glaze/actions/save"
+	"github.com/wilhelm-murdoch/glazier/cmd/glaze/actions/up"
+	"github.com/wilhelm-murdoch/glazier/internal/tmux"
+	"github.com/wilhelm-murdoch/glazier/pkg/files"
 )
 
 const defaultErrCode = 1
