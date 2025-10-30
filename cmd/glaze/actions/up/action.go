@@ -10,6 +10,7 @@ import (
 	"github.com/wilhelm-murdoch/glaze/cmd/glaze/actions"
 	"github.com/wilhelm-murdoch/glaze/internal/parser"
 	"github.com/wilhelm-murdoch/glaze/internal/schema"
+	"github.com/wilhelm-murdoch/glaze/internal/schema/pane"
 	"github.com/wilhelm-murdoch/glaze/internal/schema/session"
 	"github.com/wilhelm-murdoch/glaze/internal/schema/window"
 	"github.com/wilhelm-murdoch/glaze/internal/tmux"
@@ -91,7 +92,7 @@ func (a *Action) Run() error {
 	return nil
 }
 
-// Iterate through the windows and panes defined within the specified profile and create them within the tmux session.
+// generateWindows iterates through the windows and panes defined within the specified profile and create them within the tmux session.
 func (a *Action) generateWindows(windows []*window.Window) error {
 	for _, ws := range windows {
 		log.Info("creating new window", "window", ws.Name)
@@ -105,42 +106,9 @@ func (a *Action) generateWindows(windows []*window.Window) error {
 			return err
 		}
 
-		// Panes are originally parsed and created in the reverse order of how they are
-		// defined within the glaze definition file. So, we'll just reverse them here to
-		// set them back to the user-defined order.
-		for _, ps := range ws.Panes.Reverse().Items() {
-			log.Info("adding pane", "pane", ps.Name, "from", defaultPane.Target())
-			ptmx, err := wtmx.Split(defaultPane.Target(), ps.Name, ps.StartingDirectory)
-			if err != nil {
-				return fmt.Errorf(
-					"could not split pane `%d` for window `%s`: %w",
-					defaultPane.Index,
-					wtmx.Name,
-					err,
-				)
-			}
-
-			// Run any defined commands in order as defined within the
-			// current profile. Add a small delay between each command
-			// to ensure they are executed in order.
-			for _, cmd := range ps.Commands {
-				log.Info("sending command", "pane", ptmx.Name, "cmd", cmd)
-				time.Sleep(time.Millisecond * time.Duration(100))
-				if err := ptmx.SendKeys(cmd); err != nil {
-					return fmt.Errorf(
-						"could not execute command `%s` for pane `%s` in window `%s`: %w",
-						cmd,
-						ptmx.Name,
-						wtmx.Name,
-						err,
-					)
-				}
-			}
-
-			if ps.Focus {
-				log.Info("setting focus", "pane", ptmx.Name)
-				ptmx.Select()
-			}
+		// Panes are originally parsed and created in the reverse order of how they are defined within the glaze definition file. So, we'll just reverse them here to set them back to the user-defined order.
+		if err := a.generatePanes(ws.Panes.Reverse().Items(), defaultPane, wtmx); err != nil {
+			return err
 		}
 
 		// Remove the default pane directly from the session.
@@ -162,6 +130,47 @@ func (a *Action) generateWindows(windows []*window.Window) error {
 		if ws.Focus {
 			log.Info("setting focus", "window", wtmx.Name)
 			wtmx.Select()
+		}
+	}
+
+	return nil
+}
+
+func (a *Action) generatePanes(
+	panes []*pane.Pane,
+	defaultPane *tmux.Pane,
+	wtmx *tmux.Window,
+) error {
+	for _, ps := range panes {
+		log.Info("adding pane", "pane", ps.Name, "from", defaultPane.Target())
+		ptmx, err := wtmx.Split(defaultPane.Target(), ps.Name, ps.StartingDirectory)
+		if err != nil {
+			return fmt.Errorf(
+				"could not split pane `%d` for window `%s`: %w",
+				defaultPane.Index,
+				wtmx.Name,
+				err,
+			)
+		}
+
+		// Run any defined commands in order as defined within the current profile. Add a small delay between each command to ensure they are executed in order.
+		for _, cmd := range ps.Commands {
+			log.Info("sending command", "pane", ptmx.Name, "cmd", cmd)
+			time.Sleep(time.Millisecond * time.Duration(100))
+			if err := ptmx.SendKeys(cmd); err != nil {
+				return fmt.Errorf(
+					"could not execute command `%s` for pane `%s` in window `%s`: %w",
+					cmd,
+					ptmx.Name,
+					wtmx.Name,
+					err,
+				)
+			}
+		}
+
+		if ps.Focus {
+			log.Info("setting focus", "pane", ptmx.Name)
+			ptmx.Select()
 		}
 	}
 
