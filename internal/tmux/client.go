@@ -21,8 +21,8 @@ type Client struct {
 }
 
 // NewClient returns a new client.
-func NewClient(socketPath, socketName string, debug bool) Client {
-	return Client{
+func NewClient(socketPath, socketName string, debug bool) *Client {
+	return &Client{
 		socketPath: socketPath,
 		socketName: socketName,
 		debug:      debug,

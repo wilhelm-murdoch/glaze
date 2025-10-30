@@ -25,13 +25,13 @@ func NewBaseAction(ctx *cli.Context) (*BaseAction, error) {
 	diagsManager := diagnostics.NewDiagnosticsManager(profilePath)
 	if diagsManager.HasErrors() {
 		diagsManager.Write()
-		return nil, ge.ErrorInvalidGlazeDefinition
+		return nil, ge.ErrorInvalidDefinition
 	}
 
 	parser, parserDiags := parser.NewParser(profilePath)
 	if parserDiags.HasErrors() {
 		diagsManager.Write()
-		return nil, ge.ErrorInvalidGlazeDefinition
+		return nil, ge.ErrorInvalidDefinition
 	}
 
 	return &BaseAction{
