@@ -14,14 +14,24 @@ session {
   window {
     focus  = true
     name   = "editor"
-    layout = "tiled"
+    layout = "main-horizontal"
 
     pane {
+      name = "resized"
+
+      adjust {
+        direction = "up"
+        amount = 30
+      }
+
+      adjust {
+        direction = "right"
+        amount = "50%"
+      }
+
       commands = [
         "echo 1"
       ]
-
-      size = "50"
     }
 
     pane {

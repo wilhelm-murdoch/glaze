@@ -13,22 +13,31 @@ import (
 // the glaze cli was executed. Failing that, it attempts to read a path from a `GLAZE_PATH`
 // environment variable.
 func ResolveProfilePath(profilePath string) (string, error) {
-	if profilePath == "" {
-		cwd, err := os.Getwd()
-		if err != nil {
-			return profilePath, fmt.Errorf("could not read current working directory: %s", err)
+	if profilePath != "" {
+		if exists := files.FileExists(profilePath); !exists {
+			return profilePath, fmt.Errorf(
+				"could not locate profile `%s`; exiting ...",
+				profilePath,
+			)
 		}
 
-		profilePath = filepath.Join(cwd, ".glaze")
+		return files.ExpandPath(profilePath), nil
+	}
 
-		if !files.FileExists(profilePath) && os.Getenv("GLAZE_PATH") != "" {
-			profilePath = filepath.Join(os.Getenv("GLAZE_PATH"), ".glaze")
-		}
+	cwd, err := os.Getwd()
+	if err != nil {
+		return profilePath, fmt.Errorf("could not read current working directory: %w", err)
+	}
+
+	profilePath = filepath.Join(cwd, ".glaze")
+
+	if !files.FileExists(profilePath) && os.Getenv("GLAZE_PATH") != "" {
+		profilePath = filepath.Join(os.Getenv("GLAZE_PATH"), ".glaze")
 	}
 
 	if !files.FileExists(profilePath) {
 		return profilePath, fmt.Errorf(
-			"profile `%s` not found on the specified path, the current directory, or the GLAZE_PATH environment variable",
+			"profile `%s` not found with --profile-path, the current directory, or the GLAZE_PATH environment variable",
 			profilePath,
 		)
 	}

@@ -296,7 +296,11 @@ func (c Client) NewSessionIfNotExists(
 func (c Client) KillSessionByName(sessionName session.Name) error {
 	cmd, _ := NewCommand(c, "kill-session", "-t", fmt.Sprint(sessionName))
 
-	return cmd.Exec()
+	if _, err := cmd.ExecWithOutput(); err != nil {
+		return fmt.Errorf("%w", err)
+	}
+
+	return nil
 }
 
 // FindSessionByName returns the session with the given name if it exists.

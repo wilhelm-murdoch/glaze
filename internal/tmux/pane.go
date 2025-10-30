@@ -63,6 +63,17 @@ func (p Pane) SetEnv(key pane.Name, value pane.Value) error {
 	return cmd.Exec()
 }
 
+// Resize is responsible for modifying the height, or width, of the current pane.
+func (p Pane) Resize(size pane.Size) error {
+	return nil
+	cmd, err := NewCommand(p.Window.Session.Client, "resizep", "-t", p.Target(), "-R", "15")
+	if err != nil {
+		return err
+	}
+
+	return cmd.Exec()
+}
+
 // Select is responsible for selecting the current pane.
 func (p Pane) Select() error {
 	cmd, err := NewCommand(p.Window.Session.Client, "selectp", "-t", p.Target())

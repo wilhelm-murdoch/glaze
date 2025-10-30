@@ -18,7 +18,7 @@ type BaseAction struct {
 
 // NewBaseAction is responsible for creating a new BaseAction instance, resolving the profile path, and initializing the diagnostics manager and parser.
 func NewBaseAction(ctx *cli.Context) (*BaseAction, error) {
-	profilePath, err := profile.ResolveProfilePath(ctx.Args().First())
+	profilePath, err := profile.ResolveProfilePath(ctx.String("profile-path"))
 	if err != nil {
 		return nil, err
 	}

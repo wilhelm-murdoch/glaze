@@ -109,6 +109,11 @@ func main() {
 					},
 				},
 				&cli.StringFlag{
+					Name:  "profile-path",
+					Value: "",
+					Usage: "specify a path to a target glaze definition file",
+				},
+				&cli.StringFlag{
 					Name:  "socket-name",
 					Value: "",
 					Usage: "optional name for the tmux socket",

@@ -4,7 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"math/big"
 	"os"
+	"regexp"
 	"slices"
 	"strings"
 
@@ -85,4 +87,59 @@ func WrongAttributeDiagnostic(field, have, want string) hcl.Diagnostic {
 		Summary:  fmt.Sprintf(`Invalid %s specified`, field),
 		Detail:   fmt.Sprintf(`The %s value "%s" should be "%s".`, field, have, want),
 	}
+}
+
+// WrongSizeDiagnostic is used to determine whether a size value resolves to either a positive integer or a valid percentage string.
+func WrongSizeDiagnostic(field string, value cty.Value) hcl.Diagnostics {
+	var out hcl.Diagnostics
+
+	if value.IsNull() {
+		return nil
+	}
+
+	switch value.Type() {
+	case cty.Number:
+		f := value.AsBigFloat()
+		i, acc := f.Int64()
+
+		if acc != big.Exact || i <= 0 {
+			out = out.Append(&hcl.Diagnostic{
+				Severity: hcl.DiagError,
+				Summary:  fmt.Sprintf(`Invalid %s specified`, field),
+				Detail: fmt.Sprintf(
+					`The %s value "%s" should be a positive integer.`,
+					field,
+					value.AsString(),
+				),
+			})
+		}
+	case cty.String:
+		matched, _ := regexp.MatchString(
+			`^(\d+)\s*%$|^(\d+)$`,
+			value.AsString(),
+		)
+
+		if !matched {
+			out = out.Append(&hcl.Diagnostic{
+				Severity: hcl.DiagError,
+				Summary:  fmt.Sprintf(`Invalid %s specified`, field),
+				Detail: fmt.Sprintf(
+					`The %s value "%s" should be a valid percentage.`,
+					field,
+					value.AsString(),
+				),
+			})
+		}
+	default:
+		out = out.Append(&hcl.Diagnostic{
+			Severity: hcl.DiagError,
+			Summary:  fmt.Sprintf(`Invalid %s specified`, field),
+			Detail: fmt.Sprintf(
+				`The %s value must be an integer or percentage.`,
+				field,
+			),
+		})
+	}
+
+	return out
 }

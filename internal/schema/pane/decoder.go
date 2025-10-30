@@ -31,9 +31,9 @@ func (p *Pane) Decode(value cty.Value) hcl.Diagnostics {
 		}
 	}
 
-	if !value.GetAttr("size").IsNull() {
-		p.Size = Size(value.GetAttr("size").AsString())
-	}
+	// if !value.GetAttr("size").IsNull() {
+	// 	p.Size = Size(value.GetAttr("size").AsString())
+	// }
 
 	if !value.GetAttr("envs").IsNull() {
 		p.Envs = make(Envs)

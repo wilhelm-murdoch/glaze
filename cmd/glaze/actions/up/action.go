@@ -142,7 +142,7 @@ func (a *Action) generatePanes(
 	wtmx *tmux.Window,
 ) error {
 	for _, ps := range panes {
-		log.Info("adding pane", "pane", ps.Name, "from", defaultPane.Target())
+		log.Info("adding", "pane", ps.Name, "from", defaultPane.Target())
 		ptmx, err := wtmx.Split(defaultPane.Target(), ps.Name, ps.StartingDirectory)
 		if err != nil {
 			return fmt.Errorf(
@@ -155,7 +155,7 @@ func (a *Action) generatePanes(
 
 		// Run any defined commands in order as defined within the current profile. Add a small delay between each command to ensure they are executed in order.
 		for _, cmd := range ps.Commands {
-			log.Info("sending command", "pane", ptmx.Name, "cmd", cmd)
+			log.Info("setting", "command", cmd, "pane", ptmx.Name)
 			time.Sleep(time.Millisecond * time.Duration(100))
 			if err := ptmx.SendKeys(cmd); err != nil {
 				return fmt.Errorf(
@@ -166,6 +166,11 @@ func (a *Action) generatePanes(
 					err,
 				)
 			}
+		}
+
+		if ps.Size != "" {
+			log.Info("setting", "size", ps.Size, "pane", ptmx.Name)
+			ptmx.Resize(ps.Size)
 		}
 
 		if ps.Focus {
@@ -220,7 +225,7 @@ func (a *Action) resolveSession(profile *session.Session) (bool, error) {
 	if a.Context.Bool("clear") {
 		log.Info("clearing previous session", "session", profile.Name)
 		if err := a.client.KillSessionByName(profile.Name); err != nil {
-			return attached, fmt.Errorf("could not kill session `%s`: %w", profile.Name, err)
+			log.Debug("could not kill session", "session", profile.Name, "reason", err)
 		}
 	}
 
