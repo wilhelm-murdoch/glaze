@@ -12,6 +12,7 @@ import (
 
 type WindowId int
 
+// String is responsible for returning the string representation of the WindowId.
 func (id WindowId) String() string {
 	return fmt.Sprintf("@%d", int(id))
 }
@@ -120,6 +121,7 @@ func (w *Window) Split(
 	}, nil
 }
 
+// Kill is responsible for closing the current window.
 func (w Window) Kill() error {
 	cmd, err := NewCommand(w.Session.Client, "killw", "-t", w.Target())
 	if err != nil {
@@ -129,6 +131,7 @@ func (w Window) Kill() error {
 	return cmd.Exec()
 }
 
+// Select is responsible for selecting the current window.
 func (w Window) Select() error {
 	cmd, err := NewCommand(w.Session.Client, "selectw", "-t", w.Target())
 	if err != nil {
@@ -138,6 +141,7 @@ func (w Window) Select() error {
 	return cmd.Exec()
 }
 
+// SelectLayout is responsible for selecting the layout for the current window.
 func (w Window) SelectLayout(layout enums.Layout) error {
 	cmd, err := NewCommand(w.Session.Client, "selectl", "-t", w.Target(), fmt.Sprint(layout))
 	if err != nil {

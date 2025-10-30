@@ -13,6 +13,7 @@ import (
 
 const DefaultGlazeWindowName = "default"
 
+// Decode is responsible for decoding a cty.Value into a Window struct.
 func (w *Window) Decode(value cty.Value) hcl.Diagnostics {
 	var diags hcl.Diagnostics
 

@@ -21,6 +21,7 @@ type Action struct {
 	session *tmux.Session
 }
 
+// NewAction is responsible for creating a new Action instance.
 func NewAction(ctx *cli.Context) (*Action, error) {
 	base, err := actions.NewBaseAction(ctx)
 	if err != nil {
@@ -39,6 +40,7 @@ func NewAction(ctx *cli.Context) (*Action, error) {
 	}, nil
 }
 
+// Run is responsible for executing the up action, which includes parsing variables, decoding the profile, resolving the session, and generating windows.
 func (a *Action) Run() error {
 	variables, err := parser.CollectVariables(a.Context.StringSlice("var"))
 	if err != nil {
@@ -166,6 +168,7 @@ func (a *Action) generateWindows(windows []*window.Window) error {
 	return nil
 }
 
+// getDefaultPane is responsible for retrieving the default pane for a given tmux window.
 func (a *Action) getDefaultPane(window *tmux.Window) (*tmux.Pane, error) {
 	panes, err := a.client.Panes(window)
 	if err != nil {
@@ -183,6 +186,7 @@ func (a *Action) getDefaultPane(window *tmux.Window) (*tmux.Pane, error) {
 	return defaultPane, nil
 }
 
+// getDefaultWindow is responsible for retrieving the default window for a given tmux session.
 func (a *Action) getDefaultWindow(session *tmux.Session) (*tmux.Window, error) {
 	windows, err := a.client.Windows(session)
 	if err != nil {
@@ -200,6 +204,7 @@ func (a *Action) getDefaultWindow(session *tmux.Session) (*tmux.Window, error) {
 	return defaultWindow, nil
 }
 
+// resolveSession is responsible for resolving the tmux session, either by attaching to an existing one or creating a new one.
 func (a *Action) resolveSession(profile *session.Session) (bool, error) {
 	attached := false
 

@@ -8,6 +8,7 @@ import (
 
 type PaneId int
 
+// String is responsible for returning the string representation of the PaneId.
 func (id PaneId) String() string {
 	return fmt.Sprintf("%%%d", int(id))
 }
@@ -62,6 +63,7 @@ func (p Pane) SetEnv(key pane.Name, value pane.Value) error {
 	return cmd.Exec()
 }
 
+// Select is responsible for selecting the current pane.
 func (p Pane) Select() error {
 	cmd, err := NewCommand(p.Window.Session.Client, "selectp", "-t", p.Target())
 	if err != nil {

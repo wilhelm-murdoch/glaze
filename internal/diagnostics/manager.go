@@ -12,23 +12,28 @@ type DiagnosticsManager struct {
 	DiagnosticWriter hcl.DiagnosticWriter
 }
 
+// Write is responsible for writing the diagnostics to the DiagnosticWriter.
 func (dm *DiagnosticsManager) Write() error {
 	return dm.DiagnosticWriter.WriteDiagnostics(dm.Diagnostics)
 }
 
+// Extend is responsible for extending the existing diagnostics with new ones.
 func (dm *DiagnosticsManager) Extend(diags hcl.Diagnostics) hcl.Diagnostics {
 	dm.Diagnostics = dm.Diagnostics.Extend(diags)
 	return dm.Diagnostics
 }
 
+// Append is responsible for appending a single diagnostic to the existing ones.
 func (dm *DiagnosticsManager) Append(diag *hcl.Diagnostic) hcl.Diagnostics {
 	return dm.Diagnostics.Append(diag)
 }
 
+// HasErrors is responsible for checking if there are any errors in the diagnostics.
 func (dm *DiagnosticsManager) HasErrors() bool {
 	return dm.Diagnostics.HasErrors()
 }
 
+// NewDiagnosticsManager is responsible for creating a new DiagnosticsManager instance.
 func NewDiagnosticsManager(filePath string) *DiagnosticsManager {
 	parser := hclparse.NewParser()
 	file, diags := parser.ParseHCLFile(filePath)

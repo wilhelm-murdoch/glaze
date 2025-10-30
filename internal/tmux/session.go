@@ -12,6 +12,7 @@ import (
 
 type SessionId int
 
+// String is responsible for returning the string representation of the SessionId.
 func (id SessionId) String() string {
 	return fmt.Sprintf("$%d", int(id))
 }

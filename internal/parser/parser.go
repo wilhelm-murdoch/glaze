@@ -13,6 +13,7 @@ type Parser struct {
 	parser *hclparse.Parser
 }
 
+// Decode is responsible for decoding the HCL file into a session.Session object.
 func (p *Parser) Decode(
 	spec hcldec.Spec,
 	ctx *hcl.EvalContext,
@@ -38,6 +39,7 @@ func (p *Parser) Decode(
 	return session, diags
 }
 
+// NewParser is responsible for creating a new Parser instance and parsing the HCL file.
 func NewParser(path string) (*Parser, hcl.Diagnostics) {
 	parser := hclparse.NewParser()
 	file, diags := parser.ParseHCLFile(path)

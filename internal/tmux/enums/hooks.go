@@ -82,6 +82,7 @@ var HookList = []string{
 	HookWindowUnlinkedString,
 }
 
+// String is responsible for returning the string representation of a Hook.
 func (h Hook) String() string {
 	switch h {
 	case HookAlertActivity:
@@ -135,6 +136,7 @@ func (h Hook) String() string {
 	return HookUnknownString
 }
 
+// HookFromString is responsible for converting a string to a Hook enum.
 func HookFromString(s string) Hook {
 	switch s {
 	case HookAlertActivityString:

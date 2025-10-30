@@ -16,6 +16,7 @@ type BaseAction struct {
 	ProfilePath        string
 }
 
+// NewBaseAction is responsible for creating a new BaseAction instance, resolving the profile path, and initializing the diagnostics manager and parser.
 func NewBaseAction(ctx *cli.Context) (*BaseAction, error) {
 	profilePath, err := profile.ResolveProfilePath(ctx.Args().First())
 	if err != nil {
@@ -42,6 +43,7 @@ func NewBaseAction(ctx *cli.Context) (*BaseAction, error) {
 	}, nil
 }
 
+// Run is responsible for executing the base action, which is not yet implemented and returns an error.
 func (ba *BaseAction) Run() error {
 	return ge.ErrorNotYetImplemented
 }

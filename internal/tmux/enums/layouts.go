@@ -28,6 +28,7 @@ var LayoutList = []string{
 	LayoutTiledString,
 }
 
+// String is responsible for returning the string representation of a Layout.
 func (l Layout) String() string {
 	switch l {
 	case LayoutEvenHorizontal:
@@ -45,6 +46,7 @@ func (l Layout) String() string {
 	return LayoutUnknownString
 }
 
+// LayoutFromString is responsible for converting a string to a Layout enum.
 func LayoutFromString(s string) Layout {
 	switch s {
 	case LayoutEvenHorizontalString:

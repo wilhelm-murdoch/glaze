@@ -4,7 +4,6 @@ import (
 	"os"
 
 	"github.com/hashicorp/hcl/v2"
-	"github.com/wilhelm-murdoch/go-collection"
 	"github.com/zclconf/go-cty/cty"
 
 	"github.com/wilhelm-murdoch/glaze/internal/schema/window"
@@ -12,14 +11,7 @@ import (
 
 const DefaultGlazeSesssionName = "default"
 
-type Session struct {
-	Name              Name
-	StartingDirectory Directory
-	Envs              Envs
-	Windows           collection.Collection[*window.Window]
-	Commands          Commands
-}
-
+// Decode is responsible for decoding a cty.Value into a Session struct.
 func (s *Session) Decode(value cty.Value) hcl.Diagnostics {
 	var diags hcl.Diagnostics
 

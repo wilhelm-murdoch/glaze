@@ -10,6 +10,7 @@ import (
 
 const DefaultGlazePaneName = "default"
 
+// Decode is responsible for decoding a cty.Value into a Pane struct.
 func (p *Pane) Decode(value cty.Value) hcl.Diagnostics {
 	var diags hcl.Diagnostics
 

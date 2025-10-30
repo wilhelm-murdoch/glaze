@@ -10,6 +10,7 @@ type Action struct {
 	actions.BaseAction
 }
 
+// NewAction is responsible for creating a new Action instance for the save command.
 func NewAction(ctx *cli.Context) (*Action, error) {
 	base, err := actions.NewBaseAction(ctx)
 	if err != nil {

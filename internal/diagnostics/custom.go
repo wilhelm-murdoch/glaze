@@ -14,6 +14,7 @@ import (
 	"github.com/wilhelm-murdoch/glaze/pkg/files"
 )
 
+// ContainsDiagnostic is responsible for checking if a value is present in a given list and returning a diagnostic if not.
 func ContainsDiagnostic(field string, value cty.Value, list []string) hcl.Diagnostics {
 	var out hcl.Diagnostics
 
@@ -33,6 +34,7 @@ func ContainsDiagnostic(field string, value cty.Value, list []string) hcl.Diagno
 	return out
 }
 
+// DirectoryDiagnostic is responsible for checking if a given value is a valid directory and returning a diagnostic if not.
 func DirectoryDiagnostic(field string, value cty.Value) hcl.Diagnostics {
 	var out hcl.Diagnostics
 
@@ -54,6 +56,7 @@ func DirectoryDiagnostic(field string, value cty.Value) hcl.Diagnostics {
 	return out
 }
 
+// FileDiagnostic is responsible for checking if a given value is a valid file and returning a diagnostic if not.
 func FileDiagnostic(field string, value cty.Value) hcl.Diagnostics {
 	var out hcl.Diagnostics
 
@@ -75,6 +78,7 @@ func FileDiagnostic(field string, value cty.Value) hcl.Diagnostics {
 	return out
 }
 
+// WrongAttributeDiagnostic is responsible for returning a diagnostic for an incorrect attribute value.
 func WrongAttributeDiagnostic(field, have, want string) hcl.Diagnostic {
 	return hcl.Diagnostic{
 		Severity: hcl.DiagError,
